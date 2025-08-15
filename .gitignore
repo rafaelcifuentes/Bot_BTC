@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+reports/*
+!reports/semaforo.csv
+registry_runs.csv
