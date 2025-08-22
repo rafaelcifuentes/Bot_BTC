@@ -1,0 +1,19 @@
+name: diamante_day3_selection
+timestamp: 2025-08-22T01:56:34.745962Z
+gates:
+  pf_min: 1.6
+  wr_min: 0.6
+  trades_min: 30
+source_files:
+  - reports/val_Q4_p5050.csv
+  - reports/val_2024H1_p5050.csv
+winners:
+
+near_miss:
+  asset: BTC-USD
+  horizon: 90
+  threshold: 0.66
+  from:
+    threshold: 0.64
+    bump: 0.02
+  note: near-miss Q4 (aplicar mismo H/TH en 2024H1)
