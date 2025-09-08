@@ -1,0 +1,44 @@
+SHELL := /bin/bash
+.ONESHELL:
+
+REGISTRY := registry_runs.csv
+PYRUN := $(if $(BOTBTC_PY),$(BOTBTC_PY),python)
+
+.PHONY: register-sentexp semaforo default
+default: semaforo
+
+register-sentexp:
+	@mkdir -p reports
+	@touch $(REGISTRY)
+	@$(PYRUN) - <<'PY'
+import os, glob, sys, os.path as _p
+from datetime import datetime, timezone
+
+def now():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+paths = sorted(
+    glob.glob("reports/summary_rf_sentiment_EXP_*.json"),
+    key=os.path.getmtime, reverse=True
+)
+
+if len(paths) < 2:
+    sys.exit("⚠️ No hay suficientes summaries de SentimentEXP en reports/")
+
+live, freeze = paths[0], paths[1]
+
+def wf(p):
+    base = os.path.basename(p)
+    return _p.join("reports", base.replace("summary_", "walkforward_").replace(".json",".csv"))
+
+with open("registry_runs.csv","a") as f:
+    f.write(f"{now()},SentimentEXP,freeze,{freeze},{wf(freeze)}\n")
+    f.write(f"{now()},SentimentEXP,live,  {live},{wf(live)}\n")
+
+print("✅ Registradas SentimentEXP (freeze & live) en registry_runs.csv")
+PY
+	@tail -n 6 $(REGISTRY) || true
+
+semaforo:
+	@$(PYRUN) scripts/semaforo.py
+	@echo "👉 Abre reports/semaforo.csv"

@@ -1,0 +1,13 @@
+name: diamante_day3
+timestamp: 2025-08-22T01:55:26.301126Z
+gates:
+  pf_min: 1.6
+  wr_min: 0.6
+  trades_min: 30
+env:
+
+candidate:
+  asset: BTC-USD
+  horizon: null
+  threshold: null
+  note: near-miss bumped +0.02 desde Q4 si aplica

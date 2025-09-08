@@ -1,0 +1,19 @@
+{
+  "wL": 0.45,
+  "wS": 0.65,
+  "_meta": {
+    "note": "weights autolocked by weekly v2 (hybrid rule)",
+    "cap_mode": "min_leg*1.05",
+    "net_tol": 0.2,
+    "ts": "2025-09-06T16:40:44.614601+00:00",
+    "sources": [
+      "binance: empty",
+      "binanceus: ok",
+      "kraken: ok",
+      "bybit: empty",
+      "kucoin: ok",
+      "okx: ok",
+      "yfinance: empty"
+    ]
+  }
+}

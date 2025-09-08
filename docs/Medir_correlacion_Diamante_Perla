@@ -1,0 +1,43 @@
+CHeck de correlación + gate de cartera
+
+1. la combinación con Perla Negra (más constante y con correlación baja/negativa) + el semáforo de Corazón debería elevar el PF de cartera y, sobre todo, aplanar drawdowns. Intuición rápida:
+	•	Diamante (t=0.58 en Aug-05) trae PF≈3.0 con 36 trades → edge fuerte pero oportunista.
+	•	Perla aporta time-in-market y estabilidad; si su PF neto >1 y la correlación de PnL con Diamante es baja/negativa, al combinar disminuyes la superposición de pérdidas → sube el PF de cartera y baja MDD.
+	•	Corazón (semaforo/reglas) evita encender pesos cuando el perfil riesgo-retorno se deteriora, preservando el PF compuesto.
+
+Nota realista: no es una garantía; el PF de cartera depende de wL/wS, costes y covarianza de PnLs. Pero con dos edges >1 y correlación baja, es habitual ver PF_port > PF_individual_más_bajo y MDD_port < MDD_individual_promedio.
+
+2.	Gate de correlación vs Perla: --perla_csv + --max_corr
+	•	Objetivo: medir y limitar la correlación efectiva entre la exposición/posiciones de Diamante y la serie binaria/posiciones de Perla en la ventana OOS.
+	•	Efecto: si corr_perla > --max_corr, descarta esa config (evita “duplicar” riesgo).
+	•	Salida: los CSV (val_* o winners_*) incluyen una columna corr_perla.
+Especificación mínima del CSV de Perla (--perla_csv)
+	•	Debe cubrir la misma ventana temporal de validación.
+	•	Columnas aceptadas (al menos una):
+	•	ts (ISO 8601 o epoch), más una de:
+	•	pos en {−1, 0, +1} o {0, 1}
+	•	signal en {0, 1}
+	•	El script alinea por timestamp y calcula Pearson sobre las intersecciones válidas.
+
+Cómo confirmarlo sin salirnos del plan :
+No vamos a tocar Diamante ahora. Solo medimos (cuando toque Perla según el Plan Macro):
+	1.	Alinea ventanas (freezes) de Perla y Diamante.
+	2.	Calcula correlación rolling de PnL_4h (o de posición binaria + signo de retorno) entre Perla y Diamante; mira la mediana y los percentiles 25/75.
+	3.	Corre el conflict-guard semanal (Perla V2) para obtener wL/wS con tu regla híbrida.
+	4.	Evalúa PF_60d, WR_60d, MDD_60d del portafolio (usando esos pesos).
+	5.	Gate de cartera (idéntico espíritu al de sistema):
+	•	✅ PF_60d ≥ 1.5, WR_60d ≥ 60%, MDD_60d ≤ 1.1× baseline, y trades combinados ≥ 40–50 (suma efectiva).
+	•	⚠️ Si falla, baja max_corr o reduce peso al leg más “pegado”.
+
+Señales a vigilar (para decidir w/ Corazón)
+	•	PF_port / MDD_port vs baseline.
+	•	Overlap de drawdowns (fracción de tiempo en que ambos sistemas están en DD > X%).
+	•	Corr(posiciones) y Corr(PnL): mantener |corr| ≤ 0.3–0.4 como guía.
+	•	Time-in-market y coste efectivo (si la suma de fills sube mucho, vigilar erosión de edge).
+
+Respuesta directa a tu duda
+	•	¿Menos trades en 0.60 con PF 2.43 es malo? No. Es un perfil más conservador.
+	•	¿Perla compensa? Sí, si su edge neto es >1 y su correlación con Diamante es baja/negativa, compensa la intermitencia de Diamante y estabiliza.
+	•	¿PF final >1.5? Con los números que ya vimos (PF≈3.0 de Diamante en las ventanas recientes) y una Perla decente, es plausible superar 1.5 a nivel cartera, sobre todo cuando el semáforo de Corazón regula pesos y MDD. Lo validaremos en la fase Perla (según tu plan: V2 con autolock/semáforo y evaluación 4–8 semanas).
+
+Si quieres, cuando toque el turno de Perla, te dejo listo el check de correlación + gate de cartera para correrlo “plug-and-play” con --perla_csv y --max_corr, sin tocar la lógica de Diamante.

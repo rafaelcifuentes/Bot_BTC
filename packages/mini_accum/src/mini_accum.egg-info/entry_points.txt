@@ -1,0 +1,2 @@
+[console_scripts]
+mini-accum-backtest = mini_accum.cli:main

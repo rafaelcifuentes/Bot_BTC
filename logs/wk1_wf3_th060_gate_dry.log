@@ -1,0 +1,63 @@
+[2025-08-19 18:57:00.607150Z] RUN start | mode=dry | exch=binanceus | THRESH=0.6 | K=3 | H=60
+[2025-08-19 18:57:00.607973Z] assets=['BTC-USD', 'ETH-USD'] | weights={'BTC-USD': 0.7, 'ETH-USD': 0.3} | stops={'BTC-USD': 0.015, 'ETH-USD': 0.03} | capital=10000.0 | risk=0.0075
+[2025-08-19 18:57:00.608044Z] signals=['reports/diamante_signal_BTC_gate.csv', 'reports/diamante_signal_ETH_gate.csv']
+[2025-08-19 18:57:00.624130Z] WARN BTC-USD | sin entry price en CSV (y sin mercado live) → SKIP
+[2025-08-19 18:57:00.626253Z] WARN ETH-USD | sin entry price en CSV (y sin mercado live) → SKIP
+[2025-08-19 18:57:00.626361Z] RUN end | placed=0 | evaluated=0
+[2025-08-19 18:57:43.033343Z] RUN start | mode=dry | exch=binanceus | THRESH=0.6 | K=3 | H=60
+[2025-08-19 18:57:43.034120Z] assets=['BTC-USD', 'ETH-USD'] | weights={'BTC-USD': 0.7, 'ETH-USD': 0.3} | stops={'BTC-USD': 0.015, 'ETH-USD': 0.03} | capital=10000.0 | risk=0.0075
+[2025-08-19 18:57:43.034197Z] signals=['reports/diamante_signal_BTC_gate.csv', 'reports/diamante_signal_ETH_gate.csv']
+[2025-08-19 18:57:43.038665Z] WARN BTC-USD | sin entry price en CSV (y sin mercado live) → SKIP
+[2025-08-19 18:57:43.039894Z] WARN ETH-USD | sin entry price en CSV (y sin mercado live) → SKIP
+[2025-08-19 18:57:43.039965Z] RUN end | placed=0 | evaluated=0
+[2025-08-19 18:58:04.258117Z] RUN start | mode=dry | exch=binanceus | THRESH=0.6 | K=3 | H=60
+[2025-08-19 18:58:04.258873Z] assets=['BTC-USD', 'ETH-USD'] | weights={'BTC-USD': 0.7, 'ETH-USD': 0.3} | stops={'BTC-USD': 0.015, 'ETH-USD': 0.03} | capital=10000.0 | risk=0.0075
+[2025-08-19 18:58:04.258945Z] signals=['reports/diamante_signal_BTC_gate.csv', 'reports/diamante_signal_ETH_gate.csv']
+[2025-08-19 18:58:04.266731Z] WARN BTC-USD | sin entry price en CSV (y sin mercado live) → SKIP
+[2025-08-19 18:58:04.267743Z] WARN ETH-USD | sin entry price en CSV (y sin mercado live) → SKIP
+[2025-08-19 18:58:04.267800Z] RUN end | placed=0 | evaluated=0
+[2025-08-19 19:03:31.227486Z] RUN start | mode=dry | exch=binanceus | THRESH=0.6 | K=3 | H=60
+[2025-08-19 19:03:31.227921Z] assets=['BTC-USD', 'ETH-USD'] | weights={'BTC-USD': 0.7, 'ETH-USD': 0.3} | stops={'BTC-USD': 0.015, 'ETH-USD': 0.03} | capital=10000.0 | risk=0.0075
+[2025-08-19 19:03:31.227981Z] signals=['reports/diamante_signal_BTC_gate.csv', 'reports/diamante_signal_ETH_gate.csv']
+[2025-08-19 19:03:31.234716Z] BTC-USD ENTRY=113198.16500000 STOP=111500.19252500 TARGET1=114896.13747500 TARGET2=116594.10995000
+[2025-08-19 19:03:31.234799Z] BTC-USD SIZE(units)=0.03091923 NOTIONAL(usd)=3500.00 RISK=0.0075 WEIGHT=0.70 PROBA=1.0
+[2025-08-19 19:03:31.235746Z] ETH-USD ENTRY=4133.61000000 STOP=4009.60170000 TARGET1=4257.61830000 TARGET2=4381.62660000
+[2025-08-19 19:03:31.235796Z] ETH-USD SIZE(units)=0.18143947 NOTIONAL(usd)=750.00 RISK=0.0075 WEIGHT=0.30 PROBA=1.0
+{"summary": [{"ts": "2025-08-19 19:03:31.234845Z", "mode": "dry", "asset": "BTC-USD", "exchange": "binanceus", "symbol": "BTC/USD", "entry": 113198.165, "stop": 111500.19252499999, "tp1": 114896.137475, "tp2": 116594.10995, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.7, "risk": 0.0075, "max_loss": 52.5, "units": 0.030919229123546263, "notional": 3499.999999999995, "order": {}, "csv": "reports/diamante_signal_BTC_gate.csv"}, {"ts": "2025-08-19 19:03:31.235836Z", "mode": "dry", "asset": "ETH-USD", "exchange": "binanceus", "symbol": "ETH/USD", "entry": 4133.610000000001, "stop": 4009.6017000000006, "tp1": 4257.6183, "tp2": 4381.6266000000005, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.3, "risk": 0.0075, "max_loss": 22.5, "units": 0.18143946816463097, "notional": 750.0000000000003, "order": {}, "csv": "reports/diamante_signal_ETH_gate.csv"}]}
+[2025-08-19 19:03:31.235913Z] RUN end | placed=0 | evaluated=2
+[2025-08-19 19:03:59.715926Z] RUN start | mode=dry | exch=binanceus | THRESH=0.6 | K=3 | H=60
+[2025-08-19 19:03:59.716356Z] assets=['BTC-USD', 'ETH-USD'] | weights={'BTC-USD': 0.7, 'ETH-USD': 0.3} | stops={'BTC-USD': 0.015, 'ETH-USD': 0.03} | capital=10000.0 | risk=0.0075
+[2025-08-19 19:03:59.716425Z] signals=['reports/diamante_signal_BTC_gate.csv', 'reports/diamante_signal_ETH_gate.csv']
+[2025-08-19 19:03:59.718684Z] BTC-USD ENTRY=113198.16500000 STOP=111500.19252500 TARGET1=114896.13747500 TARGET2=116594.10995000
+[2025-08-19 19:03:59.718751Z] BTC-USD SIZE(units)=0.03091923 NOTIONAL(usd)=3500.00 RISK=0.0075 WEIGHT=0.70 PROBA=1.0
+[2025-08-19 19:03:59.719703Z] ETH-USD ENTRY=4133.61000000 STOP=4009.60170000 TARGET1=4257.61830000 TARGET2=4381.62660000
+[2025-08-19 19:03:59.719782Z] ETH-USD SIZE(units)=0.18143947 NOTIONAL(usd)=750.00 RISK=0.0075 WEIGHT=0.30 PROBA=1.0
+{"summary": [{"ts": "2025-08-19 19:03:59.718796Z", "mode": "dry", "asset": "BTC-USD", "exchange": "binanceus", "symbol": "BTC/USD", "entry": 113198.165, "stop": 111500.19252499999, "tp1": 114896.137475, "tp2": 116594.10995, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.7, "risk": 0.0075, "max_loss": 52.5, "units": 0.030919229123546263, "notional": 3499.999999999995, "order": {}, "csv": "reports/diamante_signal_BTC_gate.csv"}, {"ts": "2025-08-19 19:03:59.719837Z", "mode": "dry", "asset": "ETH-USD", "exchange": "binanceus", "symbol": "ETH/USD", "entry": 4133.610000000001, "stop": 4009.6017000000006, "tp1": 4257.6183, "tp2": 4381.6266000000005, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.3, "risk": 0.0075, "max_loss": 22.5, "units": 0.18143946816463097, "notional": 750.0000000000003, "order": {}, "csv": "reports/diamante_signal_ETH_gate.csv"}]}
+[2025-08-19 19:03:59.719927Z] RUN end | placed=0 | evaluated=2
+[2025-08-19 19:11:44.658750Z] RUN start | mode=dry | exch=binanceus | THRESH=0.6 | K=3 | H=60
+[2025-08-19 19:11:44.659239Z] assets=['BTC-USD', 'ETH-USD'] | weights={'BTC-USD': 0.7, 'ETH-USD': 0.3} | stops={'BTC-USD': 0.015, 'ETH-USD': 0.03} | capital=10000.0 | risk=0.0075
+[2025-08-19 19:11:44.659302Z] signals=['reports/diamante_signal_BTC_gate.csv', 'reports/diamante_signal_ETH_gate.csv']
+[2025-08-19 19:11:44.665807Z] BTC-USD ENTRY=113198.16500000 STOP=111500.19252500 TARGET1=114896.13747500 TARGET2=116594.10995000
+[2025-08-19 19:11:44.665915Z] BTC-USD SIZE(units)=0.03091923 NOTIONAL(usd)=3500.00 RISK=0.0075 WEIGHT=0.70 PROBA=1.0
+[2025-08-19 19:11:44.667069Z] ETH-USD ENTRY=4133.61000000 STOP=4009.60170000 TARGET1=4257.61830000 TARGET2=4381.62660000
+[2025-08-19 19:11:44.667132Z] ETH-USD SIZE(units)=0.18143947 NOTIONAL(usd)=750.00 RISK=0.0075 WEIGHT=0.30 PROBA=1.0
+{"summary": [{"ts": "2025-08-19 19:11:44.665987Z", "mode": "dry", "asset": "BTC-USD", "exchange": "binanceus", "symbol": "BTC/USD", "entry": 113198.165, "stop": 111500.19252499999, "tp1": 114896.137475, "tp2": 116594.10995, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.7, "risk": 0.0075, "max_loss": 52.5, "units": 0.030919229123546263, "notional": 3499.999999999995, "order": {}, "csv": "reports/diamante_signal_BTC_gate.csv"}, {"ts": "2025-08-19 19:11:44.667180Z", "mode": "dry", "asset": "ETH-USD", "exchange": "binanceus", "symbol": "ETH/USD", "entry": 4133.610000000001, "stop": 4009.6017000000006, "tp1": 4257.6183, "tp2": 4381.6266000000005, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.3, "risk": 0.0075, "max_loss": 22.5, "units": 0.18143946816463097, "notional": 750.0000000000003, "order": {}, "csv": "reports/diamante_signal_ETH_gate.csv"}]}
+[2025-08-19 19:11:44.667263Z] RUN end | placed=0 | evaluated=2
+[2025-08-19 19:14:59.940306Z] RUN start | mode=dry | exch=binanceus | THRESH=0.6 | K=3 | H=60
+[2025-08-19 19:14:59.941046Z] assets=['BTC-USD', 'ETH-USD'] | weights={'BTC-USD': 0.7, 'ETH-USD': 0.3} | stops={'BTC-USD': 0.015, 'ETH-USD': 0.03} | capital=10000.0 | risk=0.0075
+[2025-08-19 19:14:59.941142Z] signals=['reports/diamante_signal_BTC_gate.csv', 'reports/diamante_signal_ETH_gate.csv']
+[2025-08-19 19:14:59.946634Z] BTC-USD ENTRY=113198.16500000 STOP=111500.19252500 TARGET1=114896.13747500 TARGET2=116594.10995000
+[2025-08-19 19:14:59.946712Z] BTC-USD SIZE(units)=0.03091923 NOTIONAL(usd)=3500.00 RISK=0.0075 WEIGHT=0.70 PROBA=1.0
+[2025-08-19 19:14:59.947785Z] ETH-USD ENTRY=4133.61000000 STOP=4009.60170000 TARGET1=4257.61830000 TARGET2=4381.62660000
+[2025-08-19 19:14:59.947887Z] ETH-USD SIZE(units)=0.18143947 NOTIONAL(usd)=750.00 RISK=0.0075 WEIGHT=0.30 PROBA=1.0
+{"summary": [{"ts": "2025-08-19 19:14:59.946760Z", "mode": "dry", "asset": "BTC-USD", "exchange": "binanceus", "symbol": "BTC/USD", "entry": 113198.165, "stop": 111500.19252499999, "tp1": 114896.137475, "tp2": 116594.10995, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.7, "risk": 0.0075, "max_loss": 52.5, "units": 0.030919229123546263, "notional": 3499.999999999995, "order": {}, "csv": "reports/diamante_signal_BTC_gate.csv"}, {"ts": "2025-08-19 19:14:59.947942Z", "mode": "dry", "asset": "ETH-USD", "exchange": "binanceus", "symbol": "ETH/USD", "entry": 4133.610000000001, "stop": 4009.6017000000006, "tp1": 4257.6183, "tp2": 4381.6266000000005, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.3, "risk": 0.0075, "max_loss": 22.5, "units": 0.18143946816463097, "notional": 750.0000000000003, "order": {}, "csv": "reports/diamante_signal_ETH_gate.csv"}]}
+[2025-08-19 19:14:59.948027Z] RUN end | placed=0 | evaluated=2
+[2025-08-19 19:21:59.573440Z] RUN start | mode=dry | exch=binanceus | THRESH=0.6 | K=3 | H=60
+[2025-08-19 19:21:59.573977Z] assets=['BTC-USD', 'ETH-USD'] | weights={'BTC-USD': 0.7, 'ETH-USD': 0.3} | stops={'BTC-USD': 0.015, 'ETH-USD': 0.03} | capital=10000.0 | risk=0.0075
+[2025-08-19 19:21:59.574045Z] signals=['reports/diamante_signal_BTC_gate.csv', 'reports/diamante_signal_ETH_gate.csv']
+[2025-08-19 19:21:59.581101Z] BTC-USD ENTRY=113198.16500000 STOP=111500.19252500 TARGET1=114896.13747500 TARGET2=116594.10995000
+[2025-08-19 19:21:59.581202Z] BTC-USD SIZE(units)=0.03091923 NOTIONAL(usd)=3500.00 RISK=0.0075 WEIGHT=0.70 PROBA=1.0
+[2025-08-19 19:21:59.582264Z] ETH-USD ENTRY=4133.61000000 STOP=4009.60170000 TARGET1=4257.61830000 TARGET2=4381.62660000
+[2025-08-19 19:21:59.582333Z] ETH-USD SIZE(units)=0.18143947 NOTIONAL(usd)=750.00 RISK=0.0075 WEIGHT=0.30 PROBA=1.0
+{"summary": [{"ts": "2025-08-19 19:21:59.581254Z", "mode": "dry", "asset": "BTC-USD", "exchange": "binanceus", "symbol": "BTC/USD", "entry": 113198.165, "stop": 111500.19252499999, "tp1": 114896.137475, "tp2": 116594.10995, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.7, "risk": 0.0075, "max_loss": 52.5, "units": 0.030919229123546263, "notional": 3499.999999999995, "order": {}, "csv": "reports/diamante_signal_BTC_gate.csv"}, {"ts": "2025-08-19 19:21:59.582383Z", "mode": "dry", "asset": "ETH-USD", "exchange": "binanceus", "symbol": "ETH/USD", "entry": 4133.610000000001, "stop": 4009.6017000000006, "tp1": 4257.6183, "tp2": 4381.6266000000005, "proba": 1.0, "threshold": 0.6, "walk_k": 3, "horizon": 60, "weight": 0.3, "risk": 0.0075, "max_loss": 22.5, "units": 0.18143946816463097, "notional": 750.0000000000003, "order": {}, "csv": "reports/diamante_signal_ETH_gate.csv"}]}
+[2025-08-19 19:21:59.582469Z] RUN end | placed=0 | evaluated=2

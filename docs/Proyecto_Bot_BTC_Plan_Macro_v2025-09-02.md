@@ -8,7 +8,7 @@
 ## 0) Foto actual (corte 2025-09-02)
 - **Allocator (CEREBRO):** ✅ congelado con el perfil estable; `tests_overlay_check.py` alinea NET con la curva (Diff≈0).
 - **Corazón (semáforo):** ✅ saneado; listo para operar **en sombra** o activarse cuando Perla quede validada OOS.
-- **Perla (ojo de mercado):** ✅ edge utilizable. En pruebas recientes (Donchian 40/10, `longflat`), NET overlay de +2.09% con costes (12 bps) y turnover ≈27.2. En configuraciones anteriores (“Opción A”), con otra ventana/config, llegó a +16.3% — se mantiene como referencia, no como baseline.
+- **Perla (ojo de mercado):** ✅ edge utilizable. En pruebas recientes (Donchian 40/10, `longflat`), NET overlay de +2.09% con costes (12 bps) y turnover ≈27.2. En configuraciones anteriores ("Opción A"), con otra ventana/config, llegó a +16.3% — se mantiene como referencia, no como baseline.
 - **Diamante (ojo de mercado):** ⚠️ prioridad de auditoría/mejora. Raw audit flojo; requiere rediseño/fine‑tuning antes de activar en mezcla.
 
 ---
@@ -18,7 +18,7 @@
 - **Modularidad y seguridad:** filtros **suaves** (no ON/OFF), **histéresis** y **dwell**; **freeze semanal** de ξ*; **circuit breakers**; **TTL** de señales; **cap** de exposición; **kill‑switch** de MDD/vol.
 - **BTC-numeraire:** el éxito se mide en **BTC**; evitar métricas/decisiones en USD.
 - **Reproducibilidad:** walk‑forward/holdout, mismo ENV, **costos realistas** (fee=6 bps, slip=6 bps), logs por capa (base→corr→rr→vol→signed).
-- **Gobernanza “selected” (Diamante):** `configs/diamante_selected.yaml` solo cambia si el candidato supera **gate + no‑regresión** (4–6 semanas OOS con costes), y con snapshot versionado.
+- **Gobernanza "selected" (Diamante):** `configs/diamante_selected.yaml` solo cambia si el candidato supera **gate + no‑regresión** (4–6 semanas OOS con costes), y con snapshot versionado.
 
 ---
 
@@ -94,7 +94,7 @@ Levantar caps y habilitar **ξ* > 1.0** si el overlay demostró menor MDD/vol de
 ## 7) Cadencia operativa (semana tipo)
 - **Lunes:** refrescar `xi_star.txt`; KPIs semana previa; sanity de frescura (TTL).
 - **Mar–Jue:** OOS/stress; validar corr‑gate; revisar costos/turnover; ajustes en `heart_rules.yaml` si aplica.
-- **Viernes:** snapshots “selected”, reportes de no‑regresión; Go/No‑Go.
+- **Viernes:** snapshots "selected", reportes de no‑regresión; Go/No‑Go.
 - **Cada 4h:** generar `corazon/weights.csv` y correr **Allocator en sombra**.
 
 ---

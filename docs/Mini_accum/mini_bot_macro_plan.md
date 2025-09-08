@@ -83,7 +83,7 @@
 
 ### **Fase C — Regímenes de volatilidad**
 - **ATR% p40** para habilitar Verde/Rojo; Amarillo ⇒ **PAUSA**.  
-- (Opcional) Hibernación por “chop”: ≥2 cruces 21/55 en 40 velas 4h.  
+- (Opcional) Hibernación por "chop": ≥2 cruces 21/55 en 40 velas 4h.  
 - Aceptar si **MDD↓ ≥10%** o **flips↓ ≥10%** con Net_BTC_ratio ≥ baseline − 0.5 pp.
 
 ### **Fase D — Micro-operativa (suavizado)**

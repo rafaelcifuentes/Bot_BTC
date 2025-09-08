@@ -1,0 +1,36 @@
+Macro-flujo de integración (capas)
+	1.	Estrategia individual (unit) → Diamante, luego Perla
+	•	Cerrar parámetros con OOS rolling + fricción realista.
+	•	Gates por estrategia: PF₆₀ ≥ 1.5, WR₆₀ ≥ 60%, Trades₆₀ ≥ 30, MDD ≤ 1.1× baseline, estabilidad vs freezes.
+	•	Congelar configs/*_selected.yaml + snapshot (reports/baseline/*.json) antes de pasar a la siguiente.
+	2.	Ensamble 2×2 (pairwise): Diamante ↔ Perla
+	•	Sin tocar lógica: sólo leer señales/posiciones y medir correlación efectiva (retornos y exposición).
+	•	Gates de diversificación:
+	•	|ρ(ret_1d)| ≤ 0.35 (target), 0.45 máximo.
+	•	Overlap de exposición ≤ 65% del tiempo.
+	•	MDD(Combo) ≤ max(MDD_D, MDD_P) × 1.05.
+	•	PF₆₀(Combo) ≥ max(PF_D, PF_P) − 0.05 y preferible ↑.
+	•	Si falla por “pegado”, aplicar gate de correlación (--perla_csv --max_corr) para mantener a Diamante francotirador/independiente.
+	3.	Capa de timing/riesgo (Corazón) como semáforo
+	•	No cambia las lógicas base; sólo gating (on/off, size↓) en entornos adversos.
+	•	Gate: si Corazón = rojo, tamaño ↓ o pausa parcial; si verde, normal.
+	•	Métrica de valor: reducción de MDD y menor varianza sin degradar PF (PF_adj ≥ 0.95×, MDD_adj ≤ 0.9×).
+	4.	Orquestador (Allocator / CEREBRO)
+	•	Optimiza pesos bajo reglas duras: cap de MDD, VaR/ES, riesgo por activo, y autolock semanal (Perla V2 style).
+	•	Regla híbrida (ya definida): adopta pesos sólo si Score↑, MDD ≤ cap, Net ≥ −20% del baseline.
+
+Por qué así
+	•	Evita confundir causas: primero certidumbre por estrategia; luego medimos diversificación real (no teórica) y, al final, sizing dinámico.
+	•	Mantiene auditabilidad: cada paso deja artefactos comparables (CSV/JSON/MD + YAML congelado).
+	•	Minimiza regresiones: nada de “afinar” señales mientras validamos ensemble/allocator.
+
+Checklist de salida por capa
+	•	Diamante/Perla (unit): PF/WR/Trades/MDD ok en mediana OOS; fricción stress ok; YAML congelado.
+	•	Pairwise: ρ, overlap, PF y MDD del combo según gates; si no, activar –max_corr y re-validar.
+	•	Corazón: evidencia de MDD↓ o varianza↓ sin PF↓ material.
+	•	Allocator: backtest forward-chaining con locks semanales → Score↑ y MDD dentro de cap; logs/versionado de pesos.
+
+Higiene de portafolio (siempre)
+	•	Stress de slip/fees y latencia; kill-switch por MDD semanal; riesgo por trade/bucket; bitácora reproducible.
+
+En resumen: sí, la integración y los tests de correlación deben ocurrir al final de cada etapa (primero Diamante, luego Perla) y antes de meter a Corazón; el Allocator va al final para ajustar pesos con reglas de riesgo. Con esto, el PF conjunto debería superar 1.5 de forma más estable, y el equity curve ser más suave, sin sacrificar la independencia de Diamante.

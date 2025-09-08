@@ -1,6 +1,6 @@
 docs/mini_accum_plan.md
 
-Mini‑BOT BTC (Acumulación) — Hilo de Arranque “a rajatabla”
+Mini‑BOT BTC (Acumulación) — Hilo de Arranque "a rajatabla"
 
 Contexto
 
@@ -32,8 +32,8 @@ KPIs de aceptación (congelados)
 
 Módulos opt‑in (solo si aportan en OOS)
 	1.	Regímenes ATR% (p40) → Verde/Rojo; Amarillo = Pausa.
-	2.	Hibernación por “chop” (≥2 cruces 21/55 en 40 velas 4h).
-	3.	Grace TTL (cooldown suave): exigir señal “fuerte” para revertir en 1 vela post‑flip.
+	2.	Hibernación por "chop" (≥2 cruces 21/55 en 40 velas 4h).
+	3.	Grace TTL (cooldown suave): exigir señal "fuerte" para revertir en 1 vela post‑flip.
 	4.	ATR‑adaptativo (2 niveles) y presupuesto de turnover semanal.
 
 Se activan solo si mejoran MDD/turnover sin romper Net_BTC_ratio ni el presupuesto de flips.
@@ -497,7 +497,7 @@ Mantra: simple, probado y auditable. Satoshi a satoshi, con disciplina de flips 
 
 ⸻
 
-Monorepo (PyCharm) — estructura “paquete aislado”
+Monorepo (PyCharm) — estructura "paquete aislado"
 
 Objetivo: mantener Mini‑BOT (mini_accum) como paquete extraíble y reusable dentro de un monorepo simple. Más adelante, si lo deseas, podrás añadir diamante/, perla_negra/, corazon/, cerebro/ como paquetes hermanos sin romper nada.
 

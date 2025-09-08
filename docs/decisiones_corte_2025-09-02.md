@@ -6,8 +6,26 @@
 2. **Runner+ oficial.** Usar `allocator_sombra_runner_plus.py` para leer `fee_bps/slip_bps` desde el YAML y emitir breakdown de costes/NET en cada corrida.
 3. **Perla → única pata activa de mezcla (Plan B)** hasta que Diamante pase gates. `signals/perla.csv` alimenta al Allocator (rejilla 4h; `longflat`).
 4. **Corazón en sombra.** Mantener semáforo, LQ y corr‑gate sólo como diagnóstico; activación real cuando Perla esté OOS‑ready y Diamante re‑aprobado.
-5. **Diamante en auditoría.** Se posterga cualquier cambio del “selected” hasta cumplir gates OOS con fricción (PF≥1.6, WR≥60%, ≥30 trades/fold, MDD≤8%).
+5. **Diamante en auditoría.** Se posterga cualquier cambio del "selected" hasta cumplir gates OOS con fricción (PF≥1.6, WR≥60%, ≥30 trades/fold, MDD≤8%).
 
+Decisiones tomadas (para pegar en decisiones.md)
+	•	Freeze del Allocator: mantenemos la implementación estable; los únicos knobs vienen del YAML (fees, throttle, vol-target, límites y suavizado).
+	•	Fees/slippage desde YAML: el breakdown y los KPIs toman fee_bps/slip_bps del YAML, evitando desalineaciones.
+	•	Perla:
+	•	Modo por defecto = longflat (reduce overtrading y costes frente a longshort).
+	•	Selección OOS por oos_net con perla_grid_oos.py y --freeze_end explícito.
+	•	signals/perla.csv es la fuente oficial para el Allocator (no tocamos retP_btc si ya tiene varianza).
+	•	Plan B (temporal): Perla sola en el Allocator (alloc_base.perla=1.0, alloc_base.diamante=0.0) mientras Diamante se audita.
+	•	Corazón:
+	•	Modo sombra (diagnóstico) semanal los Lunes, con corr_gate activado pero sin forzar cambios de mezcla hasta que Diamante valide.
+	•	Ritmo de pruebas:
+	•	Miércoles: pruebas semanales de Diamante y Perla (IS/OOS).
+	•	Lunes: evaluación de Corazón (pesos y correlaciones).
+
+Adendum fecha: 2025-09-04 (America/Toronto)
+Contexto: Pruebas semanalse OOS-Perla 
+Conclusión de las 4 semanas: la regla híbrida está haciendo justo lo que querías: prioriza riesgo-ajustado (score consistentemente más alto y MDD más bajo) y, 2 de 4 semanas, también mejora el Net. Muy bien.
+Perla (40/10, longflat) queda aceptada para esta semana por OOS OK y turnover sano.
 ## Hechos/KPIs recientes
 - **Plan B (Perla sola, fees+slip=12 bps):**  
   NET overlay **0.020884**; Gross 0.054750; Costes 0.032640; Turnover **27.2**; Cost share D/P = 0/100.  

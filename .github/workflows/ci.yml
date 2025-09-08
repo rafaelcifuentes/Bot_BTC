@@ -1,0 +1,24 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Install package
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -U pip
+          pip install -e packages/mini_accum
+          pip install pytest ruff
+      - name: Lint
+        run: |
+          source .venv/bin/activate
+          ruff check packages/mini_accum/src
+      - name: Tests
+        run: |
+          source .venv/bin/activate
+          pytest packages/mini_accum/tests -q

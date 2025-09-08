@@ -1,0 +1,18 @@
+{
+  "threshold": 0.46,
+  "adx4_min": 4,
+  "adx1d_min": 0,
+  "trend_mode": "slope_up",
+  "sl_atr_mul": 1.1,
+  "tp1_atr_mul": 1.6,
+  "tp2_atr_mul": 4.5,
+  "trail_mul": 0.8,
+  "partial_pct": 0.5,
+  "risk_perc": 0.007,
+  "_meta": {
+    "profile": "A",
+    "version": "v4.3",
+    "note": "pre-run snapshot (no lock change)",
+    "timestamp_utc": "2025-08-10T01:36:20.045000+00:00"
+  }
+}

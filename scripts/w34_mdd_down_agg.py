@@ -10,7 +10,7 @@ RAW_GLOBS = [
     "reports/w34_mdd_down/raw2/*.csv",   # preferido (tu última corrida)
     "reports/w34_mdd_down/raw/*.csv"     # fallback
 ]
-OUT_DIR = "reports/w34_mdd_down"
+OUT_DIR = "../reports/w34_mdd_down"
 
 # Gates/umbrales (mismos que venimos usando)
 CAP_MDD   = 0.0187     # 1.87%
@@ -185,6 +185,9 @@ def main():
             columns={"wr":"WR","trades":"trades","mdd":"MDD"}
         )
         dff_out.to_csv(f"{OUT_DIR}/confirm_by_freeze.csv", index=False)
+
+        # después de filtrar dff = df[(t,sl,tp1,p)]
+        dff = dff.drop_duplicates(subset=["freeze"]).sort_values("freeze")
 
         summ = pd.DataFrame([{
             "PF_med": dff["pf"].median(),

@@ -1,0 +1,186 @@
+# swing_4h_phase1.py
+# Fase 1 – Optimización de la Señal para Swing Trading 4 h con ML (RandomForest)
+# Versión “diamante negro” Long-Short que produjo Net Profit ≈ 23216.79
+
+import os
+import pandas as pd
+import numpy as np
+import pandas_ta as ta
+import yfinance as yf
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+import warnings
+
+warnings.filterwarnings("ignore")
+
+# --- Parámetros fijos de contexto ---
+FIXED = {
+    "ema100_len":    100,  # EMA de 100 periodos (4 h)
+    "adx_daily_len": 14    # ADX diario para contexto
+}
+
+# --- Parámetros para la señal (a afinar en Fase 1) ---
+SIGNAL_P = {
+    "ema_fast": 12,
+    "ema_slow": 26,
+    "rsi_len":  14,
+    "atr_len":  14,
+    "adx_len":  14
+}
+
+# Columnas que vamos a usar en el modelo
+FEATURES = ["ema_fast", "ema_slow", "rsi", "atr", "adx4h", "adx_daily"]
+
+
+def download_data():
+    """
+    Carga datos 4h de BTC-USD de los últimos 2 años.
+    Si existe csv local, lo usa; si no, descarga y guarda.
+    """
+    fname = "btc_4h.csv"
+    if os.path.exists(fname):
+        df = pd.read_csv(fname, index_col=0, parse_dates=True)
+        df.index = df.index.tz_localize(None)
+    else:
+        df = yf.download("BTC-USD", period="730d", interval="4h", progress=False)
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        df.to_csv(fname)
+    df = df.loc[:, ~df.columns.duplicated()]
+    df.columns = df.columns.str.lower()
+    return df.dropna().sort_index()
+
+
+def add_features(df):
+    """
+    Añade indicadores técnicos:
+      • EMA (rápida y lenta)
+      • RSI
+      • ATR
+      • ADX intradía (robusto)
+      • ADX diario (contexto)
+    """
+    df = df.copy()
+    # EMAs
+    df["ema_fast"] = ta.ema(df["close"], length=SIGNAL_P["ema_fast"])
+    df["ema_slow"] = ta.ema(df["close"], length=SIGNAL_P["ema_slow"])
+    # RSI y ATR
+    df["rsi"] = ta.rsi(df["close"], length=SIGNAL_P["rsi_len"])
+    df["atr"] = ta.atr(df["high"], df["low"], df["close"], length=SIGNAL_P["atr_len"])
+    # ADX intradía
+    adx4h = ta.adx(df["high"], df["low"], df["close"], length=SIGNAL_P["adx_len"])
+    adx4h_cols = [c for c in adx4h.columns if "adx" in c.lower()]
+    df["adx4h"] = adx4h[adx4h_cols[0]] if adx4h_cols else np.nan
+
+    # ADX diario para contexto
+    dfd = yf.download("BTC-USD", period="400d", interval="1d", progress=False)
+    if isinstance(dfd.columns, pd.MultiIndex):
+        dfd.columns = dfd.columns.get_level_values(0)
+    dfd.columns = dfd.columns.str.lower()
+    adx_d = ta.adx(dfd["high"], dfd["low"], dfd["close"], length=FIXED["adx_daily_len"])
+    adx_d_cols = [c for c in adx_d.columns if "adx" in c.lower()]
+    if adx_d_cols:
+        dfd["adx_daily"] = adx_d[adx_d_cols[0]]
+        df["adx_daily"] = dfd["adx_daily"].reindex(df.index, method="ffill")
+    else:
+        df["adx_daily"] = np.nan
+
+    return df.dropna()
+
+
+def make_target(df):
+    """
+    Crea 'target' binario:
+      1 si close en 6 velas > close actual * 1.03,
+     -1 si close en 6 velas < close * 0.97,
+      0 en cualquier otro caso.
+    """
+    df = df.copy()
+    df["target"] = np.where(
+        df["close"].shift(-6) > df["close"] * 1.03, 1,
+        np.where(df["close"].shift(-6) < df["close"] * 0.97, -1, 0)
+    )
+    return df.dropna()
+
+
+def train_and_tune(X, y):
+    """
+    Ajusta RandomForest con GridSearchCV sobre 3 splits time-series.
+    """
+    pipe = Pipeline([
+        ("scaler", StandardScaler()),
+        ("rf", RandomForestClassifier(random_state=42, class_weight="balanced"))
+    ])
+    param_grid = {
+        "rf__n_estimators":      [50, 100],
+        "rf__max_depth":         [5, 10],
+        "rf__min_samples_split":[2, 5]
+    }
+    tscv = TimeSeriesSplit(n_splits=3)
+    grid = GridSearchCV(pipe, param_grid, cv=tscv, scoring="accuracy", n_jobs=-1, verbose=1)
+    grid.fit(X, y)
+    print("Mejores parámetros RF:", grid.best_params_)
+    return grid.best_estimator_
+
+
+def backtest_threshold(df, model, thresholds=(0.55, 0.60, 0.65, 0.70)):
+    """
+    Testea distintos umbrales de probabilidad long/short.
+    Incluye lógicos de apertura long y short para no degradar la performance.
+    """
+    X = df[FEATURES]
+    probs = model.predict_proba(X)
+    df = df.copy()
+    # índice clases: -1, 0, +1
+    idx_up   = np.where(model.classes_ == 1)[0][0]
+    idx_down = np.where(model.classes_ == -1)[0][0]
+
+    df["prob_up"]   = probs[:, idx_up]
+    df["prob_down"] = probs[:, idx_down]
+
+    results = []
+    for thr in thresholds:
+        trades = []
+        for _, r in df.iterrows():
+            # long
+            if r["prob_up"] > thr and r["close"] > r["ema_slow"]:
+                pnl = (r["close"] - r["open"]) - r["close"] * 0.0002
+                trades.append(pnl)
+            # short
+            elif r["prob_down"] > thr and r["close"] < r["ema_slow"]:
+                pnl = (r["open"] - r["close"]) - r["close"] * 0.0002
+                trades.append(pnl)
+
+        arr = np.array(trades)
+        net = arr.sum() if arr.size else 0.0
+        pf  = arr[arr>0].sum() / abs(arr[arr<0].sum()) if arr.size and arr[arr<0].size else np.nan
+        wr  = len(arr[arr>0]) / len(arr) * 100 if arr.size else 0.0
+
+        results.append({
+            "threshold":     thr,
+            "trades":        len(arr),
+            "win_rate":      wr,
+            "net_profit":    net,
+            "profit_factor": pf
+        })
+
+    return pd.DataFrame(results).sort_values("net_profit", ascending=False)
+
+
+def main():
+    df0 = download_data()
+    df1 = add_features(df0)
+    df2 = make_target(df1)
+
+    X, y = df2[FEATURES], df2["target"]
+    model = train_and_tune(X, y)
+
+    print("\n=== Threshold Tuning Swing 4H (RF) ===")
+    df_tune = backtest_threshold(df2, model)
+    print(df_tune.to_string(index=False))
+
+
+if __name__ == "__main__":
+    main()

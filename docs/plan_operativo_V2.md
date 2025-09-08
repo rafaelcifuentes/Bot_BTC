@@ -1,4 +1,30 @@
 Plan operativo (6+2 semanas) — Diamante primero, Corazón después
+Guardrails OOS — BTC (horizonte 60d)
+
+Baseline de referencia (W1·D4, costes duros):
+	•	MDD_base_60d ≈ 1.70% (slip=0.0002, cost=0.0004, features shift(1))
+
+Gate principal (mediana sobre freezes OOS):
+	•	PF_med ≥ 1.50
+	•	WR_med ≥ 60%
+	•	Trades_med ≥ 30
+
+Drawdown cap dinámico (protección de capital):
+	•	MDD_med ≤ 1.10 × MDD_base_60d → hoy: ≤ ~1.87%
+
+Robustez de colas (consistencia):
+	•	PF_min ≥ 1.30 (ningún freeze debe caer por debajo de 1.30)
+
+Stress de fricción (slip↑, fee↑):
+	•	En ≥60% de casos comparables:
+	•	PF_stress / PF_base ≥ 0.90
+	•	MDD_stress / MDD_base ≤ 1.20
+
+Notas operativas:
+	•	No cambiar lógica durante W2–W4; sólo validar y ajustar parámetros si hiciera falta para cumplir MDD cap.
+	•	Documentar FAILs por mediana o por colas; revisar en días de stress antes de cualquier ajuste.
+	•	Cierre de umbral (0.58 vs 0.60) sólo si se cumplen todos los guardrails.
+
 
 Actualización Semanas 3–6 (OOS rolling, guardrails y Decisión)
 
@@ -15,7 +41,7 @@ Ejemplo de YAML
 yaml
 # configs/diamante_selected.yaml
 horizon: 90
-threshold: 0.66
+threshold: 0.58 #0.66
 partial: "50_50"
 fee_bps: 6
 slip_bps: 6
@@ -37,6 +63,16 @@ Especificación mínima del CSV de Perla (--perla_csv)
 ⸻
 
 Semanas 3–4 — OOS rolling & guardrails (con integración de piezas)
+Mini-plan inmediato (W3–W4 con loader) comenzando hoy lunes D1-W3
+	•	Base OOS (mensual encadenado, multi-años) con T∈{0.58,0.60}, costes fijos (0.0002/0.0004), sin tocar lógica.
+	•	Dos variantes de ejecución para controlar MDD en portafolio:
+	•	VAR A (base): --partial none (tal cual) → sirve de control.
+	•	VAR B (guardrail): --partial 50_50 --breakeven_after_tp1 --risk_total_pct 0.60 → esperable bajar MDD_med ≈15–30% con PF_med ~−5–10%.
+	•	Si Perla está lista en W4, repite VAR B con --max_corr 0.35.
+
+Gates de esta etapa (portafolio):
+	•	Base (A): registro y comparación vs W2; no exigente.
+	•	Guardrail (B): PF_med ≥ 1.30 y MDD_med ≤ 1.87% en ≥60% de ventanas; si pasa, queda como setup operativo para el cierre de W4 (sin cambiar YAML de Diamante).
 
 Objetivo: validar out-of-sample encadenado, con guardrails de costes/régimen y, si ya hay serie de Perla disponible, aplicar gate de correlación para filtrar configs “pegadas”.
 
@@ -89,7 +125,17 @@ E. Entregables Semanas 3–4:
 	•	reports/winners_wf.csv (finalistas tras gates + correlación).
 	•	Bitácora semanal de parámetros cargados por loader (log).
 
+Un mini “tick list” para pegar en tu plan_operativo.md:
+	•	Correr forward-chaining con vecinos robustos (T=0.60/SL1.25/TP1=0.65/P0.80 y T=0.58/SL1.25/TP1=0.70/P0.80).
+	•	Actualizar reports/w34_neighbors/summary_by_freeze.csv y decision.md.
+	•	Generar reports/w34_oos_btc/decision.md con snapshot de la semana.
+	•	No tocar YAML definitivo hasta cumplir 3 freezes seguidos + stress OK.
 ⸻
+# Nota operativa — WF 4y (mensual)
+- Gate lite (PF/WR/Trades): t=0.60 pasa; t=0.58 no.
+- Gate estricto (añadiendo MDD cap ~1.87% y pf_min≥1.30): ninguno “blindado”.
+- Acción: seguimos con t=0.58 como vigente; t=0.60 queda como candidato long-horizon para W3–W4.
+- Cierre W4: decidir T definitivo con OOS rolling + stress + (si disponible) correlación con Perla.
 
 Semanas 4–6 — Decisión (paper readiness)
 
