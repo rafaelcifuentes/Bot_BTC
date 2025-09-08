@@ -1,202 +1,171 @@
 #!/usr/bin/env python3
+# corazon_auto.py — corre presets (ALL y LONG_V2), extrae métricas y agrega fila a un CSV diario.
+
+import argparse
 import os
 import sys
-import argparse
 import subprocess
-from datetime import datetime, timezone
+from datetime import datetime
+from pathlib import Path
 import pandas as pd
-import numpy as np
-
-# Dependencias: ccxt y pandas_ta ya están en tu entorno
-import ccxt
-import pandas_ta as ta
 
 
-def fetch_ohlcv_4h(exchange_id: str, symbol: str, limit: int = 1000):
-    ex_class = getattr(ccxt, exchange_id)
-    ex = ex_class({"enableRateLimit": True})
-    ex.load_markets()
-    data = ex.fetch_ohlcv(symbol, timeframe="4h", limit=limit)
-    if not data or len(data) == 0:
-        raise RuntimeError("No OHLCV data returned")
-    df = pd.DataFrame(data, columns=["ts", "open", "high", "low", "close", "volume"])
-    ts = pd.to_datetime(df["ts"], unit="ms", utc=True).tz_convert(None)
-    df.index = ts
-    df = df.drop(columns=["ts"])
-    return df
+def run(cmd, env=None):
+    # Log comando "bonito" igual que en tus logs previos
+    human = " ".join(cmd)
+    print(f"→ {sys.executable} {human}")
+    res = subprocess.run([sys.executable] + cmd, env=env, check=False)
+    if res.returncode != 0:
+        raise SystemExit(res.returncode)
 
 
-def adx_daily_and_atr_pct(df_4h: pd.DataFrame, adx_len: int = 14, atr_len: int = 14):
-    # Resample 4h → 1D OHLC
-    o = df_4h["open"].resample("1D").first()
-    h = df_4h["high"].resample("1D").max()
-    l = df_4h["low"].resample("1D").min()
-    c = df_4h["close"].resample("1D").last()
-
-    # Elimina días vacíos (si los hubiera)
-    valid = (~o.isna()) & (~h.isna()) & (~l.isna()) & (~c.isna())
-    o, h, l, c = o[valid], h[valid], l[valid], c[valid]
-
-    # ADX
-    adx_df = ta.adx(h, l, c, length=adx_len)
-    if adx_df is None or adx_df.empty:
-        raise RuntimeError("ADX calc returned empty frame")
-    adx_col = [col for col in adx_df.columns if col.startswith("ADX_")]
-    adx_last = float(adx_df[adx_col[0]].dropna().iloc[-1])
-
-    # ATR% = ATR / Close
-    atr_series = ta.atr(h, l, c, length=atr_len)
-    if atr_series is None or atr_series.empty:
-        raise RuntimeError("ATR calc returned empty series")
-    atr_last = float(atr_series.dropna().iloc[-1])
-    close_last = float(c.dropna().iloc[-1])
-    atr_pct = float(atr_last / close_last)
-
-    return adx_last, atr_pct
-
-
-def run_corazon(threshold: float, args, out_csv: str):
+def read_plus_row(csv_base: str, horizon_days=60) -> dict:
     """
-    Ejecuta runner_corazon.py con un umbral dado y devuelve el DataFrame de métricas (30/60/90d).
+    runner_corazon.py genera dos archivos: base.csv y base_plus.csv
+    Leemos el *_plus.csv y devolvemos los campos de interés (fila 'days'==horizon)
     """
-    cmd = [
-        sys.executable, "runner_corazon.py",
-        "--max_bars", str(args.max_bars),
-        "--fg_csv", args.fg_csv,
-        "--funding_csv", args.funding_csv,
-        "--no_gates",
-        "--threshold", f"{threshold:.2f}",
-        "--out_csv", out_csv,
-    ]
-    if args.freeze_end:
-        cmd.extend(["--freeze_end", args.freeze_end])
+    plus = Path(csv_base).with_name(Path(csv_base).stem + "_plus.csv").with_suffix(".csv")
+    if not plus.exists():
+        # fallback al CSV base si el + no existe
+        df = pd.read_csv(csv_base)
+    else:
+        df = pd.read_csv(plus)
+
+    # days está como columna (30/60/90)
+    if "days" not in df.columns:
+        raise RuntimeError(f"CSV sin columna 'days': {plus}")
+
+    row = df.loc[df["days"] == horizon_days]
+    if row.empty:
+        # toma última fila si por alguna razón no existe 'horizon'
+        row = df.tail(1)
+
+    r = row.iloc[0].to_dict()
+    # Normaliza nombres que usamos
+    out = {
+        "pf_30d": float(df.loc[df["days"] == 30, "pf"].iloc[0]) if 30 in df["days"].values else float("nan"),
+        "pf_60d": float(r.get("pf", float("nan"))),
+        "pf_90d": float(df.loc[df["days"] == 90, "pf"].iloc[0]) if 90 in df["days"].values else float("nan"),
+        "wr_60d": float(r.get("win_rate", float("nan"))),
+        "mdd_60d": float(r.get("mdd", float("nan"))),
+        "trades_60d": float(r.get("trades", float("nan"))),
+        "net_60d": float(r.get("net", float("nan"))),
+    }
+    return out
+
+
+def append_report(report_csv: Path, rows: list[dict]):
+    report_csv.parent.mkdir(parents=True, exist_ok=True)
+    dfrows = pd.DataFrame(rows)
+    header = not report_csv.exists()
+    dfrows.to_csv(report_csv, mode="a", header=header, index=False)
+    print(f"📄 Reporte actualizado → {report_csv}")
+    print(dfrows.to_string(index=False))
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--exchange", default="binanceus")
+    p.add_argument("--symbol", default="BTC/USD")  # aceptado por compatibilidad (no se pasa al runner)
+    p.add_argument("--fg_csv", default="./data/sentiment/fear_greed.csv")
+    p.add_argument("--funding_csv", default="./data/sentiment/funding_rates.csv")
+    p.add_argument("--max_bars", type=int, default=975)
+    p.add_argument("--freeze_end", default="2025-08-05 00:00")
+    p.add_argument("--threshold", type=float, default=0.60)
+    p.add_argument("--compare_both", action="store_true", help="Corre ALL y LONG_V2 y compara")
+    p.add_argument("--report_csv", default="reports/corazon_auto_daily.csv")
+
+    # Gates LONG_V2 por defecto (tus presets)
+    p.add_argument("--fg_long_min", type=float, default=-0.15)
+    p.add_argument("--fg_short_max", type=float, default=0.15)
+    p.add_argument("--funding_bias", type=float, default=0.005)
+    p.add_argument("--adx1d_len", type=int, default=14)
+    # Aceptamos --adx_min por comodidad; si viene, se usa como adx1d_min si no fue seteado explícitamente
+    p.add_argument("--adx_min", type=float, default=None)
+    p.add_argument("--adx1d_min", type=float, default=22.0)
+    p.add_argument("--adx4_min", type=float, default=12.0)
+
+    args = p.parse_args()
 
     env = os.environ.copy()
     env["EXCHANGE"] = args.exchange
 
-    print(f"▶️  Ejecutando Corazón con threshold={threshold:.2f} …")
-    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, text=True)
-    print(res.stdout)
-    if res.returncode != 0:
-        raise RuntimeError(f"runner_corazon.py fallo (umbral {threshold}):\n{res.stdout}")
+    # === 1) ALL (sin gates) ===
+    out_all = "reports/corazon_metrics_auto_all.csv"
+    cmd_all = [
+        "runner_corazon.py",
+        "--max_bars", str(args.max_bars),
+        "--fg_csv", args.fg_csv,
+        "--funding_csv", args.funding_csv,
+        "--threshold", f"{args.threshold:.2f}",
+        "--out_csv", out_all,
+        "--freeze_end", args.freeze_end,
+        "--no_gates",
+    ]
+    run(cmd_all, env=env)
+    all_metrics = read_plus_row(out_all)
 
-    # Lee métricas resultantes
-    if not os.path.exists(out_csv):
-        raise FileNotFoundError(f"No se encontró {out_csv}")
-    df = pd.read_csv(out_csv)
-    # Esperado: days,net,pf,win_rate,trades,mdd,sortino,roi_pct
-    return df
+    rows = []
+    now_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    rows.append({
+        "ts": now_ts,
+        "exchange": args.exchange,
+        "symbol": "BTC/USD",
+        "freeze_end": args.freeze_end,
+        "label": "ALL",
+        "threshold": args.threshold,
+        **all_metrics,
+    })
 
-
-def pick_threshold(adx1d: float, atr_pct: float, adx_min: float, atr_max: float,
-                   th_default: float = 0.60, th_trend: float = 0.63):
-    """
-    Regla simple:
-      - Si mercado tendencial y tranquilo → 0.63
-      - Si no → 0.60
-    """
-    if adx1d >= adx_min and atr_pct <= atr_max:
-        return th_trend, "ADX1D≥{:.0f} & ATR%≤{:.1f}% (tendencia + baja vol)".format(adx_min, atr_max*100.0)
+    # === 2) LONG_V2 (con gates) ===
+    if args.adx_min is not None and (args.adx1d_min is None or args.adx1d_min == 0):
+        adx1d_min = args.adx_min
     else:
-        return th_default, "Condición base (mixto o vol alta)"
+        adx1d_min = args.adx1d_min
 
+    out_long = "reports/corazon_metrics_auto_longv2.csv"
+    cmd_long = [
+        "runner_corazon.py",
+        "--max_bars", str(args.max_bars),
+        "--fg_csv", args.fg_csv,
+        "--funding_csv", args.funding_csv,
+        "--threshold", f"{args.threshold:.2f}",
+        "--out_csv", out_long,
+        "--freeze_end", args.freeze_end,
+        "--fg_long_min", str(args.fg_long_min),
+        "--fg_short_max", str(args.fg_short_max),
+        "--funding_bias", str(args.funding_bias),
+        "--adx1d_len", str(args.adx1d_len),
+        "--adx1d_min", str(adx1d_min),
+        "--adx4_min", str(args.adx4_min),
+    ]
 
-def assemble_row(date_utc: str, symbol: str, th_sel: float, reason: str,
-                 adx1d: float, atr_pct: float,
-                 df_sel: pd.DataFrame,
-                 th_alt: float = None, df_alt: pd.DataFrame = None):
-    # Extrae métricas por horizonte
-    def pick_row(days_val):
-        r = df_sel.loc[df_sel["days"] == days_val]
-        return r.iloc[0] if not r.empty else None
-
-    out = {
-        "date_utc": date_utc,
-        "symbol": symbol,
-        "threshold_sel": th_sel,
-        "reason": reason,
-        "adx1d": round(adx1d, 3),
-        "atr14_pct": round(atr_pct * 100.0, 3),
-    }
-
-    for d in (30, 60, 90):
-        r = pick_row(d)
-        if r is not None:
-            out[f"pf_{d}d"] = r["pf"]
-            out[f"wr_{d}d"] = r["win_rate"]
-            out[f"mdd_{d}d"] = r["mdd"]
-            out[f"net_{d}d"] = r["net"]
-            out[f"trades_{d}d"] = r["trades"]
-
-    if th_alt is not None and df_alt is not None:
-        # también guardamos referencia del alternativo
-        for d in (30, 60, 90):
-            r = df_alt.loc[df_alt["days"] == d]
-            if not r.empty:
-                out[f"pf_{d}d_alt"] = r.iloc[0]["pf"]
-                out[f"net_{d}d_alt"] = r.iloc[0]["net"]
-        out["threshold_alt"] = th_alt
-
-    return out
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Selector automático de umbral + informe Corazón")
-    parser.add_argument("--exchange", default=os.environ.get("EXCHANGE", "binanceus"))
-    parser.add_argument("--symbol", default="BTC/USD")
-    parser.add_argument("--max_bars", type=int, default=975)
-    parser.add_argument("--freeze_end", default=os.environ.get("FREEZE", ""), help="Opcional (freeze)")
-    parser.add_argument("--fg_csv", default=os.environ.get("FG", "./data/sentiment/fear_greed.csv"))
-    parser.add_argument("--funding_csv", default=os.environ.get("FU", "./data/sentiment/funding_rates.csv"))
-    parser.add_argument("--out_tmp", default="reports/corazon_metrics_auto_tmp.csv")
-    parser.add_argument("--out_tmp_alt", default="reports/corazon_metrics_auto_alt.csv")
-    parser.add_argument("--report_csv", default="reports/corazon_auto_daily.csv",
-                        help="CSV ensamblado (se agrega una fila por ejecución)")
-    # Reglas del selector
-    parser.add_argument("--adx_min", type=float, default=30.0)
-    parser.add_argument("--atr_pct_max", type=float, default=0.025, help="2.5% = 0.025")
-    parser.add_argument("--th_default", type=float, default=0.60)
-    parser.add_argument("--th_trend", type=float, default=0.63)
-    # Opcional: comparar con el otro umbral
-    parser.add_argument("--compare_both", action="store_true", help="Corre también el umbral alterno")
-
-    args = parser.parse_args()
-
-    os.makedirs(os.path.dirname(args.report_csv), exist_ok=True)
-
-    # 1) Datos 4h → ADX1D & ATR%
-    print(f"⚙️  EXCHANGE={args.exchange}  symbol={args.symbol}  timeframe=4h")
-    df4h = fetch_ohlcv_4h(args.exchange, args.symbol, limit=args.max_bars)
-    adx1d, atr_pct = adx_daily_and_atr_pct(df4h, adx_len=14, atr_len=14)
-    print(f"🔎 Diagnóstico mercado → ADX1D={adx1d:.2f} | ATR14%={atr_pct*100:.2f}%")
-
-    # 2) Selección de umbral
-    th_sel, reason = pick_threshold(adx1d, atr_pct, args.adx_min, args.atr_pct_max,
-                                    th_default=args.th_default, th_trend=args.th_trend)
-    th_alt = args.th_trend if abs(th_sel - args.th_default) < 1e-9 else args.th_default
-
-    # 3) Backtest con umbral seleccionado (y opcional con alterno)
-    df_sel = run_corazon(threshold=th_sel, args=args, out_csv=args.out_tmp)
-
-    df_alt = None
     if args.compare_both:
-        df_alt = run_corazon(threshold=th_alt, args=args, out_csv=args.out_tmp_alt)
+        run(cmd_long, env=env)
+        long_metrics = read_plus_row(out_long)
+        rows.append({
+            "ts": now_ts,
+            "exchange": args.exchange,
+            "symbol": "BTC/USD",
+            "freeze_end": args.freeze_end,
+            "label": "LONG_V2",
+            "threshold": args.threshold,
+            **long_metrics,
+        })
 
-    # 4) Ensamble de registro diario
-    now_utc = datetime.now(timezone.utc).replace(tzinfo=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    row = assemble_row(now_utc, args.symbol, th_sel, reason, adx1d, atr_pct, df_sel,
-                       th_alt=th_alt if args.compare_both else None,
-                       df_alt=df_alt)
-    # Append al CSV de reporte
-    df_out = pd.DataFrame([row])
-    if os.path.exists(args.report_csv):
-        df_prev = pd.read_csv(args.report_csv)
-        df_out = pd.concat([df_prev, df_out], ignore_index=True)
+    # === Ranking y guardado ===
+    df = pd.DataFrame(rows)
+    # rank por pf_60d (desc), NaN al final
+    df["rank"] = (-df["pf_60d"]).rank(method="min", na_option="bottom")
+    df = df.sort_values("rank")
 
-    df_out.to_csv(args.report_csv, index=False)
-    print(f"✅ Informe ensamblado → {args.report_csv}")
-    print(f"   Umbral elegido: {th_sel:.2f}  | Motivo: {reason}")
-    print("   Columns:", ", ".join(df_out.columns))
+    append_report(Path(args.report_csv), df.to_dict(orient="records"))
+
+    # Recomendación
+    best = df.iloc[0]
+    best_label = best["label"]
+    th = float(best["threshold"])
+    print(f"⭐ Recomendación (pf_60d): {best_label} @ th={th:.2f}")
 
 
 if __name__ == "__main__":

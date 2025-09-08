@@ -1,6 +1,6 @@
 # Mejoras de Alto ROI — Priorización y Detalle
 
-> **Nota:** La mejora “Auto‑tuning de `ATR_MAX`” que propuse recién **no estaba** en la lista original. En este documento **no la incluyo** para mantener fidelidad con lo acordado. Si quieres, la añadimos luego como **A4 (param-only)**.
+> **Nota:** La mejora "Auto‑tuning de `ATR_MAX`" que propuse recién **no estaba** en la lista original. En este documento **no la incluyo** para mantener fidelidad con lo acordado. Si quieres, la añadimos luego como **A4 (param-only)**.
 
 ---
 
@@ -37,11 +37,11 @@
 ## D) Proceso / Claridad (rápidos de gobernanza)
 - Runner semanal único (✅ listo: `run_heart_slim_pipeline.sh`).
 - Decision log + snapshot tras cada freeze (✅).
-- Política “no tocar selected salvo gate + no-regresión” (vigente).
+- Política "no tocar selected salvo gate + no-regresión" (vigente).
 
 ---
 
-## Tabla consolidada de la “última lista” (#1–#9, P1)
+## Tabla consolidada de la "última lista" (#1–#9, P1)
 
 | #  | Idea                                                    | Beneficio  | Esfuerzo | Tiempo | ¿Código?     | ¿Solo parámetros? | KPI de aceptación |
 |----|---------------------------------------------------------|------------|----------|--------|--------------|-------------------|-------------------|

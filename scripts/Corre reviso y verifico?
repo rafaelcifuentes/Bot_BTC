@@ -1,0 +1,8 @@
+Señales de “todo bien”
+	•	decision.md muestra A y B con sus medianas, ratios y pass_rate_both.
+	•	Hay archivos en:
+reports/w*/oos_btc/(a|b) y reports/w*/stress_btc/(a|b).
+
+Notas anti-errores
+	•	Si ves zsh: parse error near ')' o similares: estabas pegando Python en la shell. Ejecuta Python desde archivo (scripts/wk_compactor.py) o con python - <<'PY' ... PY.
+	•	Si decision.md sale vacío, revisa rutas de entrada en el runner y que existan CSVs en las carpetas A/B (base y stress).

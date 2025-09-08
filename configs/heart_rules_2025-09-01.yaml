@@ -1,0 +1,103 @@
+# Corazón — Reglas de régimen y mezcla de pesos
+# Version: v0.2 (2025-08-31)
+# Role: genera pesos suaves por estrategia (no ON/OFF), aplica LQ e integra correlación y guardarraíles.
+# Nota: mantiene tus campos originales para compatibilidad y añade los del plan macro.
+
+
+
+meta:
+  enable: true
+  timezone: "UTC"
+  legacy_compat: true   # mantiene claves originales para no romper pipelines existentes
+
+# -------------------------------
+# 1) Diagnóstico de Régimen
+# -------------------------------
+regime:
+  # === Tus campos (legacy, compatibles) ===
+  adx1d_len: 14
+  adx1d_min: 18      # ADX diario “fuerte” (confirmación macro)
+  adx4_min: 8      # ADX 4h mínimo para evitar rango muy comprimido
+  ema_fast: 50
+  ema_slow: 200
+
+  # === Nuevos (plan macro) ===
+  ema50_slope_thr: 0.0       # >0 alcista, <0 bajista (umbral bajo)
+  atr_pct_window: 100        # ventana pctl para ATR%
+  vol_pctl_low: 0.40         # p40 define rangos “calmos”
+  dwell_bars: 5              # histéresis: mínimo 6 velas en un estado
+  max_delta_weight: 0.25     # límite de cambio por barra para evitar flip-flop
+
+# Sesgos/bias (mantengo tus llaves y agrupo en bloque)
+bias:
+  fg_long_min: -0.15         # > -0.15 favorece largos (Fear & Greed normalizado)
+  fg_short_max: 0.15         # < 0.15 desincentiva cortos
+  funding_bias: 0.005        # sesgo pro-largos si funding >= +0.5%
+  use_as: "soft_bias"        # no es veto, solo sesgo suave
+
+# -------------------------------
+# 2) Mapeo a Pesos del Semáforo
+# -------------------------------
+# Estados del semáforo (suman ≈1). Estos reemplazan a reglas duras por pesos suaves.
+weights_states:
+  verde:    { diamante: 1.00, perla: 0.00 }   # fuerte régimen a favor
+  amarillo: { diamante: 0.80, perla: 0.00 }   # neutral pro-diamante sin cap total
+  rojo:     { diamante: 0.60, perla: 0.00 }   # contra-régimen conservador pero con exposición
+
+# Mantenemos tus pesos “tipos” por compatibilidad (opcional en tu generador actual)
+weights_legacy:
+  w_strong:  1.00
+  w_neutral: 0.90   # <- antes 0.85
+  w_counter: 0.75   # <- antes 0.70
+
+# -------------------------------
+# 3) LQ — Liquidity/Cluster Risk
+# -------------------------------
+lq:
+  enable: true
+  use_as: "soft_veto"       # soft_veto | bias
+  dist_close_atr: 0.6       # “cerca” = 0.6 × ATR_4h
+  min_cluster_score: 0.75    # fuerza mínima del cluster opuesto
+  mult_soft_veto: 0.70      # reduce peso un 30% si riesgo alto
+  hysteresis_steps: 2       # exigir 2 velas para cambiar estado LQ
+  safety_cap: 1.00          # no subir por encima del w_cap actual
+  max_delta_per_bar: 0.25   # permite subir/bajar más rápido sin “dientes de sierra”
+# -------------------------------
+# 4) Gate de Correlación
+# -------------------------------
+corr_gate:
+  lookback_bars: 60         # 60–90 recomendado
+  threshold: 0.35           # si corr > thr → penalizar
+  max_penalty: 0.30         # recorte máx a la pierna más débil
+  perf_window_days: 30      # comparar desempeño reciente en 30d para decidir a quién penalizar
+
+# -------------------------------
+# 5) Guardarraíles de Riesgo Global
+# -------------------------------
+freeze_xi_star:
+  update_day: "Monday"      # “congelar” ξ* semanal desde reporter/overlay
+  xi_star_cap: 1.70
+
+circuit_breakers:
+  vol_daily_pctl: 0.98      # si vol diaria > p98 → reset ξ* a 1.0
+  dd_day: -0.06             # o drawdown diario ≤ -6% (en BTC) → reset ξ* a 1.0
+
+# -------------------------------
+# 6) Seguridad y Misc
+# -------------------------------
+safety:
+  w_floor_on_signal: 0.50   # mínimo al tener señal válida (opcional; puede relajarse)
+  w_cap: 1.00               # cap de peso por estrategia (antes de cap total del Allocator)
+  ttl_bars: 1               # si una señal/peso está “viejo” (>1 barra), reducir a 0 por seguridad
+
+# ... resto del archivo ...
+
+misc:
+  shift_features_by: 1
+  timestamp_tz: "UTC"
+  outputs:
+    weights_csv: "corazon/weights.csv"
+    lq_csv: "corazon/lq.csv"
+
+runtime:
+  perla_enabled: false

@@ -1,0 +1,194 @@
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Tuple, List, Optional
+import pandas as pd, numpy as np
+
+def _max_drawdown_usd(series: pd.Series) -> float:
+    if series.empty: return 0.0
+    rollmax = series.cummax()
+    dd = series / rollmax - 1.0
+    return float(-dd.min())
+
+@dataclass
+class TradeCosts:
+    fee_bps_per_side: float
+    slip_bps_per_side: float
+    @property
+    def rate(self) -> float:
+        return (self.fee_bps_per_side + self.slip_bps_per_side) / 10_000.0
+
+def simulate(cfg: dict, df_in: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFrame, dict]:
+    df = df_in.copy().reset_index(drop=True)
+
+    ts_col = 'ts' if 'ts' in df.columns else ('timestamp' if 'timestamp' in df.columns else None)
+    if ts_col is None: raise ValueError("Falta 'ts' o 'timestamp' en el 4h.")
+    df['ts'] = pd.to_datetime(df[ts_col], utc=True, errors='coerce')
+    df = df.sort_values('ts').reset_index(drop=True)
+
+    # Señales 4h
+    fast = int(cfg['signals']['ema_fast']); slow = int(cfg['signals']['ema_slow'])
+    df['ema21'] = df['close'].ewm(span=fast, adjust=False).mean()
+    df['ema55'] = df['close'].ewm(span=slow, adjust=False).mean()
+    df['trend_up'] = df['ema21'] > df['ema55']
+    df['trend_dn'] = df['ema21'] < df['ema55']
+
+    # =========================
+    #  MACRO D1 > EMA200 (robusto)
+    # =========================
+    if 'macro_green' in df.columns:
+        df['macro_green'] = df['macro_green'].astype(bool)
+
+    elif {'d_close','d_ema200'}.issubset(df.columns):
+        # Si ya viene precalculado desde el CLI
+        df['macro_green'] = df['d_close'] > df['d_ema200']
+
+    else:
+        # Construir macro a partir del propio 4h (sin look-ahead: usa el D-1)
+        s = df[['ts','close']].copy()
+        daily = s.set_index('ts').resample('1D').last().dropna()
+        daily['d_close'] = daily['close']
+        daily['d_ema200'] = daily['d_close'].ewm(span=200, adjust=False).mean()
+        # Usar el valor confirmado del día anterior
+        daily = daily[['d_close','d_ema200']].shift(1).dropna()
+        daily = daily.reset_index().rename(columns={'ts':'d_ts'})
+
+        df = pd.merge_asof(
+            df.sort_values('ts'),
+            daily.sort_values('d_ts'),
+            left_on='ts', right_on='d_ts',
+            direction='backward'
+        )
+        df['macro_green'] = (df['d_close'] > df['d_ema200'])
+
+    df['macro_ok'] = df['macro_green'].fillna(False)
+
+    # Módulos (por defecto OFF; flags set por YAML)
+    mods = cfg.get('modules', {})
+    df['atr_yellow'] = False; df['atr_red'] = False
+    df['pause_chop'] = False; df['pause_mode'] = 'entries_only'
+    g_enabled = bool(mods.get('grace_ttl', {}).get('enabled', False))
+    g_bars    = int(mods.get('grace_ttl', {}).get('bars_after_flip', 1))
+    g_spread  = float(mods.get('grace_ttl', {}).get('ema_spread_bps', 10.0)) / 10_000.0
+
+    w_enabled = bool(mods.get('weekly_turnover_budget', {}).get('enabled', False))
+    w_max     = int(mods.get('weekly_turnover_budget', {}).get('max_flips_per_week', 4))
+
+    dwell_min = int(cfg['anti_whipsaw']['dwell_bars_min_between_flips'])
+    bars_since_flip = dwell_min
+
+    fb = cfg.get('flip_budget', {})
+    hard_per_year = int(fb.get('hard_per_year', 26))
+    enforce_hard  = bool(fb.get('enforce_hard_yearly', True))
+
+    seed_btc = float(cfg['backtest'].get('seed_btc', 1.0))
+    first_close = float(df['close'].iloc[0])
+    position = 'STABLE'
+    btc, usd = 0.0, seed_btc * first_close
+
+    schedule_buy_i: Optional[int]  = None
+    schedule_sell_i: Optional[int] = None
+    pending_exit_check_at: Optional[int] = None
+    pending_exit_exec_at: Optional[int]  = None
+
+    flips_exec_ts: List[pd.Timestamp] = []
+    out_rows = []
+
+    def budget_allows(now_ts: pd.Timestamp) -> bool:
+        if enforce_hard:
+            one_year = now_ts - pd.Timedelta(days=365)
+            if sum(ts > one_year for ts in flips_exec_ts) >= hard_per_year:
+                return False
+        if w_enabled:
+            one_week = now_ts - pd.Timedelta(days=7)
+            if sum(ts > one_week for ts in flips_exec_ts) >= w_max:
+                return False
+        return True
+
+    def grace_allows(i: int, flip_side: str) -> bool:
+        if not g_enabled or len(flips_exec_ts) == 0:
+            return True
+        if flip_side == 'SELL':
+            return True
+        last_flip_ts = flips_exec_ts[-1]
+        if (df['ts'].iloc[i] - last_flip_ts) > pd.Timedelta(hours=4*g_bars):
+            return True
+        spread = abs(df['ema21'].iloc[i] - df['ema55'].iloc[i]) / df['close'].iloc[i]
+        return spread >= g_spread
+
+    for i in range(len(df)):
+        executed = None
+
+        # Ejecuta OPEN de la barra i
+        if schedule_buy_i is not None and i == schedule_buy_i:
+            price = float(df['open'].iloc[i])
+            if usd > 0.0:
+                btc += (usd / price) * (1.0 - costs.rate); usd = 0.0
+                position = 'BTC'; bars_since_flip = 0; executed = 'BUY'
+                flips_exec_ts.append(df['ts'].iloc[i])
+            schedule_buy_i = None
+
+        if schedule_sell_i is not None and i == schedule_sell_i:
+            price = float(df['open'].iloc[i])
+            if btc > 0.0:
+                usd += btc * price * (1.0 - costs.rate); btc = 0.0
+                position = 'STABLE'; bars_since_flip = 0; executed = 'SELL'
+                flips_exec_ts.append(df['ts'].iloc[i])
+            schedule_sell_i = None
+
+        # Salida activa confirmada
+        if pending_exit_check_at is not None and i == pending_exit_check_at:
+            if not (df['close'].iloc[i] > df['ema21'].iloc[i]):
+                pending_exit_exec_at = i + 1
+            pending_exit_check_at = None
+
+        if pending_exit_exec_at is not None and i == pending_exit_exec_at:
+            if position == 'BTC':
+                schedule_sell_i = i
+            pending_exit_exec_at = None
+
+        # Señales para la próxima barra
+        if i < len(df) - 1:
+            bars_since_flip += 1
+            can_flip = bars_since_flip >= dwell_min
+
+            macro  = bool(df['macro_ok'].iloc[i])
+            up     = bool(df['trend_up'].iloc[i])
+            dn     = bool(df['trend_dn'].iloc[i])
+            now_ts = df['ts'].iloc[i]
+
+            # Salida activa si close < EMA21
+            if position == 'BTC' and df['close'].iloc[i] < df['ema21'].iloc[i]:
+                pending_exit_check_at = i + 1
+
+            want_sell = (position == 'BTC') and dn
+            want_buy  = (position == 'STABLE') and macro and up
+
+            if can_flip and budget_allows(now_ts):
+                if want_sell and grace_allows(i, 'SELL'):
+                    schedule_sell_i = i + 1
+                if want_buy and grace_allows(i, 'BUY'):
+                    schedule_buy_i = i + 1
+
+        px = float(df['close'].iloc[i])
+        equity_usd = usd + btc * px
+        equity_btc = equity_usd / px if px > 0 else np.nan
+        out_rows.append({'ts': df['ts'].iloc[i], 'open': float(df['open'].iloc[i]), 'close': px,
+                         'equity_usd': equity_usd, 'equity_btc': equity_btc, 'executed': executed})
+
+    res = pd.DataFrame(out_rows)
+    mdd_model = _max_drawdown_usd(res['equity_usd'])
+    hodl_usd = seed_btc * (df['close'] / df['close'].iloc[0])
+    mdd_hodl = _max_drawdown_usd(hodl_usd)
+    net_btc_ratio = float(res['equity_btc'].iloc[-1] / seed_btc) if seed_btc > 0 else np.nan
+    flips_total = int(res['executed'].notna().sum())
+    span_days = max((res['ts'].iloc[-1] - res['ts'].iloc[0]).days, 1)
+    flips_per_year = flips_total / (span_days / 365.2425)
+    kpis = {
+        'net_btc_ratio': net_btc_ratio,
+        'mdd_model_usd': mdd_model,
+        'mdd_hodl_usd': mdd_hodl,
+        'mdd_vs_hodl_ratio': (mdd_model / mdd_hodl) if mdd_hodl > 0 else np.nan,
+        'flips_total': flips_total,
+        'flips_per_year': flips_per_year,
+    }
+    return res, kpis

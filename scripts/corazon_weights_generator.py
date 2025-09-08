@@ -36,21 +36,28 @@ import yaml
 # ---------------------- Utils ----------------------
 
 def _ensure_utc_index(df: pd.DataFrame, ts_col: str = "timestamp") -> pd.DataFrame:
+    # Normalize time index to UTC-naive (to match baseline *_bars.csv convention)
     if ts_col in df.columns:
-        idx = pd.to_datetime(df[ts_col], utc=True)
+        s = pd.to_datetime(df[ts_col], utc=True, errors="coerce")
+        # when working on a Series, use .dt.tz_convert
+        s = s.dt.tz_convert(None)
         df = df.drop(columns=[ts_col])
+        df.index = s
+    else:
+        idx = pd.to_datetime(df.index, utc=True, errors="coerce")
+        # idx is a DatetimeIndex after to_datetime; drop tz to be naive
+        if isinstance(idx, pd.DatetimeIndex) and getattr(idx, "tz", None) is not None:
+            idx = idx.tz_convert(None)
         df.index = idx
-    elif df.index.name != ts_col:
-        df.index = pd.to_datetime(df.index, utc=True)
-    # sort & drop dups
+    # sort & drop duplicates
     df = df[~df.index.duplicated(keep="last")].sort_index()
     return df
 
 def _resample_4h(df: pd.DataFrame, how: str = "ffill") -> pd.DataFrame:
     # For OHLC we'll resample separately; for signals simple ffill is enough
     if how == "ffill":
-        return df.resample("4H").last().ffill()
-    return df.resample("4H").last()
+        return df.resample("4h").last().ffill()
+    return df.resample("4h").last()
 
 def ema(series: pd.Series, span: int) -> pd.Series:
     return series.ewm(span=span, adjust=False).mean()
@@ -180,6 +187,10 @@ def generate_weights(
     dist_close_atr = float(lq_cfg.get("dist_close_atr", 0.6))
     min_cluster_score = float(lq_cfg.get("min_cluster_score", 0.7))
 
+    # Runtime flags
+    runtime = rules.get("runtime", {})
+    perla_enabled = bool(runtime.get("perla_enabled", True))
+
     # Corr gate
     cg = rules.get("corr_gate", {})
     corr_lb = int(cg.get("lookback_bars", 60))
@@ -187,12 +198,22 @@ def generate_weights(
     corr_max_pen = float(cg.get("max_penalty", 0.30))
     perf_days = int(cg.get("perf_window_days", 30))
 
-    # Weight maps
-    ws = rules.get("weights_states", {
-        "verde": {"diamante": 0.80, "perla": 0.20},
-        "amarillo": {"diamante": 0.50, "perla": 0.50},
-        "rojo": {"diamante": 0.20, "perla": 0.80},
-    })
+    # Weight maps (support multiple schema names)
+    ws = rules.get("weights_states")
+    if ws is None:
+        wleg = rules.get("weights_legacy") or rules.get("semaforo", {}).get("weights")
+        if wleg:
+            ws = {
+                "verde":   {"diamante": float(wleg.get("w_strong", 1.0)), "perla": 1.0 - float(wleg.get("w_strong", 1.0))},
+                "amarillo":{"diamante": float(wleg.get("w_neutral", 0.75)), "perla": 1.0 - float(wleg.get("w_neutral", 0.75))},
+                "rojo":    {"diamante": float(wleg.get("w_counter", 0.5)), "perla": 1.0 - float(wleg.get("w_counter", 0.5))},
+            }
+        else:
+            ws = {
+                "verde": {"diamante": 0.80, "perla": 0.20},
+                "amarillo": {"diamante": 0.50, "perla": 0.50},
+                "rojo": {"diamante": 0.20, "perla": 0.80},
+            }
 
     # Read OHLC (expects 4h candles)
     ohlc = pd.read_csv(ohlc_path)
@@ -235,10 +256,41 @@ def generate_weights(
         clusters = _ensure_utc_index(pd.read_csv(clusters_path))
         clusters = _resample_4h(clusters)
 
-    # Prepare unified frame
-    df = pd.concat([ohlc[["Close"]], adx.rename("ADX"), atr.rename("ATR"), atr_pct.rename("ATR_pct"),
-                    ema50.rename("EMA50"), ema50_slope.rename("EMA50_slope"),
-                    d.add_prefix("D_"), p.add_prefix("P_")], axis=1).dropna()
+    # Prepare unified frame (robust): indicators required; signals optional
+    base = pd.concat(
+        [
+            ohlc[["Close"]],
+            adx.rename("ADX"),
+            atr.rename("ATR"),
+            atr_pct.rename("ATR_pct"),
+            ema50.rename("EMA50"),
+            ema50_slope.rename("EMA50_slope"),
+        ],
+        axis=1,
+    )
+
+    # Requerimos que los indicadores estén presentes; las señales pueden faltar
+    base = base.dropna(subset=["Close", "ADX", "ATR", "ATR_pct", "EMA50", "EMA50_slope"])
+
+    # Join de señales y clusters por la izquierda, para no vaciar el frame cuando no hay solape
+    df = base.copy()
+    if not d.empty:
+        df = df.join(d.add_prefix("D_"), how="left")
+    if not p.empty:
+        df = df.join(p.add_prefix("P_"), how="left")
+    if clusters is not None and not clusters.empty:
+        df = df.join(clusters, how="left")
+
+    if df.empty:
+        def _rng(x):
+            try:
+                return f"{str(x.index.min())} → {str(x.index.max())} (rows={len(x)})" if (x is not None and len(x) > 0) else "EMPTY"
+            except Exception:
+                return "EMPTY"
+        raise ValueError(
+            "generate_weights: sin solape después de preparar el frame base.\n"
+            f"Rangos: OHLC={_rng(ohlc)} | D={_rng(d)} | P={_rng(p)} | clusters={_rng(clusters) if clusters is not None else 'NONE'}"
+        )
 
     # Output containers
     rows_w = []
@@ -258,6 +310,11 @@ def generate_weights(
         st_key = state.lower()
         base_wD = ws.get(st_key, ws["amarillo"])["diamante"]
         base_wP = ws.get(st_key, ws["amarillo"])["perla"]
+
+        # If Perla is disabled at runtime, DO NOT transfer its weight into Diamante.
+        # Keep Diamante as absolute exposure from YAML; Perla forced to 0.0.
+        if not perla_enabled:
+            base_wP = 0.0
 
         # 2) LQ soft-veto (optional)
         lq_flag = "NORMAL"
@@ -323,13 +380,63 @@ def generate_weights(
                        "w_perla": round(float(wP_s), 6)})
         rows_lq.append({"timestamp": ts, "lq_flag": lq_flag})
 
-    weights_df = pd.DataFrame(rows_w).set_index("timestamp")
+    # -- build weights_df robustly from rows_w --
+    df_w = pd.DataFrame(rows_w)
+    if df_w.empty:
+        raise ValueError("generate_weights: rows_w vacío; no se generaron pesos. Revisa entradas/fechas.")
+
+    # normalizar nombre de timestamp si vino como 'ts', 'date', etc.
+    if "timestamp" not in df_w.columns:
+        for cand in ("ts", "date", "datetime", "time"):
+            if cand in df_w.columns:
+                df_w = df_w.rename(columns={cand: "timestamp"})
+                break
+    if "timestamp" not in df_w.columns:
+        raise ValueError(f"generate_weights: rows_w sin columna 'timestamp'. Columnas: {list(df_w.columns)}")
+
+    # garantizar tipos y orden temporal
+    df_w["timestamp"] = pd.to_datetime(df_w["timestamp"], utc=True, errors="coerce")
+    df_w = df_w.dropna(subset=["timestamp"]).sort_values("timestamp")
+
+    # asegurar columnas de pesos
+    # intentar mapear variantes comunes si faltan
+    if "w_diamante" not in df_w.columns:
+        for cand in ("w", "weight", "w_diamante_raw"):
+            if cand in df_w.columns:
+                df_w = df_w.rename(columns={cand: "w_diamante"})
+                break
+    if "w_diamante" not in df_w.columns:
+        raise ValueError(f"generate_weights: falta columna 'w_diamante' en rows_w. Columnas: {list(df_w.columns)}")
+
+    if "w_perla" not in df_w.columns:
+        # perla opcional; si no existe la mantenemos en 0.0
+        df_w["w_perla"] = 0.0
+
+    # convertir numéricos
+    for c in ("w_diamante", "w_perla"):
+        df_w[c] = pd.to_numeric(df_w[c], errors="coerce").fillna(0.0)
+
+    # definir DataFrame final con índice
+    weights_df = df_w.set_index("timestamp")
+
+    # sanity log: rangos de pesos
+    try:
+        _wmin = str(weights_df.index.min())
+        _wmax = str(weights_df.index.max())
+        print(f"[DEBUG] weights_df rango: {_wmin} → {_wmax}  (rows={len(weights_df)})")
+    except Exception:
+        pass
     lq_df = pd.DataFrame(rows_lq).set_index("timestamp")
 
     out_weights_path.parent.mkdir(parents=True, exist_ok=True)
     out_lq_path.parent.mkdir(parents=True, exist_ok=True)
-    weights_df.to_csv(out_weights_path, date_format="%Y-%m-%d %H:%M:%S%z")
-    lq_df.to_csv(out_lq_path, date_format="%Y-%m-%d %H:%M:%S%z")
+
+    # Force UTC-naive timestamps to match baseline *_bars.csv convention
+    weights_df.index = pd.to_datetime(weights_df.index, utc=True).tz_convert(None)
+    lq_df.index      = pd.to_datetime(lq_df.index,      utc=True).tz_convert(None)
+
+    weights_df.to_csv(out_weights_path, date_format="%Y-%m-%d %H:%M:%S")
+    lq_df.to_csv(out_lq_path, date_format="%Y-%m-%d %H:%M:%S")
 
     print(f"[OK] Pesos escritos en: {out_weights_path}")
     print(f"[OK] LQ flags escritas en: {out_lq_path}")

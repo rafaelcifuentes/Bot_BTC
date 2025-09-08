@@ -1,0 +1,133 @@
+Qué cerrar antes del Allocator (contratos y gates)
+	1.	Dónde brilla cada uno (validado empíricamente por régimen)
+
+	•	Diamante (4h, breakout-swing): medir PF/WR/MDD en bins de ADX (p.ej. <15, 15-20, >20), |slope(EMA50)| y percentiles de ATR. Debe mostrar edge en tendencia/expansión.
+	•	Perla Negra (semanal, más estable/contracíclica): medir en rango y tramos bajistas/ruidosos; confirmar que su corr con Diamante es baja/negativa en esos regímenes.
+	•	Corazón (semáforo suave): pesos estables (histeresis, dwell 6–8 barras, maxΔ 0.2) y que mejoren MDD/vol de la mezcla vs 50/50.
+Dónde brilla cada uno
+	•	Diamante (4h, oportunista/breakout-swing)
+	•	    Mejor: tramos tendenciales y/o de expansión de volatilidad (EMA50↑ o ↓ + ADX≳20). Ahí los rompimientos corren y los TP se alcanzan con poca “sobre-operación”.
+	•	    Peor: rango/chop de baja vol (ADX≲15–20). Aparecen fakeouts, más entradas pequeñas y las comisiones pesan.
+	•	Perla Negra (semanal, más estable/contracíclica)
+	•	    Mejor: rango y tramos bajistas/transiciones donde la acción es errática. Su sesgo más constante y la menor frecuencia ayudan a amortiguar y a correlacionar inverso con Diamante.
+	•	    Peor: tendencia direccional fuerte y limpia; suele “quedarse corta” frente a un breakout sostenido.
+
+	2.	Gates mínimos (OOS, con costes)
+
+	•	Diamante: PF ≥ 1.6, WR ≥ 60%, ≥30 trades en ambos folds; MDD ≤ 8% (BTC terms) en ventanas OOS 60–90d.
+	•	Perla: PF ≥ 1.2 en rangos, MDD ≤ 15%, y corr(D,P) ≤ 0.35–0.40 en neutro/rango.
+	•	Corazón overlay (modo sombra): bajar MDD ≥ 15% o Vol ≥ 10% sin degradar PF > 5% y sin subir turnover > 20%.
+
+	3.	Contratos de interfaz (para no pelear con timestamps)
+
+	•	Zona horaria: todo en UTC (tu nota de 4h+UTC es clave).
+	•	Archivos:
+	•	signals/diamante.csv: timestamp, sD ∈ [-1,1], w_diamante_raw ∈ [0,1] (4h).
+	•	signals/perla.csv: timestamp, sP ∈ [-1,1], w_perla_raw ∈ [0,1] (resample a 4h con ffill).
+	•	corazon/weights.csv: timestamp, w_diamante, w_perla (∈ [0,1], suma ≈1).
+	•	corazon/lq.csv: timestamp, lq_flag ∈ {HIGH_RISK,NORMAL} (histeresis 2 velas).
+	•	Freshness: TTL = 4h; si una señal está vieja → peso 0.
+	•	Costes: fees 6 bps + slip 6 bps (como vienes usando).
+
+	4.	Riesgo/operación
+
+	•	w_cap_total = 1.0, vol targeting anual = 20% (clamp 0.5–1.2).
+	•	xi*: freeze semanal + circuit breaker (vol diaria > p98 o DD día ≤ −6% → xi*=1.0).
+	•	Gate correlación: ventana 60–90d, umbral 0.35–0.40, penalizar la pierna de peor desempeño reciente hasta 30%.
+	•	Kill-switch: si MDD rolling 30d en BTC < −X% (define X), cortar a cash.
+
+
+
+Traducción a “semáforo” (regímenes sugeridos)
+	•	Tendencia alcista o bajista clara (EMA50 con pendiente marcada, ADX>20):
+	•	Ponderar Diamante alto (70–100%). Perla bajo (0–30%).
+	•	Si permites cortos y la tendencia es bajista: Diamante puede participar; si no, Perla hace de defensa.
+	•	Rango/lateral (ADX<15–20, bandas/ATR comprimidos):
+	•	Ponderar Perla alto (70–100%). Diamante bajo (0–30%).
+	•	Transición/posible cambio de tendencia (ADX subiendo desde <15→>20 y EMA50 cambiando de signo):
+	•	50/50 por unos días para evitar whipsaws.
+	•	Picos de volatilidad (ATR/true range en percentil alto):
+	•	Diamante puede capturar tramos grandes, pero sube el coste efectivo; controla SL/TP/partial. Perla mantiene el “lastre” estable.
+
+Nota: en tus diagnósticos recientes, el filtro duro por ADX/EMA50 no separó suficiente (ρ pequeño), así que mejor usarlo como peso suave (Allocator), no como bloqueo binario. Esto encaja perfecto con la idea de Corazón asignando pesos dinámicos y con un gate de correlación (p. ej., corr rolling 90d ≤ 0.35) para no apilar señales “pegadas”.
+
+Checklist operativo rápido
+	•	Mantén Diamante como motor en tendencia/expansión;
+	•	Deja Perla como hedge/ballast en rango/bear/ruido;
+	•	Usa semáforo suave (ADX/EMA50/ATR) para pesar, no para bloquear;
+	•	Aplica gate de correlación (máx. 0.30–0.40) cuando integremos Perla.
+
+	Dónde vive Corazón
+
+Capas:
+	1.	Estrategias base
+	•	Diamante (4h, oportunista/breakout).
+	•	Perla Negra (semanal, más estable/contracíclica).
+	2.	Corazón (semáforo / regime router) ← aquí
+	•	Lee métricas de régimen (p. ej., ADX, pendiente EMA50, ATR%) y la correlación rolling entre Diamante y Perla.
+	•	Devuelve pesos suaves por estrategia (no ON/OFF duro): w_diamante, w_perla en [0..1], que suman 1 (o <1 si quieres quedarte en cash a veces).
+	•	Aplica histeresis y suavizado (para no hacer flip-flop): dwell mínimo por estado, límite de cambio por barra, EMA sobre pesos.
+	•	Gate de correlación: si corr(Diamante, Perla) > umbral (p. ej. 0.35), reduce el peso de la más débil.
+	3.	Allocator / CEREBRO
+	•	Toma los pesos de Corazón y hace el position sizing/riesgo total a nivel cartera (entre activos y estrategias), con límites de coste/turnover.
+	4.	Ejecución & monitoreo
+	•	Enruta órdenes con el coste/latencia real, registra KPIs.
+
+Semáforo en 3 estados (ejemplo)
+	•	Verde (tendencia clara / ADX≥20, EMA50↑ o ↓, ATR% medio/alto)
+	•	Pesar Diamante alto (p. ej. 0.7–0.9), Perla 0.1–0.3.
+	•	Amarillo (transición / ADX subiendo desde <15 hacia >20)
+	•	50/50 temporal + suavizado.
+	•	Rojo (rango / ADX<15–20, ATR% comprimido)
+	•	Perla alto (0.7–0.9), Diamante bajo (0.1–0.3).
+
+En tus tests recientes, un filtro duro por ADX/EMA no separó bien; por eso Corazón aplica pesos, no bloqueos binarios.
+
+Qué produce Corazón (salida práctica)
+
+Un CSV de pesos por timestamp, por ejemplo:
+reports/corazon_weights/BTC-USD_weights.csv
+
+timestamp,w_diamante,w_perla
+2025-08-01 00:00,0.80,0.20
+2025-08-01 04:00,0.80,0.20
+
+Luego combinas señales o PnL así:
+signal_final = w_diamante * signal_diamante + w_perla * signal_perla
+
+o, a nivel PnL, ponderas la exposición/posición de cada una antes de sumar.
+
+Reglas clave de Corazón (sugeridas)
+	•	Indicadores: ADX(14), pendiente EMA50, ATR% (percentil rolling).
+	•	Umbrales (semilla):
+	•	Verde: ADX ≥ 20 y |slope(EMA50)| > umbral bajo;
+	•	Rojo: ADX < 18 y ATR% < p40;
+	•	Amarillo: lo demás.
+	•	Suavizado: ema_alpha ≈ 0.3, min_dwell_bars ≈ 6–8, max_delta_peso ≈ 0.2 por barra.
+	•	Correlación: ventana 60–90d, máx 0.30–0.40; si se excede y el PF reciente de una capa < otra, capar su peso.
+
+Cómo lo integramos con lo que ya tienes
+	•	Ahora (mientras terminas W3–W4): dejamos Corazón documentado y lo usamos como diagnóstico (generar pesos y compararlos OOS, sin alterar la lógica actual).
+	•	Después (cuando Perla esté lista): activamos el blend por pesos en el runner/Allocator. No necesitamos cambiar Diamante ni Perla; sólo mezclamos salidas con los pesos de Corazón.
+
+Cuando comenzar con Corazon ?
+	•	No “enciendas” Corazón aún en la tubería oficial, salvo que Perla se demore mucho.
+	•	Sí puedes arrancar Corazón en “modo sombra” (solo como overlay/diagnóstico encima de Diamante, con w_perla = 0) para ir probando la integración sin tocar la lógica ni contaminar los tests OOS actuales.
+
+¿Por qué?
+	•	El mayor valor de Corazón aparece cuando puede repartir peso entre Diamante y Perla y aplicar su gate de correlación. Si Perla no está, pierdes la mitad del beneficio (diversificación).
+	•	Aun así, Corazón aporta algo hoy: gestión de exposición por régimen (semaforo ADX/EMA/ATR), que puede suavizar MDD y recortar varianza sin cambiar señales/entradas de Diamante. Pero eso debe evaluarse aparte para no mover los postes del test.
+
+Qué haría yo (si quieres avanzar ya sin romper nada)
+	1.	Modo sombra de Corazón (solo Diamante):
+	•	Mantén w_diamante dinámico y w_perla = 0.
+	•	Usa un semaforo suave (no binario): p. ej. si ADX≥20 y EMA50↑ → w_diamante=1.0; si neutro → 0.75; si contra-régimen → 0.5. Con histeresis para evitar flips.
+	•	Regla de oro: todas las features con shift(1) (igual que ya hacemos). Nada de miradas al futuro.
+	2.	Evaluación totalmente paralela:
+	•	Corre el overlay de Corazón en paralelo a los OOS que ya tienes, y escribe los resultados a reports/heart/… (separado).
+	•	KPI de aceptación del overlay: PF no baja >5–10%, MDD no sube, volatilidad baja y exposure razonable. Si mejora MDD con PF casi igual, es win.
+	3.	Decisión:
+	•	Si Perla queda lista pronto, activamos Corazón “de verdad” (con w_perla>0 + gate de correlación).
+	•	Si Perla se retrasa, puedes considerar promover Corazón “suave” (solo-régimen) como guardrail opt-in en W5, pero solo si pasó sus KPI en el modo sombra.
+
+

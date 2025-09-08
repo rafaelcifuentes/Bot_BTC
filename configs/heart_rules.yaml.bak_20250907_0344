@@ -1,0 +1,141 @@
+# Corazón — Config unificada (Nivel 1 activo = SLIM; macro en advanced)
+# KPI aceptación (overlay vs base): MDD_overlay ≤ 0.85× MDD_base y PF_overlay ≥ PF_base − 0.05
+
+profile: slim
+version: 1
+
+runtime:
+  enable: true
+  use_as: hard_switch
+  mode: switch_immediate
+  macro_tf: "1d"
+  op_tf: "4h"
+  perla_enabled: false
+  dwell_bars: 0
+  hysteresis_steps: 0
+  safety_cap: 1.00
+
+rules:
+  ema200:
+    period: 200
+    price_col: close
+    require_close_above: true
+  atr_pct:
+    period: 14
+    normalize_by: close            # ATR% = ATR(14)/Close_D1
+    max_pct: 0.09                  # 9% recomendado; afina 0.07–0.12 según MDD/actividad
+    min_pct: 0.00
+
+logic:
+  # ON si (precio D1 ≥ EMA200) y (ATR% ≤ max_pct); si no, OFF
+  on_condition: "(ema200.pass and atr_pct.value <= atr_pct.max_pct)"
+  off_condition: "not(on_condition)"
+
+weights:
+  when_on: 1.0
+  when_off: 0.0
+
+outputs:
+  export_columns: [w_final, on_condition, atr_pct.value]
+  tag: "heart_slim_ema200_atrpct_v1"
+
+# ======================================================================
+# Bloque avanzado (no usado por SLIM; queda para v0.2 macro/mezcla suave)
+# ======================================================================
+advanced:
+  # Corazón — Reglas de régimen y mezcla de pesos
+  # Version: v0.2 (2025-08-31)
+  # Role: genera pesos suaves por estrategia (no ON/OFF), aplica LQ e integra correlación y guardarraíles.
+  # Nota: mantiene tus campos originales para compatibilidad y añade los del plan macro.
+
+  meta:
+    enable: true
+    timezone: "UTC"
+    legacy_compat: true
+
+  # -------------------------------
+  # 1) Diagnóstico de Régimen
+  # -------------------------------
+  regime:
+    # === Legacy compatibles ===
+    adx1d_len: 14
+    adx1d_min: 18
+    adx4_min: 8
+    ema_fast: 50
+    ema_slow: 200
+    # === Nuevos (plan macro) ===
+    ema50_slope_thr: 0.0
+    atr_pct_window: 100
+    vol_pctl_low: 0.40
+    dwell_bars: 5              # histéresis mínima 5 velas
+    max_delta_weight: 0.25     # límite de cambio por barra
+
+  # Sesgos/bias
+  bias:
+    fg_long_min: -0.15
+    fg_short_max: 0.15
+    funding_bias: 0.005        # sesgo pro-largos si funding ≥ +0.5%
+    use_as: "soft_bias"
+
+  # -------------------------------
+  # 2) Mapeo a Pesos del Semáforo
+  # -------------------------------
+  weights_states:
+    verde:    { diamante: 1.00, perla: 0.00 }
+    amarillo: { diamante: 0.80, perla: 0.00 }
+    rojo:     { diamante: 0.60, perla: 0.00 }
+
+  # Compatibilidad con pesos legacy
+  weights_legacy:
+    w_strong:  1.00
+    w_neutral: 0.90
+    w_counter: 0.75
+
+  # -------------------------------
+  # 3) LQ — Liquidity/Cluster Risk
+  # -------------------------------
+  lq:
+    enable: true
+    use_as: "soft_veto"        # reduce peso, no apaga
+    dist_close_atr: 0.6
+    min_cluster_score: 0.75
+    mult_soft_veto: 0.70
+    hysteresis_steps: 2
+    safety_cap: 1.00
+    max_delta_per_bar: 0.25
+
+  # -------------------------------
+  # 4) Gate de Correlación
+  # -------------------------------
+  corr_gate:
+    lookback_bars: 60
+    threshold: 0.35
+    max_penalty: 0.30
+    perf_window_days: 30
+
+  # -------------------------------
+  # 5) Guardarraíles de Riesgo Global
+  # -------------------------------
+  freeze_xi_star:
+    update_day: "Monday"
+    xi_star_cap: 1.70
+
+circuit_breakers:
+  vol_daily_pctl: 0.97   # antes 0.98  → dispara con volatilidad algo menor (más protector)
+  dd_day:        -0.05   # antes -0.06 → resetea ξ* si el DD diario de BTC llega a -5%
+  
+  # -------------------------------
+  # 6) Seguridad y Misc
+  # -------------------------------
+  safety:
+    w_floor_on_signal: 0.50
+    w_cap: 1.00
+    ttl_bars: 1
+
+  misc:
+    shift_features_by: 1
+    timestamp_tz: "UTC"
+    outputs:
+      weights_csv: "corazon/weights.csv"
+      lq_csv: "corazon/lq.csv"
+

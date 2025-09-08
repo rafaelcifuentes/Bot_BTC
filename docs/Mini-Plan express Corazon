@@ -1,0 +1,198 @@
+Plan exprés (modo sombra de Corazón → solo Diamante)
+	1.	Qué haremos (sin tocar nada existente)
+
+	•	Generar un timeseries de pesos w_diamante (0.5–1.0) según régimen (ADX/EMA + sesgo FG/Funding), con histeresis y todas las features shift(1).
+	•	Aplicar ese peso como overlay offline sobre las órdenes/retornos de Diamante para obtener métricas comparables.
+	•	Escribir todo a reports/heart/… y evaluar KPI de aceptación:
+	•	PF no baja > 5–10% vs baseline.
+	•	MDD igual o menor (ideal ↓).
+	•	Volatilidad menor y exposición razonable.
+
+	2.	Arquitectura mínima (nuevos artefactos)
+
+	•	scripts/heart_overlay.py → calcula régimen y w_diamante (CSV).
+	•	configs/heart_rules.yaml → umbrales del semáforo (editable).
+	•	scripts/report_heart_vs_baseline.py → compara baseline vs overlay (PF/WR/MDD/exposure) y produce reports/heart/summary_*.md.
+	•	scripts/corazon_cmds.zsh → agrega 3 helpers:
+	•	runH_build_weights (genera pesos),
+	•	runH_apply_overlay (aplica pesos a Diamante),
+	•	runH_report (KPIs + aceptación).
+
+	3.	Reglas del semáforo (suave, con histeresis)
+Valores por defecto (ajustables en configs/heart_rules.yaml):
+yaml :
+regime:
+  adx1d_len: 14
+  adx1d_min: 22
+  adx4_min: 12
+  ema_fast: 50
+  ema_slow: 200
+  fg_long_min: -0.15    # > -0.15 favorece largos
+  fg_short_max: 0.15    # < 0.15 desincentiva cortos
+  funding_bias: 0.005   # sesgo pro-largos si funding >= +0.5%
+weights:
+  w_strong: 1.00        # ADX fuerte + EMA50↑ + sesgo no adverso
+  w_neutral: 0.75
+  w_counter: 0.50       # contra-régimen
+hysteresis:
+  min_steps_hold: 3     # mantener estado al menos 3 velas 4h
+  cooloff_steps: 2      # tras flip, exigir 2 velas para re-flip
+safety:
+  w_floor_on_signal: 0.50
+  w_cap: 1.00
+misc:
+  shift_features_by: 1  # NUNCA lookahead
+
+ 	4.	Snippet listo para pegar (núcleo de pesos con histeresis)
+Crea scripts/heart_overlay.py con algo así (compacto y productivo):
+Phyton :
+# scripts/heart_overlay.py
+import pandas as pd
+import numpy as np
+
+def hysteresis_labels(raw_state, min_hold=3, cooloff=2):
+    state = raw_state.copy()
+    last = state.iloc[0]
+    hold = 0
+    for i in range(1, len(state)):
+        cur = state.iloc[i]
+        if cur != last:
+            if hold < min_hold:
+                state.iloc[i] = last
+                hold += 1
+            else:
+                state.iloc[i] = cur
+                last = cur
+                hold = -cooloff  # exigir algunas velas antes de otro flip
+        else:
+            if hold < 0:
+                hold += 1
+            else:
+                hold += 1
+    return state
+
+def compute_weights(df, rules):
+    # Espera columnas (todas shift(1) antes de llamar):
+    # close, ema50, ema200, adx1d, adx4h, fear_greed_z, funding
+    up_trend = (df['ema50'] > df['ema200'])
+    adx_ok   = (df['adx1d'] >= rules['regime']['adx1d_min']) & (df['adx4h'] >= rules['regime']['adx4_min'])
+    fg_bias  = (df['fear_greed_z'] >= rules['regime']['fg_long_min'])
+    fund_bias= (df['funding'] >= rules['regime']['funding_bias'])
+
+    raw_state = np.select(
+        [
+            (adx_ok & up_trend & fg_bias & fund_bias),
+            (adx_ok & up_trend) | fg_bias | fund_bias
+        ],
+        ['strong', 'neutral'],
+        default='counter'
+    )
+    st = pd.Series(raw_state, index=df.index)
+    st = hysteresis_labels(st, rules['hysteresis']['min_steps_hold'], rules['hysteresis']['cooloff_steps'])
+
+    w_map = {
+        'strong': rules['weights']['w_strong'],
+        'neutral': rules['weights']['w_neutral'],
+        'counter': rules['weights']['w_counter'],
+    }
+    w = st.map(w_map).clip(lower=rules['safety']['w_floor_on_signal'], upper=rules['safety']['w_cap'])
+    return st, w
+
+def main(
+    prices_csv,     # OHLC 4h con columnas base (close, etc.)
+    fg_csv,         # Fear & Greed ya alineado a 4h (o diario forward-filled)
+    funding_csv,    # funding rates alineado
+    rules_yaml,
+    out_csv
+):
+    import yaml
+    df_p = pd.read_csv(prices_csv, parse_dates=['timestamp']).set_index('timestamp').sort_index()
+    fg   = pd.read_csv(fg_csv, parse_dates=['timestamp']).set_index('timestamp').sort_index()
+    fu   = pd.read_csv(funding_csv, parse_dates=['timestamp']).set_index('timestamp').sort_index()
+
+    with open(rules_yaml) as f:
+        rules = yaml.safe_load(f)
+
+    # Features (shift(1) SIEMPRE)
+    df = df_p.copy()
+    df['ema50']  = df['close'].ewm(span=rules['regime']['ema_fast'], adjust=False).mean()
+    df['ema200'] = df['close'].ewm(span=rules['regime']['ema_slow'], adjust=False).mean()
+    # ADX ya pre-calculado idealmente; si no, usa tu helper existente y luego shift(1)
+    # Aquí asumimos columnas 'adx1d' y 'adx4h' ya existen en df_p (o mérgéalas).
+    df = df.join(fg[['fear_greed_z']], how='left').join(fu[['funding']], how='left')
+    df = df.fillna(method='ffill')
+
+    # SHIFT(1) para evitar lookahead:
+    for col in ['ema50','ema200','adx1d','adx4h','fear_greed_z','funding']:
+        if col in df.columns:
+            df[col] = df[col].shift(1)
+
+    st, w = compute_weights(df, rules)
+    out = pd.DataFrame({'timestamp': df.index, 'state': st, 'w_diamante': w}).dropna()
+    out.to_csv(out_csv, index=False)
+    print(f"[OK] Pesos escritos en {out_csv}")
+
+if __name__ == "__main__":
+    import argparse
+    p = argparse.ArgumentParser()
+    p.add_argument('--prices_csv', required=True)
+    p.add_argument('--fg_csv', required=True)
+    p.add_argument('--funding_csv', required=True)
+    p.add_argument('--rules_yaml', required=True)
+    p.add_argument('--out_csv', required=True)
+    args = p.parse_args()
+    main(args.prices_csv, args.fg_csv, args.funding_csv, args.rules_yaml, args.out_csv)
+
+  -------------
+
+	5.	Aplicación del overlay y reporte
+
+	•	Entrada: tus retornos/órdenes de Diamante (p. ej. reports/diamante_btc_weekX.csv) con columna ret_4h (o similar).
+	•	Overlay: ret_overlay = ret_4h * w_diamante (alineado por timestamp).
+	•	Reporte (scripts/report_heart_vs_baseline.py): calcula PF/WR/MDD/exposure para baseline vs overlay y escribe:
+	•	reports/heart/summary_{WFE}.md
+	•	reports/heart/kpis_{WFE}.csv
+
+	6.	Comandos (añadir a scripts/corazon_cmds.zsh)
+
+zsh :
+runH_build_weights() {
+  python scripts/heart_overlay.py \
+    --prices_csv reports/ohlc_4h/BTC-USD.csv \
+    --fg_csv ./data/sentiment/fear_greed.csv \
+    --funding_csv ./data/sentiment/funding_rates.csv \
+    --rules_yaml configs/heart_rules.yaml \
+    --out_csv reports/heart/w_diamante.csv
+}
+runH_apply_overlay() {
+  python scripts/apply_heart_overlay.py \
+    --diamante_csv reports/diamante_btc_weekX.csv \
+    --weights_csv  reports/heart/w_diamante.csv \
+    --out_csv      reports/heart/diamante_overlay_weekX.csv
+}
+runH_report() {
+  python scripts/report_heart_vs_baseline.py \
+    --baseline_csv reports/diamante_btc_weekX.csv \
+    --overlay_csv  reports/heart/diamante_overlay_weekX.csv \
+    --out_md       reports/heart/summary_weekX.md \
+    --out_csv      reports/heart/kpis_weekX.csv
+}
+
+Nota: si tu CSV de Diamante usa otros nombres de columnas, adapto en apply_heart_overlay.py (puedo darte ese script también).
+
+	7.	Criterio de aceptación (rápido y binario)
+
+	•	Acepta el overlay solo si:
+	•	PF_overlay >= 0.90 * PF_baseline, y
+	•	MDD_overlay <= MDD_baseline, y
+	•	stdev_overlay <= stdev_baseline (aprox. ↓volatilidad), y
+	•	exposure_overlay no cae por debajo de ~55–60% promedio (salvo que el MDD mejore notablemente).
+
+	8.	Operativa semanal (2–5 minutos)
+
+	•	Lunes (después de congelar FREEZE):
+runH_build_weights && runH_apply_overlay && runH_report
+Revisar reports/heart/summary_weekX.md. Si pasa KPI → marcar “OK sombra”.
+Nada se activa en producción hasta tu “go”.
+
+

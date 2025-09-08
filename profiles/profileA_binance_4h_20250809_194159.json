@@ -1,0 +1,17 @@
+{
+  "threshold": 0.49,
+  "adx4_min": 4,
+  "adx1d_min": 0,
+  "trend_mode": "slope_up",
+  "sl_atr_mul": 1.1,
+  "tp1_atr_mul": 1.6,
+  "tp2_atr_mul": 4.5,
+  "trail_mul": 0.8,
+  "partial_pct": 0.5,
+  "risk_perc": 0.0065,
+  "_meta": {
+    "profile": "A",
+    "version": "v4.2",
+    "timestamp_utc": "2025-08-09T19:41:59.417782+00:00"
+  }
+}

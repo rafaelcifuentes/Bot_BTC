@@ -1,0 +1,11 @@
+# 1) Guardar archivos
+#   - scripts/diamante_tracker.py
+#   - run_diamante_tracker.sh
+
+# 2) Permisos
+chmod +x scripts/diamante_tracker.py run_diamante_tracker.sh
+
+# 3) Ejecutar (tras tus corridas de día 2, 3, …)
+./run_diamante_tracker.sh
+#     o con parámetros:
+./run_diamante_tracker.sh reports 60

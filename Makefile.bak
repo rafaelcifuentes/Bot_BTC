@@ -1,0 +1,230 @@
+SHELL := /bin/bash
+# --- Auto-detectar Python de la venv (o caer al python del sistema) ---
+PYRUN ?= $(shell test -x .venv/bin/python && echo .venv/bin/python || command -v python)
+
+# --- FREEZE por defecto (ajústalo si cambia tu corte histórico) ---
+FREEZE_END ?= 2025-08-10
+
+# --- Flags por defecto para runners (puedes cambiarlos cuando quieras) ---
+DEFAULT_COMMON_FLAGS := \
+  --threshold 0.61 \
+  --use_sentiment \
+  --fg_csv ./data/sentiment/fear_greed.csv \
+  --funding_csv ./data/sentiment/funding_rates.csv \
+  --fg_long_min -0.18 \
+  --fg_short_max 0.18 \
+  --funding_bias 0.01 \
+  --pt_mode pct \
+  --sl_pct 0.02 \
+  --tp_pct 0.10 \
+  --trail_pct 0.015 \
+  --adx_daily_source resample \
+  --adx1d_len 14 \
+  --adx1d_min 30 \
+  --adx4_min 18
+
+# Si no pasas COMMON_FLAGS en la línea de comando, usa los de arriba:
+COMMON_FLAGS ?= $(DEFAULT_COMMON_FLAGS)
+
+# Sanitiza: si alguien mete "..." por accidente, lo quitamos
+override COMMON_FLAGS := $(filter-out ...,$(COMMON_FLAGS))
+
+REGISTRY := registry_runs.csv
+#PYRUN := $(if $(BOTBTC_PY),$(BOTBTC_PY),python)
+
+.PHONY: env semaforo open-semaforo register-sentexp registry-dedupe check-reports weekly weekly-clean default
+default: semaforo
+
+env:
+	@echo "PYRUN = $(PYRUN)"
+	@echo "Python: $$($(PYRUN) -c 'import sys; print(sys.executable)')"
+
+semaforo:
+	@$(PYRUN) scripts/semaforo.py
+	@echo "✅ Semáforo regenerado → reports/semaforo.csv"
+
+open-semaforo:
+	@open reports/semaforo.csv || true
+
+register-sentexp:
+	@mkdir -p reports
+	@touch $(REGISTRY)
+	@$(PYRUN) scripts/register_sentexp.py
+	@tail -n 6 $(REGISTRY) || true
+
+registry-dedupe:
+	@$(PYRUN) scripts/registry_dedupe.py
+
+check-reports:
+	@$(PYRUN) scripts/check_reports.py
+
+weekly: register-sentexp semaforo
+
+weekly-clean: register-sentexp registry-dedupe semaforo open-semaforo
+	@true
+
+snapshot-semaforo:
+	@mkdir -p reports/snapshots
+	@cp reports/semaforo.csv "reports/snapshots/semaforo_$$(date -u +%Y%m%dT%H%M%SZ).csv"
+	@echo "🗂️ Snapshot guardado en reports/snapshots/"
+
+# --- Registro V2 y PerlaNegra (usa el registrador genérico) ---
+register-v2:
+	@mkdir -p reports
+	@touch $(REGISTRY)
+	@$(PYRUN) scripts/register_generic.py --strategy V2 --pattern 'reports/summary_v2_*.json'
+	@tail -n 6 $(REGISTRY) || true
+
+register-perla:
+	@mkdir -p reports
+	@touch $(REGISTRY)
+	@$(PYRUN) scripts/register_generic.py --strategy PerlaNegra --pattern 'reports/summary_perla_negra_*.json'
+	@tail -n 6 $(REGISTRY) || true
+
+# Comodín para registrar todo con un solo comando
+register-all: register-v2 register-perla register-sentexp
+
+# ==========================
+# Runners + Weekly Full Run
+# ==========================
+
+# Variables (puedes ajustar por CLI)
+FREEZE ?= 2025-08-10
+FLAGS_PRIMARY := --primary_only
+#COMMON_FLAGS := --use_sentiment --fg_csv ./data/sentiment/fear_greed.csv \
+                --funding_csv ./data/sentiment/funding_rates.csv \
+                --fg_long_min -0.18 --fg_short_max 0.18 --funding_bias 0.01 \
+                --threshold 0.59 \
+                --pt_mode pct --sl_pct 0.02 --tp_pct 0.10 --trail_pct 0.015 \
+                --adx_daily_source resample --adx1d_len 14 --adx1d_min 30 \
+                --adx4_min 18
+
+# Rutas de runners
+RUNNER_V2   := runner_profileA_V2.py
+RUNNER_PERLA:= runner_profileA_PerlaNegra.py
+RUNNER_SENT := runner_profileA_RF_sentiment_EXP.py
+
+.PHONY: run-v2-freeze run-v2-live run-perla-freeze run-perla-live run-sentexp-freeze run-sentexp-live run-all weekly-full
+
+# --- V2 ---
+run-v2-freeze:
+	@echo "▶️  V2 (freeze hasta $(FREEZE))"
+	@$(PYRUN) $(RUNNER_V2) $(FLAGS_PRIMARY) --freeze_end $(FREEZE) --repro_lock $(COMMON_FLAGS)
+
+run-v2-live:
+	@echo "▶️  V2 (live)"
+	@$(PYRUN) $(RUNNER_V2) $(FLAGS_PRIMARY) $(COMMON_FLAGS)
+
+# --- Perla Negra ---
+run-perla-freeze:
+	@echo "▶️  PerlaNegra (freeze hasta $(FREEZE))"
+	@$(PYRUN) $(RUNNER_PERLA) $(FLAGS_PRIMARY) --freeze_end $(FREEZE) --repro_lock $(COMMON_FLAGS)
+
+run-perla-live:
+	@echo "▶️  PerlaNegra (live)"
+	@$(PYRUN) $(RUNNER_PERLA) $(FLAGS_PRIMARY) $(COMMON_FLAGS)
+
+# --- Sentiment EXP (runner EXP directo) ---
+run-sentexp-freeze:
+	@echo "▶️  SentimentEXP (freeze hasta $(FREEZE))"
+	@$(PYRUN) $(RUNNER_SENT) $(FLAGS_PRIMARY) --freeze_end $(FREEZE) --repro_lock $(COMMON_FLAGS)
+
+run-sentexp-live:
+	@echo "▶️  SentimentEXP (live)"
+	@$(PYRUN) $(RUNNER_SENT) $(FLAGS_PRIMARY) $(COMMON_FLAGS)
+
+# Agrupador: corre TODO (6 corridas)
+run-all: run-v2-freeze run-v2-live run-perla-freeze run-perla-live run-sentexp-freeze run-sentexp-live
+	@echo "✅ Runners completados (V2, PerlaNegra, SentimentEXP; freeze + live)"
+
+# Weekly completo: corre runners, registra, deduplica, genera semáforo y abre
+# Nota: asume que ya tienes los targets register-v2, register-perla, register-sentexp,
+#       registry-dedupe, semaforo y open-semaforo definidos en tu Makefile actual.
+weekly-full: run-all register-v2 register-perla register-sentexp registry-dedupe semaforo open-semaforo
+	@echo "✅ Weekly full listo"
+# Base de flags recomendados (para no repetir)
+
+
+# Dos variantes cambiando solo el umbral
+
+COMMON_FLAGS_59 := --threshold 0.59 $(COMMON_FLAGS_BASE)
+
+
+# Ejecuta runners (freeze+live) + registra + deduplica + semáforo con TH=0.61
+
+
+# Igual que arriba pero con TH=0.59
+
+
+# Base de flags recomendados (para no repetir)
+
+
+# Dos variantes cambiando solo el umbral
+
+COMMON_FLAGS_59 := --threshold 0.59 $(COMMON_FLAGS_BASE)
+
+
+# Ejecuta runners (freeze+live) + registra + deduplica + semáforo con TH=0.61
+
+
+# Igual que arriba pero con TH=0.59
+
+
+# Base de flags recomendados (para no repetir)
+
+
+# Dos variantes cambiando solo el umbral
+
+COMMON_FLAGS_59 := --threshold 0.59 $(COMMON_FLAGS_BASE)
+
+
+# Ejecuta runners (freeze+live) + registra + deduplica + semáforo con TH=0.61
+
+
+# Igual que arriba pero con TH=0.59
+
+
+# Base de flags recomendados (para no repetir)
+COMMON_FLAGS_BASE := --use_sentiment \
+  --fg_csv ./data/sentiment/fear_greed.csv \
+  --funding_csv ./data/sentiment/funding_rates.csv \
+  --fg_long_min -0.18 --fg_short_max 0.18 --funding_bias 0.01 \
+  --pt_mode pct --sl_pct 0.02 --tp_pct 0.10 --trail_pct 0.015 \
+  --adx_daily_source resample --adx1d_len 14 --adx1d_min 30 --adx4_min 18
+
+# Dos variantes cambiando solo el umbral
+COMMON_FLAGS_61 := --threshold 0.61 $(COMMON_FLAGS_BASE)
+COMMON_FLAGS_59 := --threshold 0.59 $(COMMON_FLAGS_BASE)
+
+.PHONY: weekly-61 weekly-59
+
+# Ejecuta runners (freeze+live) + registra + deduplica + semáforo con TH=0.61
+weekly-61:
+	@$(MAKE) weekly-full COMMON_FLAGS="$(COMMON_FLAGS_61)" PYRUN="$(PYRUN)"
+
+# Igual que arriba pero con TH=0.59
+weekly-59:
+	@$(MAKE) weekly-full COMMON_FLAGS="$(COMMON_FLAGS_59)" PYRUN="$(PYRUN)"
+
+# --- Presets para weekly-full (wrappers de conveniencia) ---
+# Base de flags recomendados (para no repetir)
+COMMON_FLAGS_BASE := --use_sentiment \
+  --fg_csv ./data/sentiment/fear_greed.csv \
+  --funding_csv ./data/sentiment/funding_rates.csv \
+  --fg_long_min -0.18 --fg_short_max 0.18 --funding_bias 0.01 \
+  --pt_mode pct --sl_pct 0.02 --tp_pct 0.10 --trail_pct 0.015 \
+  --adx_daily_source resample --adx1d_len 14 --adx1d_min 30 --adx4_min 18
+
+# Dos variantes cambiando solo el umbral
+COMMON_FLAGS_61 := --threshold 0.61 $(COMMON_FLAGS_BASE)
+COMMON_FLAGS_59 := --threshold 0.59 $(COMMON_FLAGS_BASE)
+
+.PHONY: weekly-61 weekly-59
+
+# Ejecuta runners (freeze+live) + registra + deduplica + semáforo con TH=0.61
+weekly-61:
+	@$(MAKE) weekly-full COMMON_FLAGS="$(COMMON_FLAGS_61)" PYRUN="$(PYRUN)"
+
+# Igual que arriba pero con TH=0.59
+weekly-59:
+	@$(MAKE) weekly-full COMMON_FLAGS="$(COMMON_FLAGS_59)" PYRUN="$(PYRUN)"

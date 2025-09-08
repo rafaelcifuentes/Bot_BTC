@@ -1,0 +1,31 @@
+[tzsafe:load] file=reports/windows_fixed/2023Q4/BTC-USD.csv rows=552 q={0.0: 0.02, 0.25: 0.251, 0.5: 0.501, 0.75: 0.75, 1.0: 0.98} ge={0.55: 249, 0.58: 232, 0.6: 221, 0.62: 210, 0.66: 188, 0.7: 166}
+[tzsafe:pre] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 rows=547 q={0.0: 0.02, 0.25: 0.249, 0.5: 0.496, 0.75: 0.744, 1.0: 0.98} ge={0.55: 244, 0.58: 227, 0.6: 216, 0.62: 205, 0.66: 183, 0.7: 161} TF=True MODE=soft RM=8 HYS=0.05
+[tzsafe] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 th=0.72 hor=None crosses=19 bars>=th=132
+[tzsafe:pre] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 rows=547 q={0.0: 0.02, 0.25: 0.249, 0.5: 0.496, 0.75: 0.744, 1.0: 0.98} ge={0.55: 244, 0.58: 227, 0.6: 216, 0.62: 205, 0.66: 183, 0.7: 161} TF=True MODE=soft RM=8 HYS=0.05
+[tzsafe] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 th=0.74 hor=None crosses=18 bars>=th=122
+[tzsafe:pre] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 rows=547 q={0.0: 0.02, 0.25: 0.249, 0.5: 0.496, 0.75: 0.744, 1.0: 0.98} ge={0.55: 244, 0.58: 227, 0.6: 216, 0.62: 205, 0.66: 183, 0.7: 161} TF=True MODE=soft RM=8 HYS=0.05
+[tzsafe] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 th=0.76 hor=None crosses=16 bars>=th=113
+[tzsafe:pre] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 rows=547 q={0.0: 0.02, 0.25: 0.249, 0.5: 0.496, 0.75: 0.744, 1.0: 0.98} ge={0.55: 244, 0.58: 227, 0.6: 216, 0.62: 205, 0.66: 183, 0.7: 161} TF=True MODE=soft RM=8 HYS=0.05
+[tzsafe] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 th=0.72 hor=None crosses=19 bars>=th=132
+[tzsafe:pre] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 rows=547 q={0.0: 0.02, 0.25: 0.249, 0.5: 0.496, 0.75: 0.744, 1.0: 0.98} ge={0.55: 244, 0.58: 227, 0.6: 216, 0.62: 205, 0.66: 183, 0.7: 161} TF=True MODE=soft RM=8 HYS=0.05
+[tzsafe] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 th=0.74 hor=None crosses=18 bars>=th=122
+[tzsafe:pre] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 rows=547 q={0.0: 0.02, 0.25: 0.249, 0.5: 0.496, 0.75: 0.744, 1.0: 0.98} ge={0.55: 244, 0.58: 227, 0.6: 216, 0.62: 205, 0.66: 183, 0.7: 161} TF=True MODE=soft RM=8 HYS=0.05
+[tzsafe] start=2023-10-01 00:00:00 end=2023-12-31 00:00:00 th=0.76 hor=None crosses=16 bars>=th=113
+[OK] Escrito reports/kpis_grid.csv rows=6
+[OK] Escrito reports/top_configs.csv rows=0
+[cwd] /Users/rafaelcifuentes/PycharmProjects/Bot_BTC
+[read] reports/kpis_grid.csv
+
+=== Cobertura por ventana (proporción que pasa cada gate) ===
+        %PF  %WR  %Trades
+_w                       
+2023Q4  0.0  0.0      0.0
+
+=== Near-misses (casi pasan) ===
+PF cerca: 0 | WR cerca: 0 | Trades cerca: 0
+
+=== Top candidatos que fallan 1 solo gate ===
+(no hay filas con solo 1 fallo)
+
+=== (horizon, threshold) — min por ventana y medianas (solo full_coverage) ===
+(no hay combos con coverage=3; una ventana es el cuello de botella)

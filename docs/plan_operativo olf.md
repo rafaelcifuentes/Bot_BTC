@@ -21,14 +21,14 @@ EXCHANGE=binanceus python swing_4h_forward_diamond.py --skip_yf \
 
 ---
 
-## Alcance y orden
+## Alcance y orden`
 
 1) **Fase A — Diamante (semanas 0–6)**  
    Swing 4h con ATR (SL/TP1/TP2 + parcial), validación OOS, costes realistas y guardrails.
 
 2) **Fase B — Corazón (semanas C1–C2, después de Diamante)**  
    Intradía 4h por **probabilidad + gates (ADX/FG/Funding)**, **sin** TP/SL ATR, con **snapshot diario automatizado**.
-
+`
 > **Regla:** Durante Fase A **NO** se ejecutan tareas de Corazón.
 
 ---
@@ -66,6 +66,16 @@ Out-of-sample mensual encadenado, filtros de régimen y stress tests (spreads/la
 
 **Semanas 4–6 — Decisión**  
 Semáforo: 🟢 PF ≥ 1.15 & Sortino ≥ 0.50 & MDD ≤ 1.1× baseline → **paper** con riesgo reducido.
+
+
+Nueva tarea ?
+Qué hacen exactamente las piezas nuevas (para cuando toque)
+	•	Loader diamante_selected.yaml: auto-inyecta tu última selección (p. ej. H=90, TH=0.66) sin tocar comandos.
+	•	--perla_csv + --max_corr: (apagado por defecto) leen la serie de posición o señal binaria de Perla y calculan la correlación efectiva con la exposición de Diamante en la ventana OOS; si supera --max_corr, se descarta esa config. Esto es una forma práctica de forzar diversificación (evitar config “pegadas”).  ￼
+
+Respuesta directa a tus preguntas
+	•	¿Encaja en el Plan Macro? Sí: lo dejamos agendado para la etapa de evaluación (Semanas 3–6); hoy no se usa.
+
 
 ### 4) Setup de ejecución (variables sugeridas)
 ```bash
@@ -433,4 +443,3 @@ Plan macro (resumen)
 	6.	Paso a paper/live con la configuración ganadora.
 
 (Recordatorio operativo: correr los miércoles 08:10 Montreal ≈ 12:10 UTC; guardar logs en ./logs/ y revisar ./profiles/andromeda_conflict_guard_weights.json.)
-

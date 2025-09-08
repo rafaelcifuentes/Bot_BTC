@@ -1,0 +1,11 @@
+{
+  "threshold": 0.52,
+  "adx4_min": 6,
+  "adx1d_min": 0,
+  "sl_atr_mul": 1.2,
+  "tp1_atr_mul": 1.6,
+  "tp2_atr_mul": 4.5,
+  "trail_mul": 1.0,
+  "partial_pct": 0.4,
+  "risk_perc": 0.005
+}

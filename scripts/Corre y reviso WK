@@ -1,0 +1,4 @@
+# Resumen y decisión
+sed -n '1,120p' reports/w*/summary/decision.md
+# CSV compacto
+head -n 5 reports/w*/summary/compact_base_vs_stress.csv

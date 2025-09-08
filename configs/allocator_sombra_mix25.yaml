@@ -1,0 +1,52 @@
+# --- A': mezcla prudente (D=25%, P=75%) para reintroducir Diamante ---
+rebalance_freq: 4h
+timezone: UTC
+
+costs:
+  fee_bps: 6
+  slip_bps: 6
+
+exec:
+  round_step: 0.20           # mantenemos el escalón alto para contener coste
+  max_delta_weight_bar: 0.10 # y suavizado de cambios
+
+alloc_base:
+  diamante: 0.25
+  perla:    0.75
+
+risk:
+  vol_target_ann: 0.12       # conserva el target; ajusta a 0.14 si quieres un pelín más de pulso
+  w_cap_total:    1.20
+  vol_clamp:
+    min: 0.50
+    max: 5.00
+  vol_estimator:
+    ewm_span: 60
+    vol_floor_ann: 0.10
+
+throttle:
+  enabled: true
+  span_bars: 60
+  factor_when_neg: 0.65
+
+corr_gate:
+  enabled: true              # clave cuando D y P se acercan demasiado
+  lookback_bars: 72
+  threshold: 0.35
+  max_penalty: 0.30
+  perf_window_days: 30
+
+xi_star:
+  cap: 1.65
+
+files:
+  diamante: signals/diamante.csv
+  perla:    signals/perla.csv
+  heart_weights: corazon/weights.csv
+  heart_lq:      corazon/lq.csv
+  xi_star:       reports/heart/xi_star.txt
+
+outputs:
+  kpis:         reports/allocator/sombra_kpis.md
+  equity_dir:   reports/allocator/curvas_equity/
+  weights_overlay: reports/allocator/weights_overlay.csv

@@ -1,0 +1,12 @@
+🔄 Loading 4h data (ccxt + fallbacks + yfinance)…
+✨ Adding features…
+🧠 Training model on train / scoring OOS…
+
+— Portfolio with conflict-guard (OOS zone) —
+Solo LONG  → Net 2613.48, PF 5.19, WR 13.82%, Trades 456, MDD 119.66, Score 21.84
+Solo SHORT → Net 1227.68, PF 2.20, WR 25.00%, Trades 456, MDD 79.70, Score 15.40
+Baseline   → wL 0.60, wS 0.40 | Net 2045.76, PF 3.55, WR 38.82%, Trades 456, MDD 79.73, Score 25.66
+Selected   → wL 0.35, wS 0.65 | Net 1700.03, PF 2.89, WR 38.82%, Trades 456, MDD 56.53, Score 30.08 | feasible=True | cap=83.68
+🔒 Autolock aplicado (regla híbrida cumplida).
+📝 Saved weekly summary → ./reports/conflict_guard_weekly_20250812_030623.json
+📌 Updated latest → ./reports/conflict_guard_weekly_latest.json

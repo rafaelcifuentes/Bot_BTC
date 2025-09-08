@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/mini_accum/__init__.py
+src/mini_accum/cli.py
+src/mini_accum/indicators.py
+src/mini_accum/io.py
+src/mini_accum/sim.py
+src/mini_accum.egg-info/PKG-INFO
+src/mini_accum.egg-info/SOURCES.txt
+src/mini_accum.egg-info/dependency_links.txt
+src/mini_accum.egg-info/entry_points.txt
+src/mini_accum.egg-info/requires.txt
+src/mini_accum.egg-info/top_level.txt
+tests/test_smoke.py

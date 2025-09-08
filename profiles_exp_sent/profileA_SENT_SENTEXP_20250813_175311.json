@@ -1,0 +1,40 @@
+{
+  "rf_locked": {
+    "n_estimators": 50,
+    "max_depth": 10,
+    "min_samples_split": 2,
+    "random_state": 42,
+    "class_weight": "balanced"
+  },
+  "engine": {
+    "threshold": 0.55,
+    "risk_perc": 0.01,
+    "cost": 0.0002,
+    "slip": 0.0001,
+    "pt_mode": "atr",
+    "sl_atr_mul": 2.5,
+    "tp1_atr_mul": 1.6,
+    "tp2_atr_mul": 5.0,
+    "trail_mul": 1.0,
+    "sl_pct": 0.025,
+    "tp_pct": 0.05,
+    "trail_pct": 0.01,
+    "partial_pct": 0.5,
+    "adx4_min": 10,
+    "adx1d_min": 10
+  },
+  "features": [
+    "ema_fast",
+    "ema_slow",
+    "rsi",
+    "atr",
+    "adx4h",
+    "adx_daily",
+    "fgi_norm",
+    "fgi_z30",
+    "funding_raw",
+    "funding_z30",
+    "funding_sign",
+    "funding_delta"
+  ]
+}

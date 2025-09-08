@@ -1,0 +1,25 @@
+[1] Export LIVE por-barra
+/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/lib/python3.11/site-packages/pandas_ta/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+[cost-model] slip=0.000200  cost_rt=0.000400
+⚠️ yfinance no se usó (--skip_yf). Intentando ccxt/binanceus con BTC/USD…
+Rango bruto: 2025-02-19 12:00:00 → 2025-08-05 00:00:00  | velas_brutas=1000
+Rango post-features: 2025-02-23 16:00:00 → 2025-08-05 00:00:00  | velas=975
+
+== Variante SEGURA (features shift(1)) ==
+         net    pf  win_rate  trades    mdd
+days                                       
+30   473.850 6.340    78.947      19 -0.008
+60   531.800 2.174    72.973      37 -0.017
+90   531.800 2.174    72.973      37 -0.017
+
+Buy&Hold en ~15.0 días de test: net=735.76 USD
+CSV -> reports/diamante_btc_live_2025-09-07.csv
+CSV+ -> reports/diamante_btc_live_2025-09-07_plus.csv
+[OK] Barras (Diamante por-barra) → reports/diamante_btc_costes_week1_bars.csv  (rows=293)
+[2] Pesos LIVE (YAML snapshot si existe)
+[OK] Pesos escritos en: corazon/weights_live_2025-09-07.csv
+[OK] LQ flags escritas en: corazon/lq_live_2025-09-07.csv
+[3] Overlay + [4] KPIs LIVE
+⛔ Falta: reports/diamante_btc_live_2025-09-07_bars.csv
+   Pista: Provee el CSV de Diamante (p.ej. reports/diamante_btc_week1.csv)

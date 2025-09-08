@@ -1,4 +1,4 @@
-# Plan Operativo (v2025-09-02) — “Playbook”
+# Plan Operativo (v2025-09-02) — "Playbook"
 **Actualizado:** 2025-09-03 01:54 UTC  
 **Ámbito:** semana a semana (6+2), con tracks Perla, Diamante, Corazón y Allocator.
 
@@ -56,7 +56,7 @@ PF ≥ 1.15–1.25; MDD ≤ 15%; corr(D,P) ≤ 0.35–0.40 en neutro/rango; **NE
 
 ### 4.2 Loader y gate de correlación
 - `configs/diamante_selected.yaml` (la única fuente de verdad).  
-- Gate opcional: `--perla_csv ... --max_corr 0.35` para descartar configs “pegadas” a Perla.
+- Gate opcional: `--perla_csv ... --max_corr 0.35` para descartar configs "pegadas" a Perla.
 
 ### 4.3 Comandos de referencia
 BTC (ejemplo multi‑horizonte):
@@ -132,12 +132,12 @@ python3 scripts/allocator_sombra_runner_plus.py --config configs/allocator_sombr
 ### Diario / por corrida
 - `tests_overlay_check.py` con **Diff≈0**.
 - Turnover/cost share razonables (sin picos anómalos).  
-- Vol estimator OK; sin “scale infinito”; sin pegue a caps.
+- Vol estimator OK; sin "scale infinito"; sin pegue a caps.
 
 ### Semanal (IS→OOS)
 - **Perla:** grid IS, selección por OOS (`oos_net`/`oos_pf`), escribir `signals/perla.csv`.
 - **Diamante:** auditoría/rediseño, OOS 60–90d con costes, **gates** arriba.  
-- **Corazón:** reporte semáforo (pesos, dwell, corr rolling) y “what‑if” del blend.
+- **Corazón:** reporte semáforo (pesos, dwell, corr rolling) y "what‑if" del blend.
 
 ---
 

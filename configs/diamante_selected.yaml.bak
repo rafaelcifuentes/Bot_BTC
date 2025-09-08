@@ -1,0 +1,12 @@
+# Selección Semana 1 (costes realistas)
+as_of: "2025-08-05 00:00"
+notes: "BTC OK baseline costes; ETH con poda suave t=0.61; SOL en observación."
+diamante:
+  BTC-USD:
+    threshold: "as-run"   # el usado en tus costes de hoy
+    horizons: [30, 60, 90]
+  ETH-USD:
+    threshold: 0.61
+    horizons: [60]        # horizon del gate
+  SOL-USD:
+    status: watch

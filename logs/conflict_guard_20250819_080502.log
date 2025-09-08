@@ -1,0 +1,8 @@
+/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/lib/python3.11/site-packages/pandas_ta/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+Failed to get ticker 'BTC-USD' reason: HTTPSConnectionPool(host='fc.yahoo.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x134caa910>: Failed to resolve 'fc.yahoo.com' ([Errno 8] nodename nor servname provided, or not known)"))
+
+1 Failed download:
+['BTC-USD']: ConnectionError(MaxRetryError('HTTPSConnectionPool(host=\'fc.yahoo.com\', port=443): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x134cab710>: Failed to resolve \'fc.yahoo.com\' ([Errno 8] nodename nor servname provided, or not known)"))'))
+🔄 Loading 4h data (ccxt + fallbacks + yfinance)…
+No data available.

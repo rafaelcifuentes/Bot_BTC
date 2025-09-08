@@ -1,0 +1,19 @@
+/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/lib/python3.11/site-packages/pandas_ta/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+Failed to get ticker 'BTC-USD' reason: Expecting value: line 1 column 1 (char 0)
+
+1 Failed download:
+['BTC-USD']: JSONDecodeError('Expecting value: line 1 column 1 (char 0)')
+🔄 Loading 4h data (ccxt + fallbacks + yfinance)…
+Traceback (most recent call last):
+  File "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/runner_conflict_guard_weekly_v2.py", line 571, in <module>
+    main()
+  File "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/runner_conflict_guard_weekly_v2.py", line 467, in main
+    t_end = pd.Timestamp(args.freeze_end, tz="UTC").tz_convert(None)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "timestamps.pyx", line 1865, in pandas._libs.tslibs.timestamps.Timestamp.__new__
+  File "conversion.pyx", line 364, in pandas._libs.tslibs.conversion.convert_to_tsobject
+  File "conversion.pyx", line 641, in pandas._libs.tslibs.conversion.convert_str_to_tsobject
+  File "parsing.pyx", line 336, in pandas._libs.tslibs.parsing.parse_datetime_string
+  File "parsing.pyx", line 666, in pandas._libs.tslibs.parsing.dateutil_parse
+pandas._libs.tslibs.parsing.DateParseError: Unknown datetime string format, unable to parse: YYYY-MM-DD 12:10

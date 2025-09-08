@@ -1,0 +1,12 @@
+{
+  "threshold": 0.51,
+  "adx4_min": 6,
+  "adx1d_min": 0,
+  "trend_mode": "slope_up",
+  "sl_atr_mul": 1.2,
+  "tp1_atr_mul": 1.6,
+  "tp2_atr_mul": 4.5,
+  "trail_mul": 0.8,
+  "partial_pct": 0.5,
+  "risk_perc": 0.006
+}

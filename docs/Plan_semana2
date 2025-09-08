@@ -1,0 +1,255 @@
+Semana 2 — Robustez (parte 2) · Continuación
+
+Estado:
+	•	D1 (hecho): OOS forward-chaining con costes base (slip=0.0002, cost=0.0004) y thresholds {0.58…0.62}.
+	•	Hallazgo: últimos freezes pasan (PF alto), antiguos penalizan la mediana → documentado; mantenemos T=0.58 candidato y T=0.59 runner-up para cierre de W2.
+
+W2-D1 — Walk-Forward ampliado multi-años (mensual)
+Objetivo (en sencillo)
+
+Validar que Diamante (BTC, 4h) mantiene robustez OOS cuando el punto de corte (freeze_end) avanza mes a mes a lo largo de 4 años, con el mismo coste friccional que acordamos.
+No cambiamos lógica ni features; solo “moviéndonos en el tiempo” para ver consistencia.Lo que vamos a probar: Backtests congelados con --freeze_end mensuales sobre 4 años (--period 1460d), para equity encadenada.
+
+Gate (mediana a 60d):
+PF ≥ 1.50, WR ≥ 60%, Trades ≥ 30, MDD ≤ 1.1× MDD_week1 (usa tu baseline; si no lo tienes a mano, puedes partir de 0.0187 = 1.87%, y ajustar luego).
+
+Criterio de victoria (por mediana de freezes, 60d): PF≥1.50, WR≥60%, Trades≥30, MDD≤1.1×MDD_week1.
+Quiebre: mediana PF<1.50 o WR<60% o Trades<30 → no tocar lógica, sólo anotar; revisión en D4.
+
+Tiene un scope mayor, me gustaria hacerlo, si es asi podriamos comenzar por ahi, necesito entonces que me pases el script para comenzar, estoy muy entusiasmado con nuestro BOT y quiero apurarle para avanzar con el lo mas rapido, pero de la mejor manera, possible!
+⸻
+
+W2-D2 — Curva de capital & volatilidad vs B&H (usar lo ya corrido)
+
+Objetivo: comparar equity (Diamante) vs Buy&Hold en los freezes ya generados.
+
+Qué vamos a probar
+	•	Tomar los CSV existentes de W2-D1 (usa los *_plus.csv si están: traen equity/logs).
+	•	Calcular por freeze: stdev(ret), MDD, time-in-market (exposure) y comparar con B&H.
+
+Indicadores a vigilar
+	•	stdev_ret (Diamante) ≤ stdev_ret (B&H)
+	•	MDD_D ≤ MDD_BH
+	•	PF_60d ≥ 1.50 (si ya lo tienes del D1, solo referenciar)
+
+Criterio de victoria (D2)
+	•	En ≥60% de los freezes recientes: stdev y MDD de Diamante ≤ B&H (con PF_60d ≥ 1.5).
+	•	Si no, documentar (no tocar lógica).
+
+Comandos (ejemplo)
+bash :
+# Insumos: reports/week2_oos_btc/btc_t058/*.csv y btc_t059/*.csv (o los que tengas)
+python - <<'PY'
+import glob, os, pandas as pd
+def pick(file):
+    df = pd.read_csv(file)
+    r = df.loc[df['days']==60].iloc[0]
+    return dict(
+        file=os.path.basename(file), pf=r['pf'], wr=r['win_rate'],
+        trades=int(r['trades']), mdd=abs(r['mdd'])
+    )
+rows=[]
+for pat in ["reports/week2_oos_btc/btc_t058/*.csv","reports/week2_oos_btc/btc_t059/*.csv"]:
+    for f in glob.glob(pat):
+        try: rows.append(pick(f))
+        except: pass
+res = pd.DataFrame(rows)
+res.to_csv("reports/week2_equity_summary_proxy.csv", index=False)
+print(res.groupby(res.file.str[:10]).median(numeric_only=True))  # mediana por freeze
+PY
+
+Nota: si tus *_plus.csv tienen series equity/bh_equity, usa ese par para calcular stdev/MDD; si no, deja el proxy (tabla anterior) y solo compara PF, MDD.
+
+Rutas de salida (para pegar)
+	•	reports/wf4y_btc/equity_chain_t058.csv
+	•	reports/wf4y_btc/equity_chain_t060.csv
+	•	reports/wf4y_btc/equity_vs_bh_summary.csv
+	•	reports/wf4y_btc/equity_vs_bh.md
+
+
+Fuente de datos: reports/wf4y_btc/t058/*_plus.csv y reports/wf4y_btc/t060/*_plus.csv (series mensuales congeladas con equity).
+
+Entregables D2
+	•	reports/week2_equity_summary_proxy.csv (o week2_equity_btc.csv si usas equity real)
+	•	reports/week2_equity_notes.md (2–3 bullets con conclusiones)
+
+⸻
+
+W2-D3 — KPI extra (Sharpe/Sortino por trade & exposición)
+
+Objetivo: enriquecer métricas sin cambiar la lógica.
+
+Qué vamos a calcular
+	•	Sortino por trade (si tienes PnL por operación en los *_plus.csv o en trade logs).
+	•	Exposure (tiempo en mercado), time-to-profit (si disponible).
+
+Condición de victoria (D3)
+	•	Sortino_trade ≥ 0.60 y exposure entre 25–65% (aprox) en la mediana de freezes recientes.
+	•	Si Sortino<0.4 o exposure extremo y PF<1.5 → marcar para stress (D4).
+
+Comandos (ejemplo robusto)
+bash:
+python - <<'PY'
+import glob, pandas as pd, os, numpy as np
+out=[]
+for f in glob.glob("reports/week2_oos_btc/*_plus.csv"):
+    try:
+        df = pd.read_csv(f)
+        # heurísticas: busca columnas plausibles
+        cols = {c.lower(): c for c in df.columns}
+        if 'trade_pnl' in cols:
+            r = df[cols['trade_pnl']].dropna()
+            if len(r)>3:
+                downside = r[r<0]
+                sortino = r.mean() / (downside.std(ddof=1)+1e-9)
+            else:
+                sortino = np.nan
+        else:
+            sortino = np.nan
+        # exposición: usa si existe 'exposure' o % de barras en posición
+        exposure = df[cols['exposure']].mean() if 'exposure' in cols else np.nan
+        out.append({'file':os.path.basename(f), 'sortino_trade':sortino, 'exposure':exposure})
+    except Exception:
+        pass
+pd.DataFrame(out).to_csv("reports/week2_kpis_btc.csv", index=False)
+print("OK -> reports/week2_kpis_btc.csv")
+PY
+
+Entregables D3
+	•	reports/week2_kpis_btc.csv
+	•	reports/week2_kpis_notes.md (bullet corto: ¿Sortino_trade pasa? ¿Exposure razonable?)
+
+Rutas de salida (pégalas en tu plan)
+	•	reports/week2_kpi_proxy.csv
+	•	reports/week2_kpi_proxy_summary.csv
+	•	reports/week2_kpi_notes.md
+
+# W2-D3 — KPI proxy (medianas por T)
+
+   t    pf    wr  trades sharpe_proxy sortino_proxy  gate_kpi
+0.58 0.876 60.5%    36.0        -0.06         -0.08     False
+0.59 0.876 60.5%    32.0        -0.06         -0.08     False
+0.60 0.751 56.5%    23.0        -0.14         -0.16     False
+0.61 0.810 54.5%    23.0        -0.10         -0.13     False
+0.62 0.735 55.0%    23.0        -0.15         -0.18     False
+⸻----
+	•	W2-D3 (KPI proxy) ✅ completado
+Usamos los freezes ya corridos y calculamos PF/WR/Trades + Sharpe/Sortino proxy (a partir de retornos agregados).
+El mini-resumen que mostraste confirma que el gate_kpi no pasa en la mediana (como ya esperábamos en este entorno), por lo que documentamos y seguimos.
+	•	W2-D3 (KPI extra “reales”) ➜ diferido
+Para calcular Sortino por trade y exposure reales necesitamos que los *_plus.csv traigan columnas como trade_pnl y exposure. Hoy no están (solo vemos roi_pct), así que ese tramo lo dejamos en backlog para instrumentación ligera más adelante (p. ej., W3). No tocaríamos la lógica de señales; solo telemetría.
+
+Qué registrar hoy en plan_semana.md
+	•	Entregables creados
+	•	reports/week2_kpi_proxy.csv
+	•	reports/week2_kpi_proxy_summary.csv
+	•	reports/week2_kpi_notes.md
+	•	Notas
+	•	KPI extra (Sortino_trade, exposure) diferido por ausencia de columnas en *_plus.csv.
+	•	Acción: instrumentar export mínimo de trade_pnl y %exposure más adelante (sin cambiar lógica).
+
+Decisión del día (W2-D3)
+	•	No tocar la lógica.
+	•	Marcar para stress (W2-D4) los thresholds candidatos (0.58 y 0.59) y validar resiliencia de PF/WR/MDD bajo mayor fricción.
+
+⸻-------------
+
+W2-D4 — Stress tests (fricción alta)
+
+Objetivo: comprobar resiliencia con slip=0.0003, cost=0.0005 en dos freezes recientes y T ∈ {0.58, 0.59}.
+
+Criterio de victoria (D4)
+	•	En ≥60% de combos:
+	•	PF_stress ≥ 0.9 × PF_base
+	•	MDD_stress ≤ 1.2 × MDD_base
+
+Comandos
+bash :
+export HI_SLIP=0.0003; export HI_COST=0.0005
+mkdir -p reports/week2_stress_btc
+for T in 0.58 0.59; do
+  for F in "2025-07-31 00:00" "2025-08-05 00:00"; do
+    TAG=$(echo "$F" | tr ':- ' '_')
+    python swing_4h_forward_diamond.py --skip_yf \
+      --symbol BTC-USD --period 1460d --horizons 30,60,90 \
+      --freeze_end "$F" --max_bars 975 \
+      --threshold $T --slip $HI_SLIP --cost $HI_COST \
+      --out_csv "reports/week2_stress_btc/btc_t${T//./}_${TAG}.csv"
+  done
+done
+# Resumen base vs stress (robusto a faltantes)
+python - <<'PY'
+import glob, os, pandas as pd
+def pick60(path):
+    df=pd.read_csv(path)
+    r=df.loc[df['days']==60].iloc[0]
+    return dict(pf=r['pf'], wr=r['win_rate'], trades=int(r['trades']), mdd=abs(r['mdd']))
+base = {os.path.basename(f): pick60(f) for f in glob.glob("reports/week2_oos_btc/btc_t058/*.csv")+glob.glob("reports/week2_oos_btc/btc_t059/*.csv")}
+rows=[]
+for f in glob.glob("reports/week2_stress_btc/*.csv"):
+    b=os.path.basename(f).split('_',2)[-1]
+    cur=pick60(f); ref=base.get(b)
+    if ref:
+        rows.append({
+          'file':os.path.basename(f),'pf':cur['pf'],'wr':cur['wr'],'trades':cur['trades'],'mdd':cur['mdd'],
+          'pf0':ref['pf'],'wr0':ref['wr'],'tr0':ref['trades'],'mdd0':ref['mdd'],
+          'pf_ratio':cur['pf']/(ref['pf']+1e-9), 'mdd_ratio':(cur['mdd']/(ref['mdd']+1e-9)) if ref['mdd']>0 else float('inf')
+        })
+pd.DataFrame(rows).to_csv("reports/week2_friction_summary.csv", index=False)
+print("OK -> reports/week2_friction_summary.csv")
+PY
+
+Entregables D4
+	•	reports/week2_stress_btc/*.csv
+	•	reports/week2_friction_summary.csv
+
+⸻
+
+W2-D5 — Cierre & decisión intermedia (sin cambiar lógica)
+
+Qué hacemos
+	•	Consolidar: week2_equity_summary_proxy.csv, week2_kpis_btc.csv, week2_friction_summary.csv.
+	•	Decisión preliminar de T (0.58 vs 0.59) SOLO si:
+	•	Mediana PF_60d ≥ 1.5, WR ≥ 60, Trades ≥ 30, MDD ≤ 1.1× baseline S1
+	•	Stress: PF_ratio ≥ 0.9 y MDD_ratio ≤ 1.2 en ≥60%
+	•	KPIs: Sortino_trade ≥ 0.6, exposure razonable
+
+Salidas
+	•	reports/week2_summary_oos.csv (ya lo generaste/actualizaste)
+	•	reports/week2_decision.md (veredicto preliminar; no tocar YAML definitivo hasta cierre de W2)
+	•	Nota en configs/diamante_selected.yaml solo si cumples todos los gates (“candidato blindado”)
+
+⸻Rutas de salida (para pegar en tu plan_semana.md)
+	•	reports/week2_stress_btc/*.csv (y/o reports/week2_stress_btc/**.csv si usas subcarpetas)
+	•	reports/week2_stress_btc/summary_by_level.csv
+	•	reports/week2_stress_btc/summary_notes.md
+	•	reports/week2_cierre.md
+
+"## Evaluación de gates",
+"- **Mediana 60d:** PF≥1.5, WR≥60, Trades≥30, MDD≤1.1×baseline → **No cumple en W2**.",
+"- **Stress (0.0003/0.0005):** PF_ratio≥0.9 y MDD_ratio≤1.2 en ≥60% → **No cumple**.",
+"- **KPIs proxy:** Sortino_trade≥0.6 y exposure razonable → **No cumple** (proxy limitado).",
+"",
+"## Veredicto preliminar",
+"- Mantener **T=0.58** como *candidato vigente* y **T=0.59** como *runner-up*. **No blindar** todavía.",
+"- No modificar YAML definitivo. Documentar near-miss y resultados MDD-down para futura exploración **sin** cambiar lógica en W2.",
+"",
+"## Próximo paso",
+"- Pasar a **Semana 3 — OOS r	•	Perla/Corazón y allocaolling & guardrails** (multi-activo y señales complementarias) siguiendo el plan.",
+"",
+"## Artefactos relevantes",
+"- `reports/week2_summary_oos.csv`",
+"- `reports/week2_equity_summary_proxy.csv`",
+"- `reports/week2_kpi_proxy.csv`, `reports/week2_kpi_proxy_summary.csv`, `reports/week2_kpi_notes.md`",
+"- `reports/week2_friction_summary.csv` (alias de `week2_stress_btc/summary_by_level.csv`)",
+"- `reports/week2_cierre.md`",
+
+Conclusión (corta)
+	•	W2 cerrada: quedó todo consolidado y documentado.
+	•	No blindamos aún: mantenemos 0.58 como candidato y 0.59 runner-up (coherente con lo que veníamos registrando).
+	•	Siguiente parada: Semana 3 — OOS rolling & guardrails. Si quieres, te dejo ahora mismo el esqueleto de W3 con comandos y gates.
+
+Recordatorio de disciplina
+	•	No tocar lógica ni features; todo cambio de umbral es comparativo controlado.
+	•	Documentar los FAILs de mediana por régimen; la serie reciente avala seguir OOS.
+tor → post W2 (quedan anotados en Plan Macro para su fase).

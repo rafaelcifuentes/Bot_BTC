@@ -1,0 +1,42 @@
+rebalance_freq: 4h
+timezone: UTC
+costs:
+  fee_bps: 6
+  slip_bps: 6
+exec:
+  round_step: 0.1
+  max_delta_weight_bar: 0.1
+alloc_base:
+  diamante: 0.65
+  perla: 0.0
+risk:
+  vol_target_ann: 0.1
+  w_cap_total: 1.6
+  vol_clamp:
+    min: 0.5
+    max: 5.0
+  vol_estimator:
+    ewm_span: 50
+    vol_floor_ann: 0.095
+  throttle:
+    enabled: true
+    factor_when_neg: 0.8
+    span_bars: 60
+corr_gate:
+  enabled: false
+  lookback_bars: 90
+  threshold: 0.35
+  max_penalty: 0.2
+  perf_window_days: 30
+xi_star:
+  cap: 1.65
+files:
+  diamante: signals/diamante.csv
+  perla: reports/allocator/perla_for_allocator.csv
+  heart_weights: corazon/weights.csv
+  heart_lq: corazon/lq.csv
+  xi_star: reports/heart/xi_star.txt
+outputs:
+  kpis: reports/allocator/sombra_kpis.md
+  equity_dir: reports/allocator/curvas_equity/
+  weights_overlay: reports/allocator/weights_overlay.csv
