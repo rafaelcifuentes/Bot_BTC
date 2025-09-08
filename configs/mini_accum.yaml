@@ -21,13 +21,10 @@ anti_whipsaw:
   dwell_bars_min_between_flips: 6
   ttl_confirm_bars: 1
 costs:
-  # Opción B: separado (no mezcles con bps_per_side)
   fee_bps: 6
   slip_bps: 6
-# flip_budget:
-#   enforce_hard_yearly: true
-#   hard_per_year: 26
-#   soft_per_month: 2
+  fee_bps_per_side: 6.0
+  slip_bps_per_side: 6.0
 backtest:
   reports_dir: reports/mini_accum
   seed_btc: 1.0
@@ -50,7 +47,7 @@ modules:
     enabled: true
     lookback_bars: 14
     percentile_p: 40
-    yellow_band_pct: 5
+    yellow_band_pct: 3
   macro_persist:
     enabled: false
   force_sell_on_macro_red: false
