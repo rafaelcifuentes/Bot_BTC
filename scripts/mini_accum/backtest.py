@@ -15,6 +15,7 @@ Este script no envía órdenes: solo backtest en sombra con OHLC existentes.
 from __future__ import annotations
 import argparse
 import os
+import shutil
 from dataclasses import dataclass
 from typing import Tuple, List
 import numpy as np
@@ -67,6 +68,12 @@ def max_drawdown(series: pd.Series) -> float:
     rollmax = series.cummax()
     dd = series / rollmax - 1.0
     return float(dd.min()) * -1.0 if len(series) else 0.0
+
+
+def _apply_suffix(path: str, suffix: str) -> str:
+    head, tail = os.path.split(path)
+    name, ext = os.path.splitext(tail)
+    return os.path.join(head, f"{name}__{suffix}{ext}")
 
 
 @dataclass
@@ -259,6 +266,7 @@ def main():
     ap.add_argument('--config', default='configs/mini_accum.yaml')
     ap.add_argument('--start', default=None)
     ap.add_argument('--end', default=None)
+    ap.add_argument('--suffix', default=None, help='Suffix to append to generated report filenames (e.g., bb1-dynATR-dw6-p40-yb5)')
     args = ap.parse_args()
 
     with open(args.config, 'r') as f:
@@ -321,6 +329,18 @@ def main():
     print("[OK] Equity →", eq_path)
     print("[OK] KPIs  →", kpi_path)
     print("[OK] MD    →", md_path)
+
+    # Renombrado robusto (opcional) si se pasa --suffix
+    if args.suffix:
+        new_eq = _apply_suffix(eq_path, args.suffix)
+        new_kpi = _apply_suffix(kpi_path, args.suffix)
+        new_md = _apply_suffix(md_path, args.suffix)
+        shutil.move(eq_path, new_eq)
+        shutil.move(kpi_path, new_kpi)
+        shutil.move(md_path, new_md)
+        print("[RENAMED]", os.path.basename(eq_path), "->", os.path.basename(new_eq))
+        print("[RENAMED]", os.path.basename(kpi_path), "->", os.path.basename(new_kpi))
+        print("[RENAMED]", os.path.basename(md_path), "->", os.path.basename(new_md))
 
 
 if __name__ == '__main__':
