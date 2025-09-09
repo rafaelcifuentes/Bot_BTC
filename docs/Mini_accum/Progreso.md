@@ -55,3 +55,55 @@ Resumen ejecutivo
 	3.	Probar macro_persist ligero (ej. 1–2 días > EMA200) y/o confirm_bars=2.
 	4.	Exponer flips_blocked_hard en el summary y consolidar --suffix en CLI.
 	5.	Pushear remoto + tag.
+
+
+# TODO (próxima sesión)
+- GitHub (SSH): terminar alta de clave y cambiar remoto a SSH; luego `git push` y `git push --tags`.
+- OOS formal: correr ventanas 2022H2 / 2023Q4 / 2024H1 con preset prudente xbuf25 y registrar KPIs.
+- CLI: integrar `--suffix` directo en `mini_accum/cli.py` (ahora lo cubre rename_last_reports.py).
+- Tests: smoke de weekly cap (BUY<=cap) y de cross_buffer_bps.
+- Docs: reflejar cross_buffer_bps en plan y YAML (xbuf25) y resultados de ablation xbuf0/10/15/25.
+
+¿Cómo vamos?
+	•	Infra/packaging & reproducibilidad: ~85%
+Paquete instalable, CLI funcionando, runner con sufijo (rename), logging de experimentos, freeze de entorno, comprobaciones de datos, weekly cap dinámico por ATR y cross_buffer_bps activos.
+	•	Core v0.1 (reglas congeladas): ~90%
+Macro D-1, 21/55 4h, salida activa confirmada, dwell, costes, presupuesto hard.
+	•	Validación cuantitativa (ablation + OOS): ~30–40%
+Corridas 2024–2025 y 2022–2023 hechas; falta batería OOS formal (2022H2 / 2023Q4 / 2024H1), consolidar KPIs y anotar en el log.
+	•	Docs/CI/tests: ~40%
+Plan y progreso empezados; faltan tests unitarios (cap semanal, cross buffer, integridad datos) y CI simple.
+
+Progreso global aproximado: ~60% del proyecto v0.1 “prudente”.
+
+⸻
+
+¿Rinde? (honesto y directo)
+	•	Con el preset prudente (dyn-ATR + dwell=6 + xbuf=25) los últimos KPIs que mostraste están en net_btc_ratio ≈ 0.60–0.61 y MDD_model ≈ 0.23 vs HODL 0.306 (≈**-24%** de MDD frente a HODL).
+	•	Qué pasa: Mejoramos el drawdown (bien), pero no superamos HODL y el turnover anual sigue por encima del soft/hard (≈57–70/año vs 26 objetivo).
+	•	Conclusión hoy: 1/3 de umbrales pasa (MDD ✔️), pero Net_BTC_ratio y flips/año no. Aún no es un bot “rentable vs HODL” según el criterio del plan.
+
+No te vendo humo: no puedo estimar probabilidades ni ROI futuro con responsabilidad hasta tener OOS sólido pasando umbrales. Ahora mismo, con la evidencia mostrada, la probabilidad de batir HODL con este preset es baja salvo que ajustemos.
+
+⸻
+
+Qué falta para “candidato a promoción”
+	1.	OOS formal (2022H2, 2023Q4, 2024H1) con el preset prudente y 1–2 variantes (p/yellow-band, dwell=8, xbuf=15/25).
+	2.	Reducir flips sin perder MDD: probar grace_TTL o endurecer cross_buffer_bps y/o pausa amarilla (p40±yb3→5).
+	3.	Sanity de costes y sensibilidad (±5–10 bps) para ver robustez.
+	4.	Tests mínimos (cap semanal ≤, microcruces, datos sin duplicados).
+
+⸻
+
+¿Cuántos días?
+
+No te voy a dar plazos: no doy estimaciones de tiempo. Lo que sí puedo decir es que el bloque crítico es la batería OOS + ajustes de flips; cuando eso pase umbrales, el resto (docs/tests/CI) es ejecución.
+
+⸻
+
+Recomendación práctica (mañana)
+	•	Correr OOS con el preset actual y guardar KPIs en experiments_log.csv.
+	•	Probar yb=5 (amarillo más ancho) y dwell=8 (o xbuf=15) para intentar –10–20% flips manteniendo MDD ≈.
+	•	Registrar todo (rename con sufijo) y actualizar docs/Mini_accum/Progreso.md.
+
+Descansa con la tranquilidad de que la base está sólida; ahora toca “afinar para ganar vs HODL” manteniendo el MDD bajo y los flips dentro del presupuesto.
