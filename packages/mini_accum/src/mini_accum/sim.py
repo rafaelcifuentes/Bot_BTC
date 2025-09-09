@@ -137,10 +137,21 @@ def _prepare_macro_d1(d1: pd.DataFrame, cfg: Dict) -> pd.DataFrame:
 
 
 def _prepare_h4(h4: pd.DataFrame, cfg: Dict) -> pd.DataFrame:
-    """Normaliza H4 y añade 'd_date' (int YYYYMMDD) para merge con D1."""
+    """Normaliza H4 y añade 'd_date' (int YYYYMMDD) para merge con D1, evitando duplicados."""
     df = _ensure_cols(h4, name='h4').sort_values('timestamp').reset_index(drop=True)
-    df = df.rename(columns={'timestamp': 'ts'})
-    df['d_date'] = pd.to_datetime(df['ts'], utc=True).dt.strftime('%Y%m%d').astype('int64')
+
+    # Si ya existía 'ts', elimínala para no duplicar nombre de columna
+    if 'ts' in df.columns:
+        df = df.drop(columns=['ts'])
+
+    # Crea 'ts' a partir de 'timestamp' (siempre tz-aware UTC)
+    df['ts'] = pd.to_datetime(df['timestamp'], utc=True)
+
+    # (cinturón y tirantes) elimina columnas duplicadas si las hubiera
+    df = df.loc[:, ~df.columns.duplicated()]
+
+    # Clave de merge homogénea: int YYYYMMDD
+    df['d_date'] = df['ts'].dt.strftime('%Y%m%d').astype('int64')
     return df
 
 
@@ -231,8 +242,16 @@ def run_backtest(d1: pd.DataFrame, h4: pd.DataFrame, cfg: Dict) -> Tuple[pd.Data
 
     rows = []
 
+    # --------- estado
+    position = 'STABLE'
+    ...
+    rows = []
+
+    # Buffer anti-microcruces (constante por corrida)
+    eps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0)) / 1e4
+
     # --------- bucle principal (cierre actual -> ejecutar en open siguiente)
-    for i in range(len(df) - 1):  # hasta penúltima porque ejecutamos en i+1
+    for i in range(len(df) - 1): # hasta penúltima porque ejecutamos en i+1
         ts = df.loc[i, 'ts']
         op = df.loc[i, 'open']
         cl = df.loc[i, 'close']
@@ -286,7 +305,11 @@ def run_backtest(d1: pd.DataFrame, h4: pd.DataFrame, cfg: Dict) -> Tuple[pd.Data
 
             atr_pause = _maybe_atr_pause(df, cfg, i)
 
-            trend_up = bool(df.loc[i, 'ema21'] > df.loc[i, 'ema55'])
+            eps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0)) / 1e4
+            # micro-buffer configurable para evitar microcruces
+            # justo antes de usar trend_up:
+            eps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0)) / 1e4
+            trend_up = bool(df.loc[i, 'ema21'] > df.loc[i, 'ema55'] * (1.0 + eps))
             macro_ok = bool(df.loc[i, 'macro_ok'])
 
             if position == 'STABLE':
