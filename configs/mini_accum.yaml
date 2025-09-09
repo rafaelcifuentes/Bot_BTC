@@ -11,6 +11,7 @@ data:
 signals:
   ema_fast: 21
   ema_slow: 55
+  cross_buffer_bps: 15  # exige ema21 > ema55*(1+0.0015); evita microcruces
   entry: ema21 > ema55 and macro_green
   exit_active:
     rule: close < ema21 and next_close <= next_ema21
