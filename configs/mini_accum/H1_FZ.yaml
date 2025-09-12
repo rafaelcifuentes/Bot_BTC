@@ -1,0 +1,3 @@
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 26

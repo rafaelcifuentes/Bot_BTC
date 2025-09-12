@@ -1,0 +1,10 @@
+== Controles dictamen (reports/mini_accum/dictamen_20250912_0732.tsv) ==
+Q4 oos23Q4: PASS=0 FAIL=178
+H1 oos24H1: PASS=0 FAIL=171
+
+== Top FAIL Q4 ==
+suffix                           window  netBTC              dbps                mdd_vs_HODL         flips  PASS    FAIL
+v3p3N2g-F2-H1_FZ-replay-oos23Q4  2023Q4  0.8977445654102704  0.0989762577261527  0.0778161936115595  3.0    12.175  False
+
+== Top FAIL H1 ==
+suffix  window  netBTC  dbps  mdd_vs_HODL  flips  PASS  FAIL
