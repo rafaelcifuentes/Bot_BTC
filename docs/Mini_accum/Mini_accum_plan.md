@@ -47,6 +47,47 @@ Entregables del hilo
 	•	configs/mini_accum.yaml (parámetros v0.1).
 	•	scripts/mini_accum/backtest.py (runner en sombra sobre OHLC existentes).
 	•	reports/mini_accum/* (equity vs HODL, KPIs, diffs y gráficos).
+	•	CLI `mini-accum-dictamen` (consolidación de KPIs/aceptación).
+	•	`reports/mini_accum/dictamen_*.{tsv,csv}` (export de dictamen).
+
+Dictamen (consolidación de KPIs)
+	•	Imprime en pantalla:
+```
+mini-accum-dictamen --reports-dir reports/mini_accum
+```
+	•	Incluir sufijos de depuración:
+```
+mini-accum-dictamen --reports-dir reports/mini_accum --include-dbg
+```
+	•	Exportar (TSV/CSV) y opcionalmente silenciar la salida:
+```
+mini-accum-dictamen --reports-dir reports/mini_accum \
+  --out reports/mini_accum/dictamen_$(date +%Y%m%d_%H%M).tsv \
+  --format tsv --quiet
+```
+	•	En CI: exit 0 si hay al menos un PASS, 1 si no:
+```
+mini-accum-dictamen --reports-dir reports/mini_accum \
+  --only-pass --strict-exit --quiet \
+  || echo "NO PASS"
+```
+
+Estado actual (última corrida)
+	•	Resultado del dictamen: **NO PASS** (ningún run cumple los tres umbrales congelados).
+	•	Motivos más frecuentes vistos en OOS recientes:
+		- `net_btc_ratio` < 1.05
+		- `flips_per_year` > 26.0
+		- (en algunos setups) `mdd_vs_hodl_ratio` > 0.85
+	•	Objetivo inmediato: reducir turnover y/o mejorar MDD **sin** degradar `net_btc_ratio` en 2022H2, 2023Q4 y 2024H1.
+
+Siguientes pasos (ablation opt‑in)
+	1)	Activar y evaluar **por separado (OOS)** los módulos opt‑in:
+		- Hibernación por *chop* (≥2 cruces 21/55 en 40 velas) → Pausa.
+		- *Grace TTL* (cooldown 1 vela) más estricto para reversión inmediata.
+		- Regímenes ATR% con zona Amarilla (pausa).
+		- Presupuesto semanal de flips (p.ej., ≤2).
+	2)	Mantener **congelado** el núcleo v0.1; cualquier ajuste debe entrar como módulo opt‑in.
+	3)	Documentar cada ablation con sufijos claros y consolidar con `mini-accum-dictamen`. 
 
 Checklist de arranque
 	•	Congelar núcleo v0.1 y KPIs.
@@ -888,4 +929,12 @@ mini-accum-backtest --config configs/mini_accum.yaml --start 2021-01-01 --end 20
 
 	4.	(Opcional) configura una Run Configuration que llame al binario mini-accum-backtest o al script scripts/mini_accum/run_backtest.sh.
 
-Con esta estructura, extraer mini_accum a un repo propio es trivial: copia packages/mini_accum/ y publica. El monorepo seguirá limpio y modular.
+Con esta estructura, extraer mini_accum a un repo propio es trivial: copia packages/mini_accum/ y publica. El monorepo seguirá limpio y modular.### Baselines fijados (v0.1.1-mini_accum)
+- **H1_FZ (H1 2024)**: `flip_budget.enforce_hard_yearly=true`, `hard_per_year=26`
+- **Q4_E3 (Q4 2023)**: `pause_affects_sell=true`
+
+Reproducción:
+```bash
+bash scripts/mini_accum/run_seasonal.sh 2024-01-01 2024-06-30 demoH1
+bash scripts/mini_accum/run_seasonal.sh 2023-10-01 2023-12-31 demoQ4
+```
