@@ -1,0 +1,15 @@
+# snapshot_results
+# pattern: v3p3N2g-F2-(H1_FZ|Q4_E3)-
+# windows: 2024H1 2023Q4
+# BASE: 1.05
+
+== 2024H1 ==
+v3p3N2g-F2-H1_FZ-oos24H1  2024H1  1.088869  +388.7   0.789        8.0    16.23  True
+v3p3N2g-F2-Q4_E3-oos24H1  2024H1  0.698720  -3512.8  1.067        12.0   24.35  False  net_btc_ratio<1.05; mdd_vs_hodl_ratio>0.85
+suffix                    window  netBTC    dbps     mdd_vs_HODL  flips  fpy    PASS   FAIL_REASON
+
+== 2023Q4 ==
+v3p3N2g-F2-H1_FZ-replay-oos23Q4  2023Q4  0.897745  -1522.6  1.272        3.0    12.18  False  net_btc_ratio<1.05; mdd_vs_hodl_ratio>0.85
+v3p3N2g-F2-Q4_E3-oos23Q4         2023Q4  0.884162  -1658.4  1.069        5.0    20.29  False  net_btc_ratio<1.05; mdd_vs_hodl_ratio>0.85
+suffix                           window  netBTC    dbps     mdd_vs_HODL  flips  fpy    PASS   FAIL_REASON
+
