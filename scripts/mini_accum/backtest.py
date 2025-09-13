@@ -263,7 +263,7 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--config', default='configs/mini_accum.yaml')
+    ap.add_argument('--config', default='configs/mini_accum/config.yaml')
     ap.add_argument('--start', default=None)
     ap.add_argument('--end', default=None)
     ap.add_argument('--suffix', default=None, help='Suffix to append to generated report filenames (e.g., bb1-dynATR-dw6-p40-yb5)')

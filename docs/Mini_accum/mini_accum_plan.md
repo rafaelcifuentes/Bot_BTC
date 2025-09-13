@@ -83,7 +83,7 @@
 
 ### **Fase C — Regímenes de volatilidad**
 - **ATR% p40** para habilitar Verde/Rojo; Amarillo ⇒ **PAUSA**.  
-- (Opcional) Hibernación por "chop": ≥2 cruces 21/55 en 40 velas 4h.  
+- (Opcional) Hibernación por “chop”: ≥2 cruces 21/55 en 40 velas 4h.  
 - Aceptar si **MDD↓ ≥10%** o **flips↓ ≥10%** con Net_BTC_ratio ≥ baseline − 0.5 pp.
 
 ### **Fase D — Micro-operativa (suavizado)**
@@ -233,96 +233,55 @@ paths:
 
 **Nota:** Este documento es *solo plan*; no activa ejecución ni modifica componentes existentes.
 
-```
+---
 
-<!-- Sección añadida sin borrar contenido existente: PDCA de Mejora Continua -->
+## Resumen de acciones — MAs, ATR, ADX (KISS) — 2025-09-13 07:55 UTC
 
-## 10) PDCA de Mejora Continua (v1, a rajatabla)
+1) **Señal base (simple y robusta)**
+- Entrada 4h: `EMA21 > EMA55` **y** macro verde.
+- Macro D1: `close_D1 > EMA200_D1` (línea en la arena).
+- Salida activa: `close < EMA21` con **confirmación = 2 velas**.
+- Salida pasiva: `EMA21 < EMA55`.
+- Barrido corto recomendado: `ema_fast ∈ {12,13,14}`, `ema_slow ∈ {29,31,33}`.
 
-> Esta sección complementa el plan sin modificar nada previo. Reafirma guardrails y fija un ciclo operativo simple.
+2) **Filtro de fuerza de tendencia (reduce serrucho)**
+- **ADX14 ≥ 25** como *gate de entrada* (no bloquear salidas).
+- ADX con suavizado de Wilder; ajuste fino si hace falta: 23–28–25.
 
-### Cadencia semanal
-- **Lunes**: **P**lan + **D**o (definir hipótesis y correr backtests OOS).
-- **Miércoles**: **C**heck (revisión con `mini-accum-dictamen`, análisis de fallos).
-- **Viernes**: **A**ct (integrar mejoras que **pasen KPIs** o descartar; documentar).
+3) **Volatilidad (evitar baja vol / chop)**
+- Gate por **ATR% D1** (ATR14/close) con percentil **p60–p70**; “amarillo = pausa”.
+- Úsalo como **régimen**, no como stop, en esta versión KISS.
 
-### Guardrails (congelados)
-<!-- Ya definidos en secciones 1–3; se reiteran como checklist operativo -->
-- Numeraire **BTC**; rotación **binaria** BTC ↔ USDC; **sin shorts**.
-- **Reloj 4h UTC**, decisiones al cierre y ejecución al **open** siguiente.
-- **Costes**: 6 bps fee + 6 bps slippage por lado (≈ **24 bps RT**).
-- **Flip‑budget**: **26/año** (soft **2/mes**).
-- Macro‑filtro **EMA200_D1**; anti‑whipsaw `dwell`/`ttl`.
+4) **Salidas menos sensibles (menos churn)**
+- Confirmación=2 + **margen**: exigir que `close` quede **25–30 bps por debajo de EMA21** para ejecutar la salida activa.
+- Alternativa en una segunda fase: trailing **1.5–2.0×ATR** (cuando FPY ya esté controlado).
 
-### Pasos PDCA
+5) **Rate‑limit explícito de trading**
+- **dwell** entre flips: **72–96** velas 4h (empezar por 96).
+- **cooldown/grace** tras salida: **24–36** velas (opcional).
+- **Flip budget**: hard 26/año, soft 2/mes.
+- (Opcional) Cap de flips en 24h si persisten ráfagas.
 
-#### 1) **Plan**
-- Definir **hipótesis mínima** (un solo cambio) sobre Base/Capas (p.ej. `dwell=5` o activar `regime_slim p40`).
-- Nombrar sufijo con **plantilla**:
-  
-  ```
-  bb1-<familia>-<params>-oos<ventana>
-  ```
-  
-  *Ej.*: `bb1-dwell5-oos24H1`, `bb1-regimep40-oos23Q4`.
-- **Checklist pre‑run**:
-  - Datos D1/4h UTC limpios (sin huecos/duplicados).
-  - `configs/mini_accum.yaml` acorde al experimento.
-  - `REPORT_SUFFIX` único y descriptivo.
+6) **Gating temporal (opcional, sólo si los datos lo respaldan)**
+- Evitar **entradas nuevas** en ventanas que generen churn (p.ej., ciertos fines de semana u horas de baja liquidez).
 
-#### 2) **Do** (correr OOS)
-- Ejecutar **por ventana OOS** de referencia (2–3 ventanas):
-  
-  ```bash
-  # 2022H2 (opcional estrés reciente)
-  REPORT_SUFFIX=bb1-<familia>-<params>-oos22H2 \
-  mini-accum-backtest --config configs/mini_accum.yaml \
-    --start 2022-07-01 --end 2022-12-31
+7) **Higiene de datos (crítico)**
+- **D1→4h sin look‑ahead**: el daily de **t** sólo rige barras que **abren después** del cierre de **t**.
+- Tiempos en **UTC**, sin huecos/duplicados; `open/high/low/close` válidos.
+- **Costes** realistas: 6+6 bps por lado.
 
-  # 2023Q4
-  REPORT_SUFFIX=bb1-<familia>-<params>-oos23Q4 \
-  mini-accum-backtest --config configs/mini_accum.yaml \
-    --start 2023-10-01 --end 2023-12-31
+8) **Validación y metas parciales**
+- OOS: **2022H2, 2023Q4, 2024H1**.
+- Primero bajar **FPY < 40** con ADX25 + dwell 96 + confirm 2 + margen 25 bps.
+- Luego empujar a **netBTC ≥ 1.05** y **MDD_vs_HODL ≤ 0.85** manteniendo **≤26/año**.
 
-  # 2024H1
-  REPORT_SUFFIX=bb1-<familia>-<params>-oos24H1 \
-  mini-accum-backtest --config configs/mini_accum.yaml \
-    --start 2024-01-01 --end 2024-06-30
-  ```
+9) **YAML / hooks (mínimos)**
+- `signals.exit_active.confirm_bars: 2`
+- `filters.adx: {enabled: true, period: 14, min: 25}`
+- `filters.exit_margin: {enabled: true, margin_pct: 0.0025}`
+- `anti_whipsaw.dwell_bars_min_between_flips: 72–96`
+- (Opcional) `modules_opt_in.regimes_atr: {enabled: true, atr_percentile: 60–70, yellow_pause: true}`
 
-#### 3) **Check** (gate de KPIs)
-- Consolidar y revisar resultados:
-  
-  ```bash
-  # Resumen completo
-  mini-accum-dictamen --reports-dir reports/mini_accum
-
-  # Gate automático para CI/CD
-  mini-accum-dictamen --reports-dir reports/mini_accum \
-    --only-pass --strict-exit --quiet || echo "NO PASS"
-
-  # Exportar (artefacto)
-  mini-accum-dictamen --reports-dir reports/mini_accum \
-    --out reports/mini_accum/dictamen_$(date +%Y%m%d_%H%M).tsv \
-    --format tsv --quiet
-  ```
-
-- **Reglas de aceptación** (congeladas, ver §2):
-  - `Net_BTC_ratio ≥ 1.05`
-  - `MDD_model ≤ 0.85 × MDD_HODL`
-  - `flips/año ≤ 26` (≈ **≤2/mes**)
-  - **Robustez**: pasar en **≥2** ventanas OOS.
-
-- **Guías rápidas según fallo** (`FAIL_REASON`):
-  - `net_btc_ratio<1.05` → endurecer macro/tendencia (p.ej. activar 21/55, subir confirmación), revisar costes.
-  - `mdd_vs_hodl_ratio>0.85` → considerar **regime_slim p40** o **hibernación** en amarillo; subir `dwell`.
-  - `flips_per_year>26.0` → subir `dwell`, activar **cooldown** o **budget semanal**.
-
-#### 4) **Act** (cerrar ciclo)
-- Si **pasa**: promover cambio a `v0.1-selected` (rama/PR), actualizar `configs/mini_accum.yaml` y **documentar** en `docs/mini_bot_macro_plan.md` (changelog breve).
-- Si **no pasa**: archivar el intento con sufijo, registrar causa y siguiente micro‑tweak.
-- **Artefactos y trazabilidad**:
-  - `reports/mini_accum/*{equity,kpis,summary,flips}__<suffix>.csv`
-  - `reports/mini_accum/dictamen_*.tsv|csv`
-  - Logs en `logs/mini_accum/` y commit con sufijo.
-```
+10) **Mini‑grid recomendado (muy corto)**
+- `ef ∈ {12,13,14}` × `es ∈ {29,31,33}` × `dwell ∈ {96,72}` × `confirm=2` × `margin=0.25%` × `ADX14≥25`
+- (Opcional) `atr_percentile ∈ {60,65,70}` si tu runner ya soporta el gate de ATR.
