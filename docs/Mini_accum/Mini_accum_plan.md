@@ -938,3 +938,7 @@ Reproducción:
 bash scripts/mini_accum/run_seasonal.sh 2024-01-01 2024-06-30 demoH1
 bash scripts/mini_accum/run_seasonal.sh 2023-10-01 2023-12-31 demoQ4
 ```
+
+#### Snapshot snapshot_20250913_003156.txt — TL;DR
+- H1_FZ (2024H1): netBTC 1.0889, Δbps +446.1, mdd_vs_HODL 0.789, fpy 16.23 → **PASS**
+- Q4_E3 (2023Q4): netBTC 0.8842, Δbps -1601.0, mdd_vs_HODL 1.069, fpy 20.29 → **FAIL**
