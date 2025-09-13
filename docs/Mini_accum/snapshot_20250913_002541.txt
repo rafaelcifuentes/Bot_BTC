@@ -1,0 +1,9 @@
+# snapshot_results
+# pattern: v3p3N2g-F2-H1_FZ-
+# windows: 2024H1
+# BASE: auto
+
+== 2024H1 ==
+v3p3N2g-F2-H1_FZ-oos24H1  2024H1  1.088869  +446.1  0.789        8.0    16.23  True
+suffix                    window  netBTC    dbps    mdd_vs_HODL  flips  fpy    PASS  FAIL_REASON
+
