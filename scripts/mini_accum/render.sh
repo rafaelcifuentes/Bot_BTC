@@ -1,64 +1,93 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Rellena plantillas YAML con tokens. Escoge template según EXIT_DELTA_BPS.
-# Uso:
-#   YAML_OUT=... XB=36 DW=72 MB=20 EMA_FAST=13 ATR_PAS=false ATR_P=40 \
-#   EXIT_DELTA_BPS=0 CONFIRM=0 WEEKLY_HARD=false TTL=1 TTL_CONFIRM=0 \
-#   bash scripts/mini_accum/render.sh
-#
-# Variables (con defaults razonables)
-YAML_OUT="${YAML_OUT:-configs/exp/_render.yaml}"
-XB="${XB:-36}"
-DW="${DW:-72}"
-MB="${MB:-20}"
-EMA_FAST="${EMA_FAST:-13}"
-ATR_PAS="${ATR_PAS:-true}"
-ATR_P="${ATR_P:-40}"
-YELLOW_BAND="${YELLOW_BAND:-5}"
-EXIT_DELTA_BPS="${EXIT_DELTA_BPS:-0}"     # 0 => sin delta; >0 => usa template_exitdelta
-CONFIRM="${CONFIRM:-0}"
-WEEKLY_HARD="${WEEKLY_HARD:-false}"
-TTL="${TTL:-1}"
-TTL_CONFIRM="${TTL_CONFIRM:-0}"
+# Uso: render.sh OUT_YAML XB DW
+# Ej:  bash scripts/mini_accum/render.sh configs/exp/F1_xb36_dw72.yaml 36 72
+OUT="${1:-}"
+XB="${2:-}"
+DW="${3:-}"
+MB="${MB:-20}"  # macro_buffer_bps (puedes override con: MB=18 bash ...)
 
-# Paths
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
-TPL_DIR="$REPO_ROOT/configs/templates"
-TPL_A="$TPL_DIR/mini_accum__template.yaml"
-TPL_B="$TPL_DIR/mini_accum__template_exitdelta.yaml"
-
-mkdir -p "$(dirname "$YAML_OUT")"
-
-# Calcula factor de salida si hay delta en bps
-EXIT_FACTOR="1.0"
-if [[ "$EXIT_DELTA_BPS" != "0" ]]; then
-  # factor = 1 - delta_bps/10000
-  EXIT_FACTOR=$(python - <<PY
-d = float("${EXIT_DELTA_BPS}")/10000.0
-print(f"{1.0 - d:.6f}")
-PY
-)
+if [[ -z "${OUT}" || -z "${XB}" || -z "${DW}" ]]; then
+  echo "Uso: $0 OUT_YAML XB DW   (opcional: MB=XX por env)"
+  exit 2
 fi
 
-TPL="$TPL_A"
-if [[ "$EXIT_DELTA_BPS" != "0" ]]; then
-  TPL="$TPL_B"
-fi
+mkdir -p "$(dirname "$OUT")"
 
-# Render simple con sed
-sed -e "s/__EMA_FAST__/${EMA_FAST}/g" \
-    -e "s/__XB__/${XB}/g" \
-    -e "s/__MB__/${MB}/g" \
-    -e "s/__DW__/${DW}/g" \
-    -e "s/__ATR_PAS__/${ATR_PAS}/g" \
-    -e "s/__ATR_P__/${ATR_P}/g" \
-    -e "s/__YELLOW__/${YELLOW_BAND}/g" \
-    -e "s/__CONFIRM__/${CONFIRM}/g" \
-    -e "s/__TTL__/${TTL}/g" \
-    -e "s/__TTLCONF__/${TTL_CONFIRM}/g" \
-    -e "s/__WEEKLY_HARD__/${WEEKLY_HARD}/g" \
-    -e "s/__EXIT_FACTOR__/${EXIT_FACTOR}/g" \
-    "$TPL" > "$YAML_OUT"
+cat > "$OUT" <<YAML
+version: 0.1
+numeraire: BTC
+asset: BTC-USD
+timezone: UTC
 
-echo "[render] $YAML_OUT"
+data:
+  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ts_col: timestamp
+  price_col: close
+  tz_input: UTC
+
+signals:
+  ema_fast: 13
+  ema_slow: 55
+  cross_buffer_bps: ${XB}
+  macro_buffer_bps: ${MB}
+  entry: ema13 > ema55 and macro_green
+  exit_active:
+    rule: close < ema13
+    confirm_bars: 0
+  exit_passive:
+    rule: ema13 < ema55
+
+anti_whipsaw:
+  dwell_bars_4h: ${DW}
+  dwell_bars_min_between_flips: ${DW}
+  grace_ttl_bars_4h: 1
+  ttl_confirm_bars: 0
+
+costs:
+  fee_bps_per_side: 6.0
+  slip_bps_per_side: 6.0
+
+backtest:
+  reports_dir: reports/mini_accum
+  seed_btc: 1.0
+
+kpis:
+  accept:
+    net_btc_ratio_min: 1.05
+    mdd_vs_hodl_ratio_max: 0.85
+    flips_per_year_max: 26
+    flips_per_month_soft: 2
+
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 26
+  allow_riskoff_over_budget: true
+
+modules:
+  hibernation_chop:
+    enabled: false
+    lookback_bars_4h: 60
+    min_crosses: 4
+  grace_ttl:
+    enabled: true
+  weekly_turnover_budget:
+    enabled: true
+    flips_per_week_max: 1
+    dynamic_by_atr: true
+    enforce_hard: false
+  atr_regime:
+    enabled: true
+    lookback_bars: 14
+    percentile_p: 40
+    yellow_band_pct: 5
+    pause_affects_sell: true
+  macro_persist:
+    enabled: false
+
+force_sell_on_macro_red: false
+YAML
+
+echo "[render] $OUT  (xb=${XB}, dw=${DW}, mb=${MB})"
