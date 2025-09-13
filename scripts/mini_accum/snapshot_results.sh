@@ -40,4 +40,8 @@ OUT="$DOC_DIR/snapshot_${STAMP}.txt"
   done
 } | tee "$OUT"
 
+# Mantener/actualizar symlink del último snapshot (relativo dentro de DOC_DIR)
+ln -sfn "$(basename "$OUT")" "$DOC_DIR/latest_snapshot.txt"
+
 echo "→ Escribí $OUT"
+echo "→ Actualicé latest_snapshot.txt -> $(basename "$OUT")"
