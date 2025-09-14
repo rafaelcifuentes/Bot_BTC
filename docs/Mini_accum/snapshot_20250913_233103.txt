@@ -1,0 +1,8 @@
+# snapshot_results
+# pattern: KISSv4_CORE_(M0(25|30|35)|EXIT_ATRk(15|20)|EXITpassive|CONF3|DW84)
+# windows: 2025Q2
+# BASE: auto
+
+== 2025Q2 ==
+suffix  window  netBTC  dbps  mdd_vs_HODL  flips  fpy  PASS  FAIL_REASON
+
