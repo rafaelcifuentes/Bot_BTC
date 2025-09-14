@@ -5,3 +5,8 @@ __pycache__/
 reports/
 .env
 !reports/mini_accum/*__DEMO_PASS.*
+# --- allow publishing PASS artefacts only ---
+!reports/mini_accum/
+reports/mini_accum/*
+!reports/mini_accum/*__DEMO_PASS.*
+# -------------------------------------------
