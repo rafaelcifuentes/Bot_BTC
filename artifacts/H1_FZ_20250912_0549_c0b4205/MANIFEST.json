@@ -1,0 +1,21 @@
+{
+  "artifact": "H1_FZ",
+  "commit": "c0b4205",
+  "config": "configs/baselines/F2_H1_FZ.yaml",
+  "report_suffix": "v3p3N2g-F2-H1_FZ-oos24H1",
+  "window": "2024H1",
+  "metrics": {
+    "net_btc_ratio": 1.088868978375402,
+    "mdd_model_usd": 0.17739459693569748,
+    "mdd_hodl_usd": 0.22492501387131425,
+    "mdd_vs_hodl_ratio": 0.7886832766283157,
+    "flips_total": 8
+  },
+  "files": [
+    "H1_FZ_equity.csv",
+    "H1_FZ_kpis.csv",
+    "H1_FZ_summary.md",
+    "H1_FZ_flips.csv",
+    "F2_H1_FZ.yaml"
+  ]
+}

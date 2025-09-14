@@ -1,453 +1,375 @@
-# -*- coding: utf-8 -*-
-import math
+from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, Tuple
-
+from typing import Tuple, List, Optional
+from collections import deque
 import numpy as np
 import pandas as pd
 
-from .indicators import ema
 
-
-# =============================
-# Costs
-# =============================
-@dataclass
-class Costs:
-    bps_per_side: float = 12.0  # fee+slip por lado (12 bps side ~ 24 bps RT)
-
-    @property
-    def frac_side(self) -> float:
-        return self.bps_per_side / 1e4
-
-
-def TradeCosts(fee_bps_per_side: float, slip_bps_per_side: float):
-    """
-    Back-compat para CLI antiguo: TradeCosts(fee_bps, slip_bps) -> Costs
-    """
-    total = float(fee_bps_per_side) + float(slip_bps_per_side)
-    return Costs(bps_per_side=total)
-
-
-# =============================
-# Utilidades
-# =============================
-def _ensure_cols(df: pd.DataFrame, name: str = "df") -> pd.DataFrame:
-    """Normaliza nombres y tipos mínimos requeridos para OHLCV."""
-    if not hasattr(df, "columns"):
-        raise TypeError(f"{name}: se esperaba DataFrame, pero llegó {type(df)}")
-
-    out = df.copy()
-
-    # normaliza nombre de timestamp a 'timestamp'
-    if 'timestamp' not in out.columns:
-        for c in ['ts', 'date', 'datetime', 'time', 'Date', 'Datetime', 'Time']:
-            if c in out.columns:
-                out = out.rename(columns={c: 'timestamp'})
-                break
-    if 'timestamp' not in out.columns:
-        raise ValueError(f"{name}: falta columna 'timestamp'.")
-
-    # asegura tipo datetime tz-aware UTC
-    out['timestamp'] = pd.to_datetime(out['timestamp'], utc=True, errors='coerce')
-    out = out.dropna(subset=['timestamp']).sort_values('timestamp')
-
-    # check OHLCV
-    for c in ['open', 'high', 'low', 'close']:
-        if c not in out.columns:
-            raise ValueError(f"{name}: falta columna '{c}' en DataFrame OHLC.")
-        out[c] = pd.to_numeric(out[c], errors='coerce')
-
-    if 'volume' in out.columns:
-        out['volume'] = pd.to_numeric(out['volume'], errors='coerce')
-
-    out = out.drop_duplicates(subset=['timestamp'], keep='last')
-    return out
-
-
-def _weekly_key(ts: pd.Timestamp) -> str:
-    iso = ts.isocalendar()
-    return f"{iso.year}-W{int(iso.week):02d}"
-
-
-def _calc_mdd(series: pd.Series) -> float:
-    """Máximo drawdown en fracción (0..1) de una curva en USD."""
-    s = series.astype(float)
-    roll_max = s.cummax()
-    dd = (s - roll_max) / roll_max.replace(0, np.nan)
-    dd = dd.fillna(0.0)
+def max_drawdown(series: pd.Series) -> float:
+    """Máx. drawdown en valor positivo (p.ej. 0.25 = -25%)."""
+    if series is None or len(series) == 0:
+        return 0.0
+    rollmax = series.cummax()
+    dd = series / rollmax - 1.0
     return float(-dd.min()) if len(dd) else 0.0
 
 
-def _maybe_atr_pause(df4h: pd.DataFrame, cfg: Dict, i: int) -> bool:
+@dataclass
+class TradeCosts:
+    fee_bps_per_side: float
+    slip_bps_per_side: float
+
+    def __post_init__(self) -> None:
+        # Sanity checks: no negative bps
+        if self.fee_bps_per_side < 0 or self.slip_bps_per_side < 0:
+            raise ValueError("fee_bps_per_side and slip_bps_per_side must be >= 0")
+
+    @property
+    def rate(self) -> float:
+        """Total cost per side as a fraction, i.e., (fee + slip) / 10_000."""
+        return (self.fee_bps_per_side + self.slip_bps_per_side) / 10_000.0
+
+
+def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFrame, dict]:
     """
-    Pausa por ATR% (opcional). Si no está activado en YAML, devuelve False (no pausar).
-      - ATR14%
-      - Percentil p sobre todo el histórico.
-      - Banda amarilla ±yellow_band_pct (puntos de percentil): pausa si cae en la banda.
+    Backtest binario BTC↔USDC:
+      - Señal: EMA_fast > EMA_slow (con banda cross_buffer_bps) y macro verde (D1 close > D1 EMA200)
+      - Salidas: activa con confirmación (confirm_bars) y pasiva por cruce (ema_fast<ema_slow)
+      - Anti-whipsaw:
+          * dwell mínimo entre flips (dwell_bars_min_between_flips)
+          * pausa tras flip (pause_after_flip_bars), opcionalmente también bloquea ventas (pause_affects_sell)
+      - Presupuesto anual (flip_budget.hard_per_year) y throttle semanal soft de BUY (flip_budget.soft_per_week)
+      - Régimen ATR con “yellow band” (modules.atr_regime.{enabled,percentile_p,yellow_band_pct,pause_affects_sell})
+      - Ejecución: al OPEN de la siguiente vela
+    Requiere en df4: ['ts','open','high','low','close','d_close','d_ema200'] (merge previo).
     """
-    mods = cfg.get('modules', {})
-    atr_cfg = mods.get('atr_regime', {}) or {}
-    if not atr_cfg.get('enabled', False):
-        return False
+    # Guard por DF vacío
+    if df4 is None or df4.empty:
+        res = pd.DataFrame(columns=[
+            'ts', 'open', 'close', 'd_close', 'd_ema200', 'ema21', 'ema55',
+            'macro_green', 'trend_up', 'position', 'btc', 'usd',
+            'equity_btc', 'equity_usd', 'executed', 'exec_reason', 'blocked_reason'
+        ])
+        kpis = {
+            'net_btc_ratio': None,
+            'mdd_model_usd': 0.0,
+            'mdd_hodl_usd': 0.0,
+            'mdd_vs_hodl_ratio': None,
+            'flips_total': 0,
+            'flips_blocked_hard': 0,
+            'flips_per_year': None,
+        }
+        return res, kpis
 
-    lookback = int(atr_cfg.get('lookback_bars', 14))
-    p = float(atr_cfg.get('percentile_p', 40.0))
-    yb = float(atr_cfg.get('yellow_band_pct', 3.0))
+    df = df4.copy()
 
-    c = df4h['close']
-    h = df4h['high']
-    l = df4h['low']
-    pc = c.shift(1)
-    tr = pd.concat([(h - l).abs(), (h - pc).abs(), (l - pc).abs()], axis=1).max(axis=1)
-    atr14 = tr.ewm(span=lookback, adjust=False).mean()
-    atr_pct = (atr14 / c.replace(0, np.nan)) * 100.0
+    # --- EMAs 4h + cross buffer en bps ---
+    ema_fast = int(cfg['signals']['ema_fast'])
+    ema_slow = int(cfg['signals']['ema_slow'])
+    df['ema21'] = df['close'].ewm(span=ema_fast, adjust=False).mean()
+    df['ema55'] = df['close'].ewm(span=ema_slow, adjust=False).mean()
 
-    thr_y_low = np.nanpercentile(atr_pct, max(0.0, p - yb))
-    thr_y_high = np.nanpercentile(atr_pct, min(100.0, p + yb))
+    xbps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0)) / 10_000.0
+    up_thr = (1.0 + xbps)
+    down_thr = (1.0 - xbps)
+    df['trend_up'] = df['ema21'] > (df['ema55'] * up_thr)
+    df['trend_dn'] = df['ema21'] < (df['ema55'] * down_thr)
 
-    val = float(atr_pct.iloc[i])
-    if math.isnan(val):
-        return False
+    # --- Exit guardrail by ATR (optional, controlled by YAML: filters.exit_atr.{enabled,period,mult}) ---
+    ex_atr_cfg = (cfg.get('filters', {}) or {}).get('exit_atr', {}) or {}
+    use_guard = bool(ex_atr_cfg.get('enabled', False))
+    period_atr = int(ex_atr_cfg.get('period', 14))
+    mult_atr = float(ex_atr_cfg.get('mult', 1.5))
 
-    return (val >= thr_y_low) and (val <= thr_y_high)
+    # Default: guard passes (no extra restriction)
+    df['exit_guard_ok'] = True
 
+    if use_guard and all(c in df.columns for c in ['high', 'low', 'close']):
+        prev_close = df['close'].shift(1)
+        tr = (df['high'] - df['low']).abs()
+        tr = np.maximum(tr, (df['high'] - prev_close).abs())
+        tr = np.maximum(tr, (df['low'] - prev_close).abs())
+        atr = tr.ewm(span=period_atr, adjust=False).mean()
+        # Allow passive exit only if close < ema21 - k*ATR
+        df['exit_guard_ok'] = df['close'] < (df['ema21'] - mult_atr * atr)
 
-# =============================
-# Preparación de datos
-# =============================
-def _prepare_macro_d1(d1: pd.DataFrame, cfg: Dict) -> pd.DataFrame:
-    """
-    Construye macro diario con confirmación D-1 (sin look-ahead).
-    Devuelve columnas: ['d_date','d_close','d_ema200','macro_ok_d1']
-    donde d_date es int YYYYMMDD.
-    """
-    d1 = _ensure_cols(d1, name='d1').sort_values('timestamp').set_index('timestamp')
+    # Macro (debe venir del merge diario)
+    if 'macro_green' not in df.columns:
+        df['macro_green'] = df['d_close'] > df['d_ema200']
 
-    # Señal de D-1 (shift para no ver futuro)
-    sig = pd.DataFrame(index=d1.index)
-    sig['d_close'] = d1['close']
-    sig['d_ema200'] = ema(sig['d_close'], 200)
-    sig = sig.shift(1)
-    sig['macro_ok_d1'] = sig['d_close'] > sig['d_ema200']
+    # --- Anti-whipsaw (pausa y dwell) ---
+    aw = cfg.get('anti_whipsaw', {}) or {}
+    dwell_min = int(aw.get('dwell_bars_min_between_flips', aw.get('dwell_bars_min', 0)))
+    pause_after_flip_bars = int(aw.get('pause_after_flip_bars', 0))
+    pause_affects_sell = bool(aw.get('pause_affects_sell', False))
 
-    out = sig.reset_index()
-    out['d_date'] = pd.to_datetime(out['timestamp'], utc=True).dt.strftime('%Y%m%d').astype('int64')
-    return out[['d_date', 'd_close', 'd_ema200', 'macro_ok_d1']]
+    # --- Exit Active params (seguros si faltan en el YAML) ---
+    exit_cfg = cfg.get('signals', {}).get('exit_active', {}) or {}
+    active_exit_enabled = bool(exit_cfg.get('enabled', True))
+    confirm_bars = int(exit_cfg.get('confirm_bars', 1))
+    max_wait_after_confirm = int(exit_cfg.get('max_wait_bars_after_confirm', 2))
+    age_valve_enabled = bool(exit_cfg.get('age_valve_enabled', False))  # por defecto OFF
 
+    # --- Presupuesto / throttle ---
+    fb = cfg.get('flip_budget', {}) or {}
+    hard_per_year = int(fb.get('hard_per_year', 10**9))  # si no está: infinito
+    enforce_hard = bool(fb.get('enforce_hard_yearly', True))
+    soft_per_week = int(fb.get('soft_per_week', fb.get('soft_weekly', 10**9)))  # throttle semanal de BUY (rolling 7d)
 
-def _prepare_h4(h4: pd.DataFrame, cfg: Dict) -> pd.DataFrame:
-    """Normaliza H4 y añade 'd_date' (int YYYYMMDD) para merge con D1, evitando duplicados."""
-    df = _ensure_cols(h4, name='h4').sort_values('timestamp').reset_index(drop=True)
+    # --- ATR Regime + Yellow band (opcional) ---
+    atr_cfg = (cfg.get('modules', {}) or {}).get('atr_regime', {}) or {}
+    atr_enabled = bool(atr_cfg.get('enabled', False))
+    atr_p = float(atr_cfg.get('percentile_p', 36))
+    yellow_pct = float(atr_cfg.get('yellow_band_pct', 0.0))
+    atr_blocks_sell = bool(atr_cfg.get('pause_affects_sell', False))
 
-    # Si ya existía 'ts', elimínala para no duplicar nombre de columna
-    if 'ts' in df.columns:
-        df = df.drop(columns=['ts'])
+    if atr_enabled and all(c in df.columns for c in ['high', 'low', 'close']):
+        prev_close = df['close'].shift(1)
+        tr = (df['high'] - df['low']).abs()
+        tr = np.maximum(tr, (df['high'] - prev_close).abs())
+        tr = np.maximum(tr, (df['low'] - prev_close).abs())
+        atr14 = tr.ewm(span=14, adjust=False).mean()
+        df['atr_nrm'] = (atr14 / df['close']).clip(lower=0)
+        thr = float(np.nanpercentile(df['atr_nrm'].values, atr_p))
+        low_band = thr * (1.0 - yellow_pct)
+        high_band = thr * (1.0 + yellow_pct)
+        df['atr_quiet'] = df['atr_nrm'] <= low_band
+        df['atr_loud'] = df['atr_nrm'] >= high_band
+        df['atr_yellow'] = ~(df['atr_quiet'] | df['atr_loud'])
+    else:
+        df['atr_quiet'] = True
+        df['atr_loud'] = False
+        df['atr_yellow'] = False
 
-    # Crea 'ts' a partir de 'timestamp' (siempre tz-aware UTC)
-    df['ts'] = pd.to_datetime(df['timestamp'], utc=True)
+    # --- XB adaptativo por ATR (opcional) ---
+    # Si está habilitado, recomputa trend_up/trend_dn usando un buffer por-vela
+    # determinado por el régimen ATR (quiet / yellow / loud).
+    xb_cfg = (cfg.get('modules', {}) or {}).get('xb_adaptive', {}) or {}
+    if bool(xb_cfg.get('enabled', False)):
+        # Helper: convertir bps a fracción
+        def _bps_to_frac(v: float) -> float:
+            return float(v) / 10_000.0
 
-    # (cinturón y tirantes) elimina columnas duplicadas si las hubiera
-    df = df.loc[:, ~df.columns.duplicated()]
+        # Valores por régimen; si faltan, caen al cross_buffer global
+        default_bps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0))
+        xb_quiet = _bps_to_frac(xb_cfg.get('quiet_bps', default_bps))
+        xb_yellow = _bps_to_frac(xb_cfg.get('yellow_bps', default_bps))
+        xb_loud = _bps_to_frac(xb_cfg.get('loud_bps', default_bps))
 
-    # Clave de merge homogénea: int YYYYMMDD
-    df['d_date'] = df['ts'].dt.strftime('%Y%m%d').astype('int64')
-    return df
+        # Si el régimen ATR no está activo, atr_quiet=True para todo (definido arriba)
+        xbps_row = np.where(df['atr_quiet'], xb_quiet,
+                            np.where(df['atr_loud'], xb_loud, xb_yellow))
+        up_thr_row = 1.0 + xbps_row
+        down_thr_row = 1.0 - xbps_row
 
+        # Recalcular las máscaras de tendencia con umbrales por fila
+        df['trend_up'] = df['ema21'] > (df['ema55'] * up_thr_row)
+        df['trend_dn'] = df['ema21'] < (df['ema55'] * down_thr_row)
 
-# =============================
-# Backtest
-# =============================
-def run_backtest(d1: pd.DataFrame, h4: pd.DataFrame, cfg: Dict) -> Tuple[pd.DataFrame, Dict]:
-    """
-    Núcleo v0.1 con:
-      - Macro D1 (D-1) sin look-ahead
-      - Entrada: ema21>ema55 y macro_ok
-      - Salidas: (a) activa con confirmación (close<ema21 y NO recuperación al cierre siguiente),
-                 (b) pasiva ema21<ema55,
-                 (c) (opcional) SELL forzado si macro se pone rojo (flag YAML).
-      - Dwell entre flips
-      - Presupuesto semanal de flips (opcional)
-      - Costes en bps por lado
-      - Evaluación al cierre de la vela 4h; ejecución en el open de la siguiente
-    """
-    # --------- datos 4h
-    df = _prepare_h4(h4, cfg)
-    df['ema21'] = ema(df['close'], 21)
-    df['ema55'] = ema(df['close'], 55)
-    df['next_open'] = df['open'].shift(-1)
-    df['prev_close'] = df['close'].shift(1)
+    # --- Capital inicial ---
+    seed_btc = float(cfg['backtest'].get('seed_btc', 1.0))
+    btc = seed_btc
+    usd = 0.0
+    position = 'BTC' if (bool(df['macro_green'].iloc[0]) and bool(df['trend_up'].iloc[0])) else 'STABLE'
+    if position == 'STABLE':
+        first_open = float(df['open'].iloc[0])
+        usd = btc * first_open
+        btc = 0.0
 
-    # salida activa vectorizada (usa barra previa y actual para poder ejecutar en la próxima)
-    exit_active_sig = (df['prev_close'] < df['ema21'].shift(1)) & (df['close'] <= df['ema21'])
-    df['exit_active_sig'] = exit_active_sig
+    # --- Estado de control ---
+    bars_since_flip = dwell_min  # permitir flip inicial
+    pause_until_i = -1  # índice (inclusive) hasta el que dura la pausa tras flip
 
-    # --------- macro D1 (D-1) y merge por día (UTC)
-    d1_macro = _prepare_macro_d1(d1, cfg)
-    df = df.merge(d1_macro, on='d_date', how='left')
-    df['macro_ok'] = df['macro_ok_d1'].fillna(False)
+    flips_exec_ts: List[pd.Timestamp] = []
+    flips_blocked_hard = 0
+    last_buys: deque[pd.Timestamp] = deque()  # para throttle semanal soft (ventana 7 días)
 
-    # --------- parámetros / defaults
-    backtest = cfg.get('backtest', {}) or {}
-    seed_usd = float(backtest.get('seed_usd', 69259.12))
-    seed_btc = backtest.get('seed_btc', None)
+    # Órdenes programadas (+ razones persistentes para el flip)
+    schedule_buy_i: Optional[int] = None
+    schedule_sell_i: Optional[int] = None
+    schedule_buy_reason: Optional[str] = None
+    schedule_sell_reason: Optional[str] = None
 
-    anti = cfg.get('anti_whipsaw', {}) or {}
-    dwell_min = int(anti.get('dwell_bars_min_between_flips', 6))
+    pending_exit_i: Optional[int] = None  # índice donde se detectó close<ema_fast para salida activa
 
-    costs_cfg = cfg.get('costs', {}) or {}
-    # permite fee_bps + slip_bps o bps_per_side directamente
-    bps_side = float(costs_cfg.get('bps_per_side', costs_cfg.get('fee_bps', 6.0) + costs_cfg.get('slip_bps', 6.0)))
-    costs = Costs(bps_per_side=bps_side)
+    out_rows: List[dict] = []
 
-    modules = cfg.get('modules', {}) or {}
-    weekly_cfg = modules.get('weekly_turnover_budget', {}) or {}
-    weekly_on = bool(weekly_cfg.get('enabled', False))
-    flips_per_week_max = int(weekly_cfg.get('flips_per_week_max', 2))
-    force_sell_on_macro_red = bool(modules.get('force_sell_on_macro_red', False))
+    def budget_allows(ts: pd.Timestamp) -> bool:
+        if not enforce_hard:
+            return True
+        one_year_ago = ts - pd.Timedelta(days=365)
+        recent = sum(t > one_year_ago for t in flips_exec_ts)
+        return recent < hard_per_year
 
-    # --- Presupuesto dinámico por ATR: 2-verde / 1-resto (opcional)
-    atr_cfg = modules.get('atr_regime', {}) or {}
-    dyn_by_atr = bool(weekly_cfg.get('dynamic_by_atr', False))
-
-    # Serie con el "cap" de BUY permitido en cada barra (1 por defecto)
-    buy_cap_series = pd.Series(int(flips_per_week_max), index=df.index)
-
-    if weekly_on and dyn_by_atr and atr_cfg.get('enabled', False):
-        lookback = int(atr_cfg.get('lookback_bars', 14))
-        p = float(atr_cfg.get('percentile_p', 40.0))
-        yb = float(atr_cfg.get('yellow_band_pct', 5.0))  # por defecto 5p en preset prudente
-
-        c = df['close']; h = df['high']; l = df['low']; pc = c.shift(1)
-        tr = pd.concat([(h - l).abs(), (h - pc).abs(), (l - pc).abs()], axis=1).max(axis=1)
-        atr14 = tr.ewm(span=lookback, adjust=False).mean()
-        atr_pct = (atr14 / c.replace(0, np.nan)) * 100.0
-
-        thr_green = np.nanpercentile(atr_pct, min(100.0, p + yb))
-
-        # verde => 2; resto => 1
-        buy_cap_series = pd.Series(np.where(atr_pct > thr_green, 2, 1), index=df.index).fillna(1).astype(int)
-
-    # --------- estado
-    position = 'STABLE'
-    usd = float(seed_usd)
-    if seed_btc is not None:
-        usd = float(seed_btc) * float(df['open'].iloc[0])
-    btc = 0.0
-
-    last_flip_i = -10_000
-    flips_total = 0
-    flips_week: Dict[str, int] = {}
-    pending_signal = None  # 'BUY' o 'SELL' para ejecutar en la próxima barra
-
-    rows = []
-
-    # --------- estado
-    position = 'STABLE'
-    ...
-    rows = []
-
-    # Buffer anti-microcruces (constante por corrida)
-    eps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0)) / 1e4
-
-    # --------- bucle principal (cierre actual -> ejecutar en open siguiente)
-    for i in range(len(df) - 1): # hasta penúltima porque ejecutamos en i+1
-        ts = df.loc[i, 'ts']
-        op = df.loc[i, 'open']
-        cl = df.loc[i, 'close']
-        next_op = df.loc[i + 1, 'open']
-
-        # 1) ejecutar si había signal pendiente
+    n = len(df)
+    # Deja 2 barras de margen por la ejecución "siguiente open"
+    for i in range(0, max(0, n - 2)):
+        row = df.iloc[i]
         executed = None
-        if pending_signal == 'BUY' and position == 'STABLE':
-            usd *= (1.0 - costs.frac_side)
-            price = op if (next_op and not np.isnan(next_op)) else op
-            btc = usd / price
-            usd = 0.0
-            position = 'BTC'
-            executed = 'BUY'
-            pending_signal = None
-            last_flip_i = i
-            flips_total += 1
-            if weekly_on:
-                wk = _weekly_key(ts)
-                flips_week[wk] = flips_week.get(wk, 0) + 1
+        exec_reason_cur = None
+        blocked_reason_cur = None
 
-        elif pending_signal == 'SELL' and position == 'BTC':
-            usd = btc * op
-            usd *= (1.0 - costs.frac_side)
-            btc = 0.0
-            position = 'STABLE'
-            executed = 'SELL'
-            pending_signal = None
-            last_flip_i = i
-            flips_total += 1
-            # Removed weekly count increment for SELL
+        # === Ejecutar órdenes programadas al OPEN de esta barra ===
+        if schedule_buy_i is not None and i == schedule_buy_i:
+            price = float(row['open'])
+            if usd > 0.0:
+                btc += (usd / price) * (1.0 - costs.rate)
+                usd = 0.0
+                position = 'BTC'
+                flips_exec_ts.append(row['ts'])
+                last_buys.append(row['ts'])
+                bars_since_flip = 0
+                executed = 'BUY'
+                exec_reason_cur = schedule_buy_reason or 'BUY_trend'
+                if pause_after_flip_bars > 0:
+                    pause_until_i = max(pause_until_i, i + pause_after_flip_bars)
+            schedule_buy_i = None
+            schedule_buy_reason = None
 
-        # 2) equity al cierre de la barra i (marcamos ejecución si hubo al inicio)
-        eq_usd = usd if position == 'STABLE' else btc * cl
-        eq_btc = (0.0 if cl == 0 else eq_usd / cl)
+        if schedule_sell_i is not None and i == schedule_sell_i:
+            price = float(row['open'])
+            if btc > 0.0:
+                usd += btc * price * (1.0 - costs.rate)
+                btc = 0.0
+                position = 'STABLE'
+                flips_exec_ts.append(row['ts'])
+                bars_since_flip = 0
+                executed = 'SELL'
+                exec_reason_cur = schedule_sell_reason or 'SELL_cross_or_active'
+                if pause_after_flip_bars > 0:
+                    pause_until_i = max(pause_until_i, i + pause_after_flip_bars)
+            schedule_sell_i = None
+            schedule_sell_reason = None
 
-        rows.append({
-            'ts': ts, 'open': op, 'close': cl,
-            'equity_usd': float(eq_usd), 'equity_btc': float(eq_btc),
-            'executed': executed
+        # === Señales al CIERRE de esta barra ===
+        macro_green = bool(row['macro_green'])
+        trend_up = bool(row['trend_up'])
+        trend_dn = bool(row['trend_dn'])
+
+        # Dwell + Pausa
+        bars_since_flip += 1
+        can_dwell = (bars_since_flip >= dwell_min)
+        under_pause = (i < pause_until_i)
+        can_buy = can_dwell and (not under_pause)  # la pausa siempre afecta compras
+        can_sell = can_dwell and (not under_pause if pause_affects_sell else True)
+
+        # Gating por ATR yellow band (si está activo)
+        if atr_enabled and bool(df['atr_yellow'].iloc[i]):
+            can_buy = False
+            if atr_blocks_sell:
+                can_sell = False
+
+        # ======= Salida ACTIVA =======
+        if active_exit_enabled and position == 'BTC' and (row['close'] < row['ema21']) and (pending_exit_i is None):
+            pending_exit_i = i
+
+        # Cancelar salida activa si hay recuperación
+        if active_exit_enabled and pending_exit_i is not None and (row['close'] > row['ema21']):
+            pending_exit_i = None
+
+        # Confirmación + gating de salida activa
+        if active_exit_enabled and pending_exit_i is not None and (i >= pending_exit_i + confirm_bars):
+            age_since_confirm = i - (pending_exit_i + confirm_bars)
+            regime_allows_active_exit = (trend_dn or (not macro_green) or (row['close'] < row['ema55']))
+            allow_due_to_age = (age_valve_enabled and (age_since_confirm >= max_wait_after_confirm))
+
+            if (row['close'] <= row['ema21']) and (regime_allows_active_exit or allow_due_to_age) \
+                    and can_sell and (schedule_sell_i is None):
+                if budget_allows(row['ts']):
+                    schedule_sell_i = i + 1
+                    schedule_sell_reason = 'SELL_active'
+                    pending_exit_i = None
+                else:
+                    flips_blocked_hard += 1
+                    # mantenemos pending_exit_i para reintentar más adelante
+
+        # ======= Salida PASIVA por cruce EMAs =======
+        if position == 'BTC' and trend_dn and can_sell and bool(df['exit_guard_ok'].iat[i]) and schedule_sell_i is None:
+            if budget_allows(row['ts']):
+                schedule_sell_i = i + 1
+                if schedule_sell_reason is None:
+                    schedule_sell_reason = 'SELL_cross'
+            else:
+                flips_blocked_hard += 1
+
+        # ======= Entrada a BTC =======
+        if position == 'STABLE' and macro_green and trend_up and can_buy and schedule_buy_i is None:
+            # Throttle semanal soft para BUY (rolling 7 días; no cuenta SELL)
+            if soft_per_week < 10**8:
+                seven_days_ago = row['ts'] - pd.Timedelta(days=7)
+                while last_buys and last_buys[0] <= seven_days_ago:
+                    last_buys.popleft()
+                if len(last_buys) >= soft_per_week:
+                    blocked_reason_cur = 'soft_week_buy_limit'
+            if blocked_reason_cur is None:
+                if budget_allows(row['ts']):
+                    schedule_buy_i = i + 1
+                    if schedule_buy_reason is None:
+                        schedule_buy_reason = 'BUY_trend'
+                else:
+                    flips_blocked_hard += 1
+                    blocked_reason_cur = 'hard_year_budget'
+
+        # ======= Equity (al cierre de la barra i) =======
+        price_now = float(row['close'])
+        equity_btc = btc + (usd / price_now if price_now > 0 else 0.0)
+        equity_usd = btc * price_now + usd
+
+        out_rows.append({
+            'ts': row['ts'],
+            'open': float(row['open']),
+            'close': price_now,
+            'd_close': float(row.get('d_close', np.nan)),
+            'd_ema200': float(row.get('d_ema200', np.nan)),
+            'ema21': float(row['ema21']),
+            'ema55': float(row['ema55']),
+            'macro_green': macro_green,
+            'trend_up': trend_up,
+            'position': position,
+            'btc': float(btc),
+            'usd': float(usd),
+            'equity_btc': float(equity_btc),
+            'equity_usd': float(equity_usd),
+            'executed': executed,
+            'exec_reason': exec_reason_cur,
+            'blocked_reason': blocked_reason_cur,
         })
 
-        # 3) generar nueva señal (que se ejecutará en la PRÓXIMA barra)
-        if i < (len(df) - 2):  # aún hay una barra futura para ejecutar
-            can_flip = (i - last_flip_i) >= dwell_min
-            wk = _weekly_key(ts)
-            # Budget BUY dinámico (por barra): cap=1 o 2 según ATR; SELL siempre permitido
-            buy_cap = int(buy_cap_series.iloc[i]) if weekly_on else 1_000_000
-            buy_ok = (not weekly_on) or (flips_week.get(wk, 0) < buy_cap)
-            sell_ok = True
+    res = pd.DataFrame(out_rows)
 
-            atr_pause = _maybe_atr_pause(df, cfg, i)
+    # ------- KPIs -------
+    if res.empty:
+        kpis = {
+            'net_btc_ratio': None,
+            'mdd_model_usd': 0.0,
+            'mdd_hodl_usd': 0.0,
+            'mdd_vs_hodl_ratio': None,
+            'flips_total': 0,
+            'flips_blocked_hard': int(flips_blocked_hard),
+            'flips_per_year': None,
+        }
+        return res, kpis
 
-            eps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0)) / 1e4
-            # micro-buffer configurable para evitar microcruces
-            # justo antes de usar trend_up:
-            eps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0)) / 1e4
-            trend_up = bool(df.loc[i, 'ema21'] > df.loc[i, 'ema55'] * (1.0 + eps))
-            macro_ok = bool(df.loc[i, 'macro_ok'])
+    hodl_usd = res['close'] * seed_btc
+    mdd_model_usd = max_drawdown(res['equity_usd'])
+    mdd_hodl_usd = max_drawdown(hodl_usd)
+    mdd_ratio = (mdd_model_usd / mdd_hodl_usd) if mdd_hodl_usd > 0 else np.nan
 
-            if position == 'STABLE':
-                if macro_ok and trend_up and can_flip and buy_ok and (not atr_pause):
-                    pending_signal = 'BUY'
-            elif position == 'BTC':
-                if (not macro_ok) and can_flip and force_sell_on_macro_red:
-                    pending_signal = 'SELL'
-                else:
-                    exit_confirm = bool(df.loc[i, 'exit_active_sig'])  # cierra<ema21 y NO recupera la barra actual
-                    exit_passive = bool(df.loc[i, 'ema21'] < df.loc[i, 'ema55'])
-                    if can_flip and (exit_confirm or exit_passive) and sell_ok:
-                        pending_signal = 'SELL'
+    total_days = (pd.Timestamp(res['ts'].iloc[-1]) - pd.Timestamp(res['ts'].iloc[0])).days
+    years = total_days / 365.25 if total_days > 0 else np.nan
 
-    equity_df = pd.DataFrame(rows)
-
-    # --- Diagnóstico: presupuesto BUY semanal (no afecta resultados) ---
-    try:
-        base_cap = int(cfg.get('modules', {}).get('weekly_turnover_budget', {}).get('flips_per_week_max', 1))
-
-        # BUYs/semana desde equity
-        iso_eq = equity_df['ts'].dt.isocalendar()
-        eq_week = iso_eq.year.astype(str) + '-W' + iso_eq.week.astype(str).str.zfill(2)
-        buys_by_week = (
-            equity_df.assign(week=eq_week)
-                     .loc[lambda x: x['executed'] == 'BUY']
-                     .groupby('week')['executed']
-                     .count()
-        )
-
-        # Cap semanal desde H4 (máximo cap por barra dentro de la semana)
-        iso_h4 = df['ts'].dt.isocalendar()
-        h4_week = iso_h4.year.astype(str) + '-W' + iso_h4.week.astype(str).str.zfill(2)
-        cap_by_week = (
-            pd.Series(buy_cap_series.values, index=h4_week)
-              .groupby(level=0)
-              .max()
-              .astype(int)
-        )
-
-        # Alinear índices y rellenar caps faltantes con base_cap
-        buys_al, cap_al = buys_by_week.align(cap_by_week, join='outer', fill_value=0)
-        cap_al = cap_al.replace(0, np.nan).fillna(base_cap).astype(int)
-        buys_al = buys_al.astype(int)
-
-        viol = int((buys_al > cap_al).sum())
-
-        print("BUY/semana (últimas 12):")
-        print(buys_al.tail(12))
-        print("\nCap por semana (últimas 12):")
-        print(cap_al.tail(12))
-        print("\nMax BUY/semana:", int(buys_al.max() if not buys_al.empty else 0))
-        print("Semanas con violación de cap:", viol)
-
-        if viol:
-            detail = (
-                pd.DataFrame({'buys': buys_al, 'cap': cap_al})
-                .query('buys > cap')
-                .sort_index()
-            )
-            print("\nViolaciones:\n", detail)
-
-        missing_in_cap = set(buys_al.index) - set(cap_al.index)
-        missing_in_buys = set(cap_al.index) - set(buys_al.index)
-        if missing_in_cap or missing_in_buys:
-            print("\nSemanas sin correspondencia -> en cap:", missing_in_cap, " | en buys:", missing_in_buys)
-    except Exception as e:
-        print("[WARN] Diagnóstico weekly_turnover_budget falló:", repr(e))
-
-    # --------- KPIs
-    first_price = float(df['open'].iloc[0])
-    init_btc_hodl = (seed_usd / first_price)
-    hodl_equity = init_btc_hodl * df['close']
-    mdd_model = _calc_mdd(equity_df['equity_usd'])
-    mdd_hodl = _calc_mdd(hodl_equity)
-
-    final_usd_model = float(equity_df['equity_usd'].iloc[-1])
-    final_usd_hodl = float(hodl_equity.iloc[-1])
-    net_btc_ratio = (final_usd_model / final_usd_hodl) if final_usd_hodl else 0.0
-
-    days = (equity_df['ts'].iloc[-1] - equity_df['ts'].iloc[0]).days
-    years = max(1e-9, days / 365.25)
-    flips_per_year = flips_total / years
+    flips_total = int(len([x for x in res['executed'] if isinstance(x, str)]))
+    flips_per_year = (flips_total / years) if years and years > 0 else np.nan
+    net_btc_ratio = float(res['equity_btc'].iloc[-1] / seed_btc)
 
     kpis = {
-        'net_btc_ratio': net_btc_ratio,
-        'mdd_model_usd': mdd_model,
-        'mdd_hodl_usd': mdd_hodl,
-        'mdd_vs_hodl_ratio': (mdd_model / mdd_hodl) if mdd_hodl else np.nan,
-        'flips_total': float(flips_total),
-        'flips_per_year': float(flips_per_year),
+        'net_btc_ratio': net_btc_ratio if net_btc_ratio == net_btc_ratio else None,
+        'mdd_model_usd': float(mdd_model_usd),
+        'mdd_hodl_usd': float(mdd_hodl_usd),
+        'mdd_vs_hodl_ratio': float(mdd_ratio) if mdd_ratio == mdd_ratio else None,
+        'flips_total': int(flips_total),
+        'flips_blocked_hard': int(flips_blocked_hard),
+        'flips_per_year': float(flips_per_year) if flips_per_year == flips_per_year else None,
     }
-    return equity_df, kpis
-
-
-# =============================
-# API pública (con compatibilidad)
-# =============================
-def simulate(a, b=None, c=None):
-    """
-    Compatibilidad:
-      - Nuevo: simulate(d1_df, h4_df, cfg_dict)
-      - Antiguo (CLI): simulate(cfg_dict, df, trade_costs)  -> carga d1/h4 desde cfg
-    """
-    # Nuevo estilo
-    if isinstance(a, pd.DataFrame) and isinstance(b, pd.DataFrame) and isinstance(c, dict):
-        d1, h4, cfg = a, b, c
-        return run_backtest(d1, h4, cfg)
-
-    # Estilo CLI antiguo: a=cfg (dict)
-    if isinstance(a, dict):
-        cfg = a
-
-        # Legacy CLI style: a=cfg (dict), b=h4 DataFrame (already filtered by --start/--end), c=costs
-        if isinstance(b, pd.DataFrame):
-            h4 = b
-        else:
-            from .io import load_ohlc
-            h4 = load_ohlc(
-                cfg['data']['ohlc_4h_csv'],
-                cfg['data'].get('ts_col', 'timestamp'),
-                cfg['data'].get('tz_input', 'UTC'),
-            )
-
-        # Always load D1 from cfg, but trim to the H4 range (+buffer for EMA/shift)
-        from .io import load_ohlc
-        d1_full = load_ohlc(
-            cfg['data']['ohlc_d1_csv'],
-            cfg['data'].get('ts_col', 'timestamp'),
-            cfg['data'].get('tz_input', 'UTC'),
-        )
-
-        h4_range = _ensure_cols(h4, name='h4_range')
-        t0 = pd.to_datetime(h4_range['timestamp'].min(), utc=True).normalize() - pd.Timedelta(days=3)
-        t1 = pd.to_datetime(h4_range['timestamp'].max(), utc=True).normalize()
-        d1_full = _ensure_cols(d1_full, name='d1_full')
-        d1 = d1_full[(d1_full['timestamp'] >= t0) & (d1_full['timestamp'] <= t1)]
-
-        return run_backtest(d1, h4, cfg)
-
-    raise TypeError("simulate: firma no soportada. Usa (d1_df, h4_df, cfg_dict) o (cfg_dict, ...) legacy.")
+    return res, kpis

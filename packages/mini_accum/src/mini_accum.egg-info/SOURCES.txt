@@ -2,6 +2,7 @@ README.md
 pyproject.toml
 src/mini_accum/__init__.py
 src/mini_accum/cli.py
+src/mini_accum/dictamen.py
 src/mini_accum/indicators.py
 src/mini_accum/io.py
 src/mini_accum/sim.py

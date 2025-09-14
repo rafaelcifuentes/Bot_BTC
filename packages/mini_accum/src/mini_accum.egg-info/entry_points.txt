@@ -1,2 +1,3 @@
 [console_scripts]
 mini-accum-backtest = mini_accum.cli:main
+mini-accum-dictamen = mini_accum.dictamen:main

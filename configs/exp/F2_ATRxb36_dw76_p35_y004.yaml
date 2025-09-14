@@ -1,0 +1,45 @@
+# v3p3N2g — ATRcombo + cb0, dw=76, xb=36
+
+strategy: bb1-core-v3p3N2g
+
+data:
+  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ts_col: timestamp
+  tz_input: UTC
+
+backtest:
+  reports_dir: reports/mini_accum
+
+costs:
+  fee_bps_per_side: 5
+  slip_bps_per_side: 2
+  spread_bps_per_side: 0
+  borrow_bps_annual: 0
+  funding_bps_daily: 0
+
+# NUEVO: presupuesto de flips
+flip_budget:
+  hard_per_year: 26        # límite duro anual
+  soft_per_week: 1         # límite “soft” semanal (comentario si no aplica)
+  soft_weekly: 1           # redundante por si el loader usa este nombre
+
+signals:
+  ema_fast: 13
+  ema_slow: 55
+  cross_buffer_bps: 36
+  exit_active:
+    rule: "close < ema_fast"
+    confirm_bars: 0
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 76
+  dwell_bars_4h: 76
+  grace_ttl_bars_4h: 1
+
+modules:
+  atr_regime:
+    enabled: true
+    percentile_p: 35
+    pause_affects_sell: false
+    yellow_band_pct: 0.04

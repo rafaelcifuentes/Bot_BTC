@@ -21,6 +21,7 @@ signals:
     confirm_bars: 2
   exit_passive:
     rule: "ema21 < ema55 and macro_red"
+  cross_buffer_bps: 20
 filters:
   adx:
     enabled: true
@@ -46,7 +47,10 @@ modules:
     enabled: false
   weekly_turnover_budget:
     enabled: false
+  xb_adaptive:
+    enabled: false
 flip_budget:
   hard_per_year: 26
   enforce_hard_yearly: false
 force_sell_on_macro_red: true
+# touch 2025-09-14 05:57:42 UTC

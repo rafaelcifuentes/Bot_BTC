@@ -1,0 +1,52 @@
+# Mini-Accum KISS v4 — single source of truth
+
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
+  ts_col: timestamp
+  tz_input: UTC
+backtest:
+  reports_dir: reports/mini_accum
+costs:
+  fee_bps_per_side: 6
+  slip_bps_per_side: 6
+macro_filter:
+  use: true
+signals:
+  ema_fast: 21
+  ema_slow: 55
+  entry: "ema21 > ema55 and macro_green"
+  exit_active:
+    rule: "ema21 < ema55"
+    confirm_bars: 1
+  exit_passive:
+    rule: "ema21 < ema55 and macro_red"
+filters:
+  adx:
+    enabled: true
+    period: 14
+    min: 22
+  exit_margin:
+    enabled: true
+    margin_pct: 0.003
+anti_whipsaw:
+  dwell_bars_4h: 0
+  dwell_bars_min_between_flips: 60
+  grace_ttl_bars_4h: 0
+  ttl_confirm_bars: 2
+modules:
+  atr_regime:
+    enabled: true
+    percentile_p: 65
+  hibernation_chop:
+    enabled: false
+    window_bars: 40
+    min_crosses: 2
+  grace_ttl:
+    enabled: false
+  weekly_turnover_budget:
+    enabled: false
+flip_budget:
+  hard_per_year: 26
+  enforce_hard_yearly: false
+force_sell_on_macro_red: false

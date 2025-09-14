@@ -1,0 +1,18 @@
+signals:
+  ema_fast: 13
+  ema_slow: 55
+  cross_buffer_bps: 48
+  exit_active:
+    enabled: true
+    confirm_bars: 2
+    max_wait_bars_after_confirm: 6
+    age_valve_enabled: false   # <- clave para no forzar ventas por “tiempo”
+anti_whipsaw:
+  dwell_bars_min_between_flips: 32
+  pause_after_flip_bars: 8
+  pause_affects_sell: true
+  hysteresis_pct: 0.004
+  rearm_bars_after_cancel: 2
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 26

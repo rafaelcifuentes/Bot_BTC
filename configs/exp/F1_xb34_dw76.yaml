@@ -1,0 +1,144 @@
+version: 0.1
+version: 0.1
+numeraire: BTC
+numeraire: BTC
+asset: BTC-USD
+asset: BTC-USD
+timezone: UTC
+timezone: UTC
+
+
+data:
+data:
+  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
+  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ts_col: timestamp
+  ts_col: timestamp
+  price_col: close
+  price_col: close
+  tz_input: UTC
+  tz_input: UTC
+
+
+signals:
+signals:
+  ema_fast: 13
+  ema_fast: 13
+  ema_slow: 55
+  ema_slow: 55
+  cross_buffer_bps: 34
+  cross_buffer_bps: 34
+  macro_buffer_bps: 20
+  macro_buffer_bps: 20
+  entry: ema13 > ema55
+  entry: ema13 > ema55
+  exit_active:
+  exit_active:
+    rule: close < ema13
+    rule: close < ema13
+    confirm_bars: 0
+    confirm_bars: 0
+  exit_passive:
+  exit_passive:
+    rule: ema13 < ema55
+    rule: ema13 < ema55
+
+
+anti_whipsaw:
+anti_whipsaw:
+  dwell_bars_4h: 76
+  dwell_bars_4h: 76
+  dwell_bars_min_between_flips: 76
+  dwell_bars_min_between_flips: 76
+  grace_ttl_bars_4h: 1
+  grace_ttl_bars_4h: 1
+  ttl_confirm_bars: 0
+  ttl_confirm_bars: 0
+
+
+costs:
+costs:
+  fee_bps_per_side: 6.0
+  fee_bps_per_side: 6.0
+  slip_bps_per_side: 6.0
+  slip_bps_per_side: 6.0
+
+
+backtest:
+backtest:
+  reports_dir: reports/mini_accum
+  reports_dir: reports/mini_accum
+  seed_btc: 1.0
+  seed_btc: 1.0
+
+
+kpis:
+kpis:
+  accept:
+  accept:
+    net_btc_ratio_min: 1.05
+    net_btc_ratio_min: 1.05
+    mdd_vs_hodl_ratio_max: 0.85
+    mdd_vs_hodl_ratio_max: 0.85
+    flips_per_year_max: 26
+    flips_per_year_max: 26
+    flips_per_month_soft: 2
+    flips_per_month_soft: 2
+
+
+flip_budget:
+flip_budget:
+  enforce_hard_yearly: true
+  enforce_hard_yearly: true
+  hard_per_year: 26
+  hard_per_year: 26
+  allow_riskoff_over_budget: true
+  allow_riskoff_over_budget: true
+
+
+modules:
+modules:
+  hibernation_chop:
+  hibernation_chop:
+    enabled: false
+    enabled: false
+    lookback_bars_4h: 60
+    lookback_bars_4h: 60
+    min_crosses: 4
+    min_crosses: 4
+  grace_ttl:
+  grace_ttl:
+    enabled: true
+    enabled: true
+  weekly_turnover_budget:
+  weekly_turnover_budget:
+    enabled: true
+    enabled: true
+    flips_per_week_max: 1
+    flips_per_week_max: 1
+    dynamic_by_atr: true
+    dynamic_by_atr: true
+    enforce_hard: false
+    enforce_hard: false
+  atr_regime:
+  atr_regime:
+    enabled: true
+    enabled: true
+    lookback_bars: 14
+    lookback_bars: 14
+    percentile_p: 40
+    percentile_p: 40
+    yellow_band_pct: 5
+    yellow_band_pct: 5
+    pause_affects_sell: true
+    pause_affects_sell: true
+  macro_persist:
+  macro_persist:
+    enabled: false
+    enabled: true
+
+
+force_sell_on_macro_red: true
+force_sell_on_macro_red: true

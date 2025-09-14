@@ -1,0 +1,47 @@
+strategy: bb1-core-v3p3N2g
+data:
+  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ts_col: timestamp
+  tz_input: UTC
+backtest:
+  seed_btc: 1.0
+  reports_dir: reports/mini_accum
+costs:
+  fee_bps_per_side: 5
+  slip_bps_per_side: 2
+  spread_bps_per_side: 0
+  borrow_bps_annual: 0
+  funding_bps_daily: 0
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 26
+  soft_per_week: 1
+  soft_weekly: 1
+  soft_roundtrips_per_week: 0
+signals:
+  ema_fast: 13
+  ema_slow: 55
+  cross_buffer_bps: 36
+  exit_active:
+    rule: close < ema_fast
+    confirm_bars: 1
+    max_wait_bars_after_confirm: 2
+    dynamic_confirm_by_atr:
+      enabled: true
+anti_whipsaw:
+  dwell_bars_min_between_flips: 6
+  pause_after_flip_bars: 12
+  pause_affects_sell: true
+  dwell_bars_4h: 76
+  grace_ttl_bars_4h: 1
+  hysteresis_pct: 0.004
+  rearm_bars_after_cancel: 2
+  min_hold_bars: 8
+modules:
+  atr_regime:
+    enabled: true
+    percentile_p: 36BASE=1.0506 scripts/mini_accum/pretty_results.sh 'v3p3N2g-F2-(xb36-dw76-ATRp36-y005|TOP)-'
+      2024H1
+    pause_affects_sell: false
+    yellow_band_pct: 0.05

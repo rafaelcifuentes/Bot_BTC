@@ -1,0 +1,57 @@
+# === Receta mínima para validar señales en H1-2024 ===
+strategy:
+  name: F1-min
+
+# NOTA: el motor usa `signals.entry/exit`; mantenerlos sincronizados con estas expresiones.
+entry: "(close > (ema_55 + (1.10 * atr_14))) and (close.shift(1) > (ema_55.shift(1) + (1.10 * atr_14.shift(1)))) and (ema_55 > ema_200) and (((ema_55 - ema_55.shift(6)) / ema_55.shift(6)) >= 0.004) and ((atr_14 / close) >= 0.008) and ((atr_14 / close) <= 0.025)"
+exit:  "(((close < (ema_55 - (0.40 * atr_14))) and (close.shift(1) < (ema_55.shift(1) - (0.40 * atr_14.shift(1)))) and (ema_55 < ema_55.shift(1))) or (ema_55 < ema_200))"
+
+signals:
+  ema_fast: 55
+  ema_slow: 200
+  entry: "(close > (ema_55 + (1.10 * atr_14))) and (close.shift(1) > (ema_55.shift(1) + (1.10 * atr_14.shift(1)))) and (ema_55 > ema_200) and (((ema_55 - ema_55.shift(6)) / ema_55.shift(6)) >= 0.004) and ((atr_14 / close) >= 0.008) and ((atr_14 / close) <= 0.025)"
+  exit:  "(((close < (ema_55 - (0.40 * atr_14))) and (close.shift(1) < (ema_55.shift(1) - (0.40 * atr_14.shift(1)))) and (ema_55 < ema_55.shift(1))) or (ema_55 < ema_200))"
+
+modules:
+  indicators:
+    ema:
+      enabled: true
+      lengths: [55, 200]         # ¡clave! crea ema_55 y ema_200
+
+    atr:
+      enabled: true
+      lengths: [14]
+
+  atr_regime:
+    enabled: true               # encendido para filtrar chop con configuración por defecto
+
+  macro_persist:
+    enabled: true              # lo encendemos luego de ver que hay flips
+
+risk:
+  flip_budget:
+    enabled: true
+    enforce_hard_yearly: true
+    hard_per_year: 26           # guarda disciplina (máx ~26/año)
+  cooldown:
+    enabled: true
+    min_bars_between_flips: 6    # 24h en 4h; evita BUY/SELL/BY serrucho
+    min_hold_bars: 6             # obliga a sostener una posición al menos 24h
+    exception_take_profit_bps: 60 # permite cerrar si hay +0.60% a favor aunque no cumpla hold
+
+report:
+  suffix: F1min-ema55x200-atrBand110-2bar-slope6x40bp-atrGate8to25bp-exit40-cd6h6tp60-4h_2025H2
+
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv   # ← ajusta si tu ruta es otra
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
+  ts_col: timestamp                       # ← CAMBIA a "timestamp" si es tu cabecera
+  tz_input: UTC
+
+backtest:
+  reports_dir: reports/mini_accum
+  enter_on_first_bar_if_true: true   # ← solo si existe en tu engine
+  # --- Trading costs (required by CLI) ---
+costs:
+  fee_bps_per_side: 5              # 0.05% taker fee por lado
+  slip_bps_per_side: 5             # 0.05% deslizamiento por lado
