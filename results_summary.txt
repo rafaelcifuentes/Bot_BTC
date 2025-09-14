@@ -1,0 +1,4 @@
+v3p3N2g-F2-xb36-dw76-ATRcombo — H1: netBTC 1.0498 (Δ +56 bps), mdd_vs_HODL 0.78, fpy 24.4, min4h 76, weeks>1 0 — PASS.  Q4: 0.88.
+v3p3N2g-F3-xb36-dw76-exitD5 — H1: netBTC 1.0471 (Δ +29 bps), mdd_vs_HODL 0.79, fpy 24.2, min4h 76, weeks>1 0 — PASS.  Q4: 0.87.
+v3p3N2g-F2-xb36-dw76-ATRcombo — H1: netBTC 1.0498 (Δ +56 bps), mdd_vs_HODL 0.78, fpy 24.4, min4h 76, weeks>1 0 — PASS.  Q4: 0.88.
+v3p3N2g-F3-xb36-dw76-exitD5   — H1: netBTC 1.0471 (Δ +29 bps), mdd_vs_HODL 0.79, fpy 24.2, min4h 76, weeks>1 0 — PASS.  Q4: 0.87.

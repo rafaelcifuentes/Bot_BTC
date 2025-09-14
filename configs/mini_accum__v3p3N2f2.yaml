@@ -13,7 +13,7 @@ data:
 signals:
   ema_fast: 13
   ema_slow: 55
-  cross_buffer_bps: 35        # <= N2f1 (N2f2: 30)
+  cross_buffer_bps: 30        # <= N2f1 (N2f2: 30)
   macro_buffer_bps: 15
   entry: ema13 > ema55 and macro_green
   exit_active:

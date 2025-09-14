@@ -1,0 +1,42 @@
+strategy: bb1-core-v3p3N2g
+
+data:
+  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ts_col: timestamp
+  tz_input: UTC
+
+backtest:
+  seed_btc: 1.0
+  reports_dir: reports/mini_accum
+
+costs:
+  fee_bps_per_side: 5
+  slip_bps_per_side: 2
+  spread_bps_per_side: 0
+  borrow_bps_annual: 0
+  funding_bps_daily: 0
+
+signals:
+  ema_fast: 13
+  ema_slow: 55
+  cross_buffer_bps: 42
+  exit_active:
+    enabled: true
+    confirm_bars: 2
+    max_wait_bars_after_confirm: 2
+    age_valve_enabled: false
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 76
+  pause_after_flip_bars: 8
+  pause_affects_sell: true     # frena ventas durante la pausa post-flip
+
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 26
+  soft_per_week: 1
+
+modules:
+  atr_regime:
+    enabled: false

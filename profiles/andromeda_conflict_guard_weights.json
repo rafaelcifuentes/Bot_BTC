@@ -1,11 +1,11 @@
 {
-  "wL": 0.45,
-  "wS": 0.65,
+  "wL": 0.4,
+  "wS": 0.6,
   "_meta": {
     "note": "weights autolocked by weekly v2 (hybrid rule)",
     "cap_mode": "min_leg*1.05",
     "net_tol": 0.2,
-    "ts": "2025-09-06T16:40:44.614601+00:00",
+    "ts": "2025-09-10T17:22:35.701918+00:00",
     "sources": [
       "binance: empty",
       "binanceus: ok",

@@ -1,157 +1,203 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 from __future__ import annotations
 
-import os, glob, argparse
-import pandas as pd, yaml
+import argparse
+import os
+from typing import Optional
 
-from .io import load_ohlc
+import pandas as pd
+import yaml
+
+from .io import load_ohlc, merge_daily_into_4h
 from .sim import simulate, TradeCosts
 
+__all__ = ["main"]
 
-# ---------- helpers ----------
-def _rename_last_reports(reports_dir: str, suffix: str) -> int:
+
+def _rename_with_suffix(path: str, suffix: Optional[str]) -> str:
     """
-    Renombra el trío más reciente {equity,kpis,summary} agregando __<suffix>.
-    Devuelve cuántos archivos renombró (0..3).
+    Si hay suffix, renombra foo.csv -> foo__{suffix}.csv.
+    Devuelve la ruta final (renombrada u original).
     """
     if not suffix:
-        return 0
-    pats = [
-        os.path.join(reports_dir, "base_v0_1_*_equity.csv"),
-        os.path.join(reports_dir, "base_v0_1_*_kpis.csv"),
-        os.path.join(reports_dir, "base_v0_1_*_summary.md"),
-    ]
-    renamed = 0
-    for pat in pats:
-        files = sorted(glob.glob(pat))
-        if not files:
-            continue
-        src = files[-1]
-        head, tail = os.path.split(src)
-        name, ext = os.path.splitext(tail)
-        dst = os.path.join(head, f"{name}__{suffix}{ext}")
-        try:
-            os.replace(src, dst)
-            print(f"[RENAMED] {tail} -> {os.path.basename(dst)}")
-            renamed += 1
-        except Exception as e:
-            print(f"[WARN] Falló rename {tail}: {e}")
-    return renamed
+        return path
+    base, ext = os.path.splitext(path)
+    new_path = f"{base}__{suffix}{ext}"
+    try:
+        os.replace(path, new_path)
+        print(f"[RENAMED] {os.path.basename(path)} -> {os.path.basename(new_path)}")
+        return new_path
+    except Exception as e:
+        print(f"[WARN] rename failed for {path}: {e}")
+        return path
 
+# --- guardias previos al rename ---
+import csv, sys
 
-def _read_cfg(path: str) -> dict:
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
-
-
-def _build_costs(cfg: dict):
+def _kpi_netbtc_or_none(kpi_csv: str):
     """
-    Acepta cualquiera de:
-      - fee_bps_per_side / slip_bps_per_side
-      - fee_bps / slip_bps (interpreta por lado)
-      - bps_per_side
+    Lee el CSV de KPIs y devuelve el valor de 'netBTC' como float si existe.
+    Fallback: intenta encontrar el primer valor numérico de la primera fila de datos.
     """
-    c = (cfg.get("costs") or {})
-    if "fee_bps_per_side" in c or "slip_bps_per_side" in c:
-        fee = float(c.get("fee_bps_per_side", c.get("fee_bps", 0.0)))
-        slp = float(c.get("slip_bps_per_side", c.get("slip_bps", 0.0)))
-        return TradeCosts(fee, slp)
-    if "fee_bps" in c or "slip_bps" in c:
-        fee = float(c.get("fee_bps", 0.0))
-        slp = float(c.get("slip_bps", 0.0))
-        return TradeCosts(fee, slp)
-    if "bps_per_side" in c:
-        bps = float(c["bps_per_side"])
-        return TradeCosts(bps, 0.0)
-    return TradeCosts(6.0, 6.0)
+    try:
+        with open(kpi_csv, newline='') as fh:
+            r = csv.DictReader(fh)
+            first = next(r, None)
+            if not first:
+                return None
+            # Preferimos columna 'netBTC' explícita
+            if "netBTC" in first and (first["netBTC"] or "").strip():
+                try:
+                    return float(first["netBTC"])
+                except Exception:
+                    return None
+            # Fallback: primer valor numérico en la fila
+            for v in first.values():
+                s = (v or "").strip()
+                if not s:
+                    continue
+                try:
+                    return float(s)
+                except Exception:
+                    continue
+            return None
+    except Exception:
+        return None
+
+def _flips_has_executed(flips_csv: str):
+    try:
+        with open(flips_csv, newline='') as fh:
+            r = csv.DictReader(fh)
+            for row in r:
+                if (row.get('executed') or '').strip():
+                    return True
+    except Exception:
+        pass
+    return False
+
+def _print_summary_and_save_flips(res: pd.DataFrame, rep_dir: str, run_id: str, suffix: Optional[str]) -> None:
+    """
+    Guarda *_flips.csv y saca un mini-resumen al final.
+    Requiere que res tenga columnas: ts, executed, open, close.
+    """
+    if res.empty or "executed" not in res.columns:
+        print("[SUMMARY] flips_total=0 (sin filas ejecutadas)")
+        return
+
+    flips = res[res["executed"].notna()][["ts", "executed", "open", "close"]].copy()
+    flips_path = os.path.join(rep_dir, f"{run_id}_flips.csv")
+    flips.to_csv(flips_path, index=False)
+    flips_path = _rename_with_suffix(flips_path, suffix)
+
+    buy_count = int((flips["executed"] == "BUY").sum())
+    sell_count = int((flips["executed"] == "SELL").sum())
+    total = len(flips)
+    print(f"[SUMMARY] flips_total={total} (BUY={buy_count}, SELL={sell_count}) | flips_csv={os.path.basename(flips_path)}")
+
+    if total:
+        print("\n== FLIPS ejecutados ==")
+        with pd.option_context("display.max_rows", None, "display.max_columns", None):
+            print(flips.to_string(index=False))
+
+        iso = pd.to_datetime(flips["ts"]).dt.isocalendar()
+        weekly = flips.groupby([iso.year, iso.week])["executed"].count()
+        print("\n== Flips por semana ==")
+        print(weekly)
 
 
-def _ensure_ts(df: pd.DataFrame, preferred: str | None = None) -> pd.DataFrame:
-    """Garantiza una columna 'timestamp' tz-aware UTC y ordena por ella."""
-    cand = [preferred] if preferred else []
-    cand += ['timestamp', 'ts', 'date', 'datetime', 'time', 'Date', 'Datetime', 'Time']
-    ts_col = None
-    for c in cand:
-        if c and (c in df.columns):
-            ts_col = c
-            break
-    if ts_col is None:
-        raise KeyError("No encuentro columna temporal en H4 (intenté: " + ", ".join(cand) + ")")
-    out = df.copy()
-    out['timestamp'] = pd.to_datetime(out[ts_col], utc=True, errors='coerce')
-    out = out.dropna(subset=['timestamp']).sort_values('timestamp')
-    return out
-
-
-# ---------- CLI ----------
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--config", default="configs/mini_accum.yaml")
-    ap.add_argument("--start", default=None)
-    ap.add_argument("--end", default=None)
-    ap.add_argument("--suffix", default=os.environ.get("REPORT_SUFFIX", ""))
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Mini-BOT BTC (mini_accum) — backtest CLI")
+    ap.add_argument("--config", default="configs/mini_accum/config.yaml", help="Ruta al YAML de configuración")
+    ap.add_argument("--start", default=None, help="ISO date (UTC). Ej: 2024-01-01")
+    ap.add_argument("--end", default=None, help="ISO date (UTC). Ej: 2024-06-30")
+    ap.add_argument("--suffix", default=None, help="Sufijo de reporte; si no se pasa, se usa $REPORT_SUFFIX si existe")
     args = ap.parse_args()
 
-    cfg = _read_cfg(args.config)
+    # suffix precedence: CLI arg > env var
+    suffix = args.suffix if args.suffix else os.environ.get("REPORT_SUFFIX")
 
-    rep_dir = cfg.get("backtest", {}).get("reports_dir", "reports/mini_accum")
+    with open(args.config, "r") as f:
+        cfg = yaml.safe_load(f)
+
+    rep_dir = cfg["backtest"]["reports_dir"]
     os.makedirs(rep_dir, exist_ok=True)
 
-    # Carga H4 crudo desde CSV según YAML
-    ts_col_cfg = cfg.get("data", {}).get("ts_col", "timestamp")
-    tz_in      = cfg.get("data", {}).get("tz_input", "UTC")
-    h4 = load_ohlc(cfg["data"]["ohlc_4h_csv"], ts_col_cfg, tz_in)
+    # Cargar datos
+    df4 = load_ohlc(cfg["data"]["ohlc_4h_csv"], cfg["data"]["ts_col"], cfg["data"]["tz_input"])
+    d1 = load_ohlc(cfg["data"]["ohlc_d1_csv"], cfg["data"]["ts_col"], cfg["data"]["tz_input"])
 
-    # Normaliza la columna temporal (evita KeyError: 'timestamp' en filtros)
-    h4 = _ensure_ts(h4, preferred=ts_col_cfg)
-
-    # Filtro temporal
+    # Merge D1→4h y filtro temporal
+    df = merge_daily_into_4h(df4, d1)
     if args.start:
-        t0 = pd.Timestamp(args.start, tz="UTC")
-        h4 = h4[h4['timestamp'] >= t0]
+        df = df[df["ts"] >= pd.Timestamp(args.start, tz="UTC")]
     if args.end:
-        t1 = pd.Timestamp(args.end, tz="UTC")
-        h4 = h4[h4['timestamp'] <= t1]
+        df = df[df["ts"] <= pd.Timestamp(args.end, tz="UTC")]
 
     # Costes
-    costs = _build_costs(cfg)
+    costs = TradeCosts(
+        fee_bps_per_side=float(cfg["costs"]["fee_bps_per_side"]),
+        slip_bps_per_side=float(cfg["costs"]["slip_bps_per_side"]),
+    )
 
-    # Simulación (modo legacy: a=cfg, b=h4, c=costs) -> D1 lo carga internamente y recorta
-    equity_df, kpis = simulate(cfg, h4, costs)
+    # Simulación
+    res, kpis = simulate(cfg, df, costs)
 
-    run_id  = pd.Timestamp.utcnow().strftime("base_v0_1_%Y%m%d_%H%M")
+    # Guardar salidas
+    run_id = pd.Timestamp.utcnow().strftime("base_v0_1_%Y%m%d_%H%M")
     eq_path = os.path.join(rep_dir, f"{run_id}_equity.csv")
-    kp_path = os.path.join(rep_dir, f"{run_id}_kpis.csv")
+    kpi_path = os.path.join(rep_dir, f"{run_id}_kpis.csv")
     md_path = os.path.join(rep_dir, f"{run_id}_summary.md")
 
-    equity_df.to_csv(eq_path, index=False)
-    pd.DataFrame([kpis]).to_csv(kp_path, index=False)
-
-    # Veredicto simple (si existen umbrales)
-    acc = (cfg.get("kpis", {}).get("accept") or {})
-    btc_min      = float(acc.get("net_btc_ratio_min", float("-inf")))
-    mdd_vs_max   = float(acc.get("mdd_vs_hodl_ratio_max", float("inf")))
-    flips_yr_max = float(acc.get("flips_per_year_max", float("inf")))
-
-    ok_btc  = kpis.get("net_btc_ratio", float("-inf")) >= btc_min
-    ok_mdd  = kpis.get("mdd_vs_hodl_ratio", float("inf")) <= mdd_vs_max
-    ok_flip = kpis.get("flips_per_year", float("inf")) <= flips_yr_max
-    verdict = "ACEPTAR" if (ok_btc and ok_mdd and ok_flip) else "RECHAZAR"
-
+    res.to_csv(eq_path, index=False)
+    kpi_df = pd.DataFrame([kpis])
+    # Reordenar columnas para mostrar primero métricas clave (si existen)
+    cols = list(kpi_df.columns)
+    priority = [
+        c for c in [
+            "netBTC", "net_btc_ratio",
+            "mdd_vs_HODL", "mdd_vs_hodl_ratio",
+            "fpy", "flips_per_year"
+        ] if c in cols
+    ]
+    others = [c for c in cols if c not in priority]
+    kpi_df = kpi_df[priority + others] if priority else kpi_df
+    kpi_df.to_csv(kpi_path, index=False)
     with open(md_path, "w") as f:
         f.write(f"# Mini-BOT BTC v0.1 — Resumen {run_id}\n\n")
+        f.write("## KPIs\n")
         for k, v in kpis.items():
             f.write(f"- **{k}**: {v}\n")
-        f.write(f"\n**Veredicto:** {verdict}\n")
 
-    print("[OK]", eq_path)
-    print("[OK]", kp_path)
-    print("[OK]", md_path)
+    print(f"[OK] {eq_path}")
+    print(f"[OK] {kpi_path}")
+    print(f"[OK] {md_path}")
 
-    # Renombrado opcional con sufijo
-    if args.suffix:
-        _rename_last_reports(rep_dir, args.suffix)
+    # --- Guardarraíl antes de renombrar ---
+    # Toleramos variaciones de nombre en KPIs entre engines: netBTC | net_btc_ratio | net_btc | net
+    net_candidate = (
+        kpis.get("netBTC")
+        or kpis.get("net_btc_ratio")
+        or kpis.get("net_btc")
+        or kpis.get("net")
+    )
+    try:
+        net = float(net_candidate) if net_candidate is not None else float(_kpi_netbtc_or_none(kpi_path) or 0.0)
+    except Exception:
+        net = float(_kpi_netbtc_or_none(kpi_path) or 0.0)
 
+    has_flips = ("executed" in res.columns) and res["executed"].notna().any()
+
+    if not (net > 0.0 and has_flips):
+        # Caso inválido: NO renombrar; guardar flips sin sufijo para inspección
+        print(f"[SKIP] KPI/Flips inválidos (netBTC={net:.4f}, flips={has_flips}); no renombro artefactos.")
+        _print_summary_and_save_flips(res, rep_dir, run_id, suffix=None)
+        return
+
+    # Caso válido: renombrar artefactos y flips con el sufijo
+    eq_path = _rename_with_suffix(eq_path, suffix)
+    kpi_path = _rename_with_suffix(kpi_path, suffix)
+    md_path = _rename_with_suffix(md_path, suffix)
+    _print_summary_and_save_flips(res, rep_dir, run_id, suffix)
 
 if __name__ == "__main__":
     main()

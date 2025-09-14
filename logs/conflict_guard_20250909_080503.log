@@ -1,0 +1,18 @@
+/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/lib/python3.11/site-packages/pandas_ta/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, DistributionNotFound
+Failed to get ticker 'BTC-USD' reason: Expecting value: line 1 column 1 (char 0)
+
+1 Failed download:
+['BTC-USD']: JSONDecodeError('Expecting value: line 1 column 1 (char 0)')
+🔄 Loading 4h data (ccxt + fallbacks + yfinance)…
+✨ Adding features…
+🧠 Training model on train / scoring OOS…
+
+— Portfolio with conflict-guard (OOS zone) —
+Solo LONG  → Net 1441.75, PF 4.08, WR 7.66%, Trades 470, MDD 146.73, Score 9.83
+Solo SHORT → Net 2149.46, PF 3.00, WR 32.77%, Trades 470, MDD 101.05, Score 21.27
+Baseline   → wL 0.60, wS 0.40 | Net 1724.54, PF 3.41, WR 40.43%, Trades 470, MDD 72.06, Score 23.93
+Selected   → wL 0.40, wS 0.60 | Net 1866.12, PF 3.23, WR 40.43%, Trades 470, MDD 50.41, Score 37.02 | feasible=True | cap=106.10
+🔒 Autolock aplicado (regla híbrida cumplida).
+📝 Saved weekly summary → ./reports/conflict_guard_weekly_20250909_080541.json
+📌 Updated latest → ./reports/conflict_guard_weekly_latest.json

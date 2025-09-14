@@ -17,6 +17,7 @@ authors = [{name = "Rafael Cifuentes"}]
 
 [project.scripts]
 mini-accum-backtest = "mini_accum.cli:main"
+mini-accum-dictamen = "mini_accum.dictamen:main"
 
 [tool.pytest.ini_options]
 minversion = "8.0"

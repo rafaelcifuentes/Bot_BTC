@@ -1,0 +1,36 @@
+# configs/exp/F2_ATRxb36_dw76_p36_y005_H1_freeze.yaml
+strategy: bb1-core-v3p3N2g
+
+data:
+  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ts_col: timestamp
+  tz_input: UTC
+
+backtest:
+  seed_btc: 1.0
+  reports_dir: reports/mini_accum
+
+costs:
+  fee_bps_per_side: 5
+  slip_bps_per_side: 2
+
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 26
+
+signals:
+  ema_fast: 13
+  ema_slow: 55
+  cross_buffer_bps: 36
+  exit_active:
+    enabled: true              # <-- clave para replicar TOP
+    confirm_bars: 1
+    max_wait_bars_after_confirm: 2
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 24   # o 32
+  pause_after_flip_bars: 8           # o 12
+  pause_affects_sell: true
+  rearm_bars_after_cancel: 2
+  hysteresis_pct: 0.004

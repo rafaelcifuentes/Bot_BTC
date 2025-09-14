@@ -1,0 +1,1 @@
+bash scripts/mini_accum/run_ATRcombo_tight.sh

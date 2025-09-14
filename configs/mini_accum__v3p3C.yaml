@@ -1,4 +1,3 @@
-cat > configs/mini_accum__v3p3C.yaml <<'YAML'
 version: 0.1
 numeraire: BTC
 asset: BTC-USD
@@ -12,7 +11,7 @@ data:
 signals:
   ema_fast: 21
   ema_slow: 55
-  cross_buffer_bps: 30   # entra un poco antes que xbuf45
+  cross_buffer_bps: 30
   macro_buffer_bps: 12
   entry: ema21 > ema55 and macro_green
   exit_active:
@@ -21,9 +20,9 @@ signals:
   exit_passive:
     rule: ema21 < ema55
 anti_whipsaw:
-  dwell_bars_4h: 72                # ~12 días, reduce churn > v3p3B(d84) pero no tan “lento”
+  dwell_bars_4h: 72
   dwell_bars_min_between_flips: 72
-  grace_ttl_bars_4h: 8             # evita re-entradas demasiado pronto tras TTL
+  grace_ttl_bars_4h: 8
   ttl_confirm_bars: 2
 costs:
   fee_bps: 6
@@ -52,8 +51,8 @@ modules:
     enabled: true
   weekly_turnover_budget:
     enabled: true
-    flips_per_week_max: 1   # “gating” semanal estricto
-    dynamic_by_atr: false   # sin relajar por ATR
+    flips_per_week_max: 1
+    dynamic_by_atr: false
     enforce_hard: true
   atr_regime:
     enabled: true
@@ -64,4 +63,3 @@ modules:
   macro_persist:
     enabled: false
 force_sell_on_macro_red: false
-YAML

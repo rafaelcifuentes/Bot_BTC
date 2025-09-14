@@ -1,0 +1,10 @@
+# Mini-BOT BTC v0.1 — Resumen base_v0_1_20250912_0955
+
+## KPIs
+- **net_btc_ratio**: 0.8841616069154246
+- **mdd_model_usd**: 0.08320323090678294
+- **mdd_hodl_usd**: 0.07781619361155956
+- **mdd_vs_hodl_ratio**: 1.0692277152762601
+- **flips_total**: 5
+- **flips_blocked_hard**: 0
+- **flips_per_year**: 20.291666666666668

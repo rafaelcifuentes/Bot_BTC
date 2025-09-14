@@ -1,0 +1,51 @@
+version: 0.1
+numeraire: BTC
+asset: BTC-USD
+timezone: UTC
+data:
+  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ts_col: timestamp
+  price_col: close
+  tz_input: UTC
+signals:
+  ema_fast: 13
+  ema_slow: 55
+  cross_buffer_bps: 35
+  macro_buffer_bps: 15
+  entry: ema13 > ema55 and macro_green
+  exit_active:
+    rule: close < ema13
+    confirm_bars: 1
+  exit_passive:
+    rule: ema13 < ema55
+anti_whipsaw:
+  dwell_bars_4h: 76
+  dwell_bars_min_between_flips: 76
+  grace_ttl_bars_4h: 12
+  ttl_confirm_bars: 2
+costs:
+  fee_bps: 6
+  slip_bps: 6
+  fee_bps_per_side: 6.0
+  slip_bps_per_side: 6.0
+backtest:
+  reports_dir: reports/mini_accum
+  seed_btc: 1.0
+kpis:
+  accept:
+    net_btc_ratio_min: 1.05
+    mdd_vs_hodl_ratio_max: 0.85
+    flips_per_year_max: 26
+    flips_per_month_soft: 2
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 26
+  allow_riskoff_over_budget: true
+modules:
+  hibernation_chop: {enabled: true, lookback_bars_4h: 60, min_crosses: 4}
+  grace_ttl: {enabled: true}
+  weekly_turnover_budget: {enabled: true, flips_per_week_max: 1, dynamic_by_atr: true, enforce_hard: false}
+  atr_regime: {enabled: true, lookback_bars: 14, percentile_p: 40, yellow_band_pct: 5, pause_affects_sell: false}
+  macro_persist: {enabled: false}
+force_sell_on_macro_red: false

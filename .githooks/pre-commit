@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+CHANGED=$(git diff --cached --name-only --diff-filter=ACMRT | grep -E '\.ya?ml$' || true)
+[ -z "$CHANGED" ] && exit 0
+ok=1
+for f in $CHANGED; do
+  if ! yq -e '.' "$f" >/dev/null 2>&1; then
+    echo "❌ YAML inválido: $f"; ok=0; continue
+  fi
+  if ggrep -n -E '^#!|<<..PY|^\s*def\s|^\s*import\s' "$f" >/dev/null 2>&1; then
+    echo "❌ Posible código no-YAML en: $f"; ok=0; continue
+  fi
+done
+[ $ok -eq 1 ] || exit 1
