@@ -4,3 +4,4 @@ __pycache__/
 .ipynb_checkpoints/
 reports/
 .env
+!reports/mini_accum/*__DEMO_PASS.*
