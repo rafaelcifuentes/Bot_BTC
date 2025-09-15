@@ -1,5 +1,8 @@
-version: KISSv1_BASE_20250915_1309_provisional
+version: KISSv1_BASE_20250915_1642_final
 frozen: true
 notes:
 - baseline: provisional
   frozen_at_utc: '2025-09-15T17:09:43.453727'
+- baseline: final
+  locked_at_utc: '2025-09-15T20:42:20.003374'
+status: final
