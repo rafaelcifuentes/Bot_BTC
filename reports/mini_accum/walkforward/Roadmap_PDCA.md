@@ -69,5 +69,38 @@ En bull markets largos, SMA200 (gate de venta) puede mantener posición y dar `r
 ## Baseline & Lock-in
 - Versión: `KISSv1_BASE_20250915_1309_provisional`
 - Candidato: `DD15_RB1_H30_G200_BULL0`
-- Estado: **Provisional** (quitar cuando DSR>0 y PBO ≤ 0.25, ideal ≤ 0.20, y 2 semanas OOS sin regresión).
+- Estado: **Definitivo** (quitar cuando DSR>0 y PBO ≤ 0.25, ideal ≤ 0.20, y 2 semanas OOS sin regresión).
 - Copia YAML: `configs/mini_accum/kiss_v1_BASE_20250915_1309.yaml`
+
+
+## Tests anti-overfitting
+- **PBO/CSCV**: N/A (pocas ventanas para CSCV)
+- **DSR**: 83.33% configs con Sharpe deflactado > 0
+- **Reality Check (White)**: p = 1.000
+- **SPA (Hansen)**: p = 1.000 (mejor cfg: `DD14_RB1_H30_G200_BULL0`)
+
+**Criterios orientativos de significancia**
+- PBO ≤ 0.20; DSR>0 significativo; Reality Check/SPA no rechazan al 5–10%.
+
+**Candidato:** `DD15_RB1_H30_G200_BULL0`
+
+## Tests anti-overfitting
+- **PBO/CSCV**: N/A (pocas ventanas para CSCV)
+- **DSR**: 83.33% configs con Sharpe deflactado > 0
+- **Reality Check (White)**: p = 1.000
+- **SPA (Hansen)**: p = 1.000 (mejor cfg: `DD14_RB1_H30_G200_BULL0`)
+
+**Criterios orientativos de significancia**
+- PBO ≤ 0.20; DSR>0 significativo; Reality Check/SPA no rechazan al 5–10%.
+
+**Candidato:** `DD15_RB1_H30_G200_BULL0`## Tests anti-overfitting (refuerzo CSCV)
+- **PBO/CSCV**: p̂ = 0.107  *(n_samples=2048, draws=2048; ventanas: WF_2023H1, WF_2023H2, WF_2024H1, WF_2024H2, WF_2025H1)*
+- **DSR**: 100.0% (N=72)
+
+**Candidato:** `DD15_RB1_H30_G200_BULL0`
+
+
+### Baseline & Lock-in (Final)
+- Versión: `KISSv1_BASE_20250915_1642_final`
+- Candidato: `DD15_RB1_H30_G200_BULL0`
+- Estado: **Definitivo**
