@@ -10,3 +10,10 @@ reports/
 reports/mini_accum/*
 !reports/mini_accum/*__DEMO_PASS.*
 # -------------------------------------------
+
+# mini_accum live artifacts
+signals/
+health/
+reports/mini_accum/*state*.json
+reports/mini_accum/*kpis.csv
+logs/
