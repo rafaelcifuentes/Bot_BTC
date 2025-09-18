@@ -1,4 +1,38 @@
 #!/usr/bin/env python3
+from pathlib import Path
+import logging, time
+from logging.handlers import TimedRotatingFileHandler
+
+LOG_DIR = Path("logs")
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+handler = TimedRotatingFileHandler(
+    LOG_DIR / "mini_accum.log", when="midnight", interval=1, backupCount=7,
+    utc=True, encoding="utf-8"
+)
+console = logging.StreamHandler()
+
+class _UTCFormatter(logging.Formatter):
+    converter = time.gmtime
+fmt = _UTCFormatter("%(asctime)sZ %(levelname)s %(name)s: %(message)s", "%Y-%m-%dT%H:%M:%S")
+
+handler.setFormatter(fmt)
+console.setFormatter(fmt)
+
+logging.basicConfig(level=logging.DEBUG, handlers=[handler, console])
+logger = logging.getLogger("mini_accum")
+
+from pathlib import Path
+import logging
+
+import os, json
+OVERRIDE = os.getenv("OVERRIDE_MODE", "NONE").upper()  # NONE|PAUSE
+if OVERRIDE == "PAUSE":
+    print("[PAUSE] override_mode=PAUSE")
+    # escribe health en PAUSE y sal
+    Path("health").mkdir(exist_ok=True, parents=True)
+    (Path("health")/"mini_accum.status").write_text("PAUSE\n", encoding="utf-8")
+    raise SystemExit(0)
+                    format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 # -*- coding: utf-8 -*-
 """
 mini_accum → Corazón (executor/guardian) — KISS pass-through
@@ -6,10 +40,57 @@ mini_accum → Corazón (executor/guardian) — KISS pass-through
 - Llamar cada 4h (ideal: tras cerrar la vela, al open de la siguiente).
 - RUN_MODE=paper => simula y registra; RUN_MODE=live => ccxt (si falla, cae a paper).
 """
+# --- ADD: logging + watchdog + helpers ---
 
 import os, json, csv
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+import logging, logging.handlers
+from pathlib import Path
+import pandas as pd
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+_logger = logging.getLogger("mini_accum.live")
+_logger.setLevel(logging.DEBUG)
+
+_fh = logging.handlers.TimedRotatingFileHandler(
+    LOG_DIR / "mini_accum.log", when="midnight", backupCount=14, utc=True
+)
+_fh.setFormatter(logging.Formatter("%(asctime)sZ %(levelname)s %(message)s"))
+_fh.setLevel(logging.DEBUG)
+_logger.addHandler(_fh)
+
+_sh = logging.StreamHandler()
+_sh.setFormatter(logging.Formatter("%(levelname)s %(message)s"))
+_sh.setLevel(logging.INFO)
+_logger.addHandler(_sh)
+
+def _last_close(csv_path: str):
+    try:
+        df = pd.read_csv(csv_path, parse_dates=["ts"])
+        if df.empty:
+            return None, None
+        ts = df["ts"].iloc[-1]
+        if getattr(ts, "tzinfo", None) is None:
+            ts = ts.tz_localize("UTC")
+        else:
+            ts = ts.tz_convert("UTC")
+        return float(df["close"].iloc[-1]), ts
+    except Exception as e:
+        _logger.warning(f"last_close failed for {csv_path}: {e}")
+        return None, None
+
+def _watchdog_check(sig_ts_utc: str, max_hours: float = 8.0) -> bool:
+    try:
+        now = pd.Timestamp.utcnow().tz_localize("UTC")
+        ts = pd.Timestamp(sig_ts_utc).tz_convert("UTC")
+        age_h = (now - ts).total_seconds() / 3600.0
+        return age_h <= max_hours
+    except Exception as e:
+        _logger.warning(f"watchdog parse error: {e}")
+        return False
+
 
 RUN_MODE     = os.getenv("RUN_MODE", "paper").lower()  # "paper" o "live"
 REPO         = Path(__file__).resolve().parents[2]
@@ -120,6 +201,69 @@ def main():
         return 0
     if not soft_ok:
         print("[WARN] soft monthly budget exceeded; proceeding (soft cap).")
+
+    # --- ADD inside main(), after reading latest.json into 'sig' and before flipping ---
+
+    # 1) Watchdog (si la señal está vieja, no actuamos)
+    WD_HOURS = float(os.getenv("WATCHDOG_HOURS", "8"))
+    if WD_HOURS > 0:
+        is_fresh = _watchdog_check(sig.get("ts_utc", ""), max_hours=WD_HOURS)
+        if not is_fresh:
+            # escribe estado de salud y aborta acción
+            Path("health").mkdir(exist_ok=True, parents=True)
+            with open("health/mini_accum.status", "a", encoding="utf-8") as fh:
+                fh.write("watchdog,WARN,stale_signal\n")
+            _logger.warning("Watchdog: señal stale (> %sh). No-Op y WARN.", WD_HOURS)
+            print("Watchdog: stale signal — no-op")
+            return 0
+
+    # 2) Calcular/actualizar NetBTC vs HODL live (con último close 4h; fallback 1d)
+    price, pts = _last_close(os.getenv("H4_CSV", "data/ohlc/4h/BTC-USD.csv"))
+    if price is None:
+        price, pts = _last_close(os.getenv("D1_CSV", "data/ohlc/1d/BTC-USD.csv"))
+
+    state_path = Path("state/mini_accum_state.json")
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    if state_path.exists():
+        st = json.loads(state_path.read_text())
+    else:
+        st = {"prev_price": None, "model_equity": 1.0, "hodl_equity": 1.0}
+
+    prev_price = st.get("prev_price")
+    model_eq = float(st.get("model_equity", 1.0))
+    hodl_eq = float(st.get("hodl_equity", 1.0))
+
+    if price is not None:
+        if prev_price is None:
+            # primer sample: inicializa y no mueves equity
+            st["prev_price"] = price
+        else:
+            ratio = price / float(prev_price)
+            # HODL siempre sigue precio
+            hodl_eq *= ratio
+            # modelo sólo cuando está en BTC (pos=1)
+            pos = float(sig.get("position_pct_btc", 0.0))
+            if pos >= 0.999:
+                model_eq *= ratio
+            # guarda
+            st["prev_price"] = price
+            st["model_equity"] = model_eq
+            st["hodl_equity"] = hodl_eq
+
+        # persistir estado
+        state_path.write_text(json.dumps(st, ensure_ascii=False, indent=2))
+
+        # loggear a live_kpis.csv
+        kpis_path = Path("reports/mini_accum/live_kpis.csv")
+        kpis_path.parent.mkdir(parents=True, exist_ok=True)
+        net_btc_vs_hodl = (model_eq / hodl_eq) if hodl_eq > 0 else 1.0
+        with open(kpis_path, "a", encoding="utf-8") as fh:
+            fh.write(
+                f"{pd.Timestamp.utcnow().tz_localize('UTC')},{price},{sig.get('position_pct_btc')},"
+                f"{model_eq:.6f},{hodl_eq:.6f},{net_btc_vs_hodl:.6f}\n"
+            )
+        _logger.debug(f"LiveKPIs: price={price} model={model_eq:.6f} hodl={hodl_eq:.6f} net={net_btc_vs_hodl:.6f}")
+
 
     # 5) Ejecutar flip
     ok = False
