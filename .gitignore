@@ -17,3 +17,9 @@ health/
 reports/mini_accum/*state*.json
 reports/mini_accum/*kpis.csv
 logs/
+# data/artefactos locales
+data/ohlc/**/*.csv
+cache/
+logs/
+reports/**/*
+!docs/Mini_accum/checkpoints/**   # preserva snapshots
