@@ -81,3 +81,80 @@ echo "[OK] Pipeline KISS v1 completo → $OUT_ROADMAP"
     echo "[A/B] No se encontró candidato; se omite. (Define AB_CANDIDATE_CSV o coloca exactamente un CSV en reports/mini_accum/experiments/*/wf_summary_kpis.csv)"
   fi
 ) || echo "[WARN] Bloque A/B condicional encontró un error (continuo pipeline)."
+
+  # ---------------------------------------------
+# Tracking Error semanal (vs referencia backtest)
+#   - Periodo: lunes pasado 00:00 ET → este lunes 00:00 ET
+#   - OHLC: reports/ohlc_4h/BTC-USD.csv  (timestamp,close)
+#   - Shadow: reports/mini_accum/exec/orders_preview.csv
+#   - Ref: signals/mini_accum/history.csv (si no existe → usa shadow)
+#   - Coste por flip: COST_PER_FLIP (default 0.0006 = 0.06%)
+#   - Criterio: |TE| ≤ 0.03 (±3%)
+# ---------------------------------------------
+(
+  set -e
+  ROOT="${ROOT:-$HOME/PycharmProjects/Bot_BTC}"
+  OUT="$ROOT/reports/mini_accum/walkforward"
+  FD="${FREEZE_DATE:-$(TZ=America/New_York date +%F)}"
+  WFM="$OUT/freezes/$FD/weekly_freeze_summary.$FD.md"
+
+  OHLC="$ROOT/reports/ohlc_4h/BTC-USD.csv"
+  SHADOW="$ROOT/reports/mini_accum/exec/orders_preview.csv"
+  REFHIST="$ROOT/signals/mini_accum/history.csv"
+  COST_PER_FLIP="${COST_PER_FLIP:-0.0006}"
+
+  if [ ! -f "$OHLC" ] || [ ! -f "$SHADOW" ]; then
+    echo "[TE] SKIP (faltan OHLC=$OHLC o SHADOW=$SHADOW)"; exit 0
+  fi
+
+  python - "$OHLC" "$SHADOW" "$REFHIST" "$WFM" "$FD" "$COST_PER_FLIP" <<'PY'
+import sys, os, pandas as pd, numpy as np
+from datetime import timedelta
+OHLC, SHADOW, REFHIST, WFM, FD, COST = sys.argv[1:7]
+COST=float(COST)
+
+ohlc=pd.read_csv(OHLC)
+if "timestamp" not in ohlc.columns or "close" not in ohlc.columns:
+    raise SystemExit(f"[TE] CSV OHLC debe tener columnas 'timestamp' y 'close': {OHLC}")
+ohlc["timestamp"]=pd.to_datetime(ohlc["timestamp"], utc=True)
+t1=pd.Timestamp(FD+" 00:00:00", tz="America/New_York").tz_convert("UTC")
+t0=t1-timedelta(days=7)
+df=ohlc[(ohlc["timestamp"]>=t0)&(ohlc["timestamp"]<t1)].copy()
+if df.empty: print("[TE] SKIP (sin barras en la semana)"); sys.exit(0)
+df["ret"]=df["close"].pct_change().fillna(0.0)
+
+def load_pos(path_fallback):
+    if os.path.isfile(REFHIST):
+        src=REFHIST; pos=pd.read_csv(src)
+        if "ts" not in pos.columns or "decision" not in pos.columns: src=path_fallback; pos=pd.read_csv(src)
+    else:
+        src=path_fallback; pos=pd.read_csv(src)
+    pos["ts"]=pd.to_datetime(pos["ts"], utc=True)
+    return pos, src
+
+sh=pd.read_csv(SHADOW); sh["ts"]=pd.to_datetime(sh["ts"], utc=True)
+rf, src_ref = load_pos(SHADOW)
+
+def weekly(net_src):
+    ev=net_src[net_src["ts"]<=t1].copy().sort_values("ts")
+    prev=net_src[net_src["ts"]<t0].tail(1)
+    if len(prev)==1: ev=pd.concat([prev,ev],ignore_index=True)
+    if ev.empty: ev=pd.DataFrame([{"ts":t0,"decision":0}])
+    pos=ev.set_index("ts")["decision"].astype(int).reindex(df["timestamp"]).ffill().bfill().astype(int)
+    flips=(pos!=pos.shift(1).fillna(pos.iloc[0])).sum()
+    gross=(1.0+(pos.shift(1).fillna(pos.iloc[0])*df["ret"])).prod()-1.0
+    return float(gross - flips*COST), int(flips)
+
+r_shadow, f_shadow = weekly(sh)
+r_ref,    f_ref    = weekly(rf)
+te=r_shadow - r_ref
+status = "PASS" if abs(te) <= 0.03 else "FAIL"
+line=(f"\n> Tracking Error (semana {t0.date()}→{t1.date()}, ref={os.path.basename(src_ref)}) — "
+      f"shadow={r_shadow:+.2%}, ref={r_ref:+.2%}, TE={te:+.2%} → **{status}**\n")
+try:
+    with open(WFM,"a") as f: f.write(line)
+    print("[TE] anotado en", os.path.basename(WFM), "|", line.strip())
+except Exception as e:
+    print("[TE] WARN no pude escribir:", e, "|", line.strip())
+PY
+) || echo "[TE] WARN: bloque TE falló (continuo pipeline)."
