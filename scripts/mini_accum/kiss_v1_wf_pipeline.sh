@@ -35,3 +35,49 @@ python "$REPO_DIR/tools/mini_accum/stats_overfit.py" \
   --candidate "DD15_RB1_H30_G200_BULL0"
 
 echo "[OK] Pipeline KISS v1 completo → $OUT_ROADMAP"
+
+# ---------------------------------------------
+# [Optional] A/B semanal en sombra (condicional)
+# Corre SOLO si existe un CSV candidato B.
+#   - A = reports/mini_accum/walkforward/wf_summary_kpis.csv
+#   - B se toma de:
+#       1) $AB_CANDIDATE_CSV si está definido y existe
+#       2) auto-descubrimiento si hay EXACTAMENTE uno en:
+#          reports/mini_accum/experiments/*/wf_summary_kpis.csv
+#   - Etiqueta = $AB_LABEL o el nombre del directorio del candidato.
+#   - No falla el pipeline si el A/B falla o no hay candidato.
+# ---------------------------------------------
+(
+  set -e
+  ROOT="${ROOT:-$HOME/PycharmProjects/Bot_BTC}"
+  A="$ROOT/reports/mini_accum/walkforward/wf_summary_kpis.csv"
+  CAND=""
+  LABEL="${AB_LABEL:-candidate}"
+
+  # 1) Candidato explícito por variable de entorno
+  if [ -n "${AB_CANDIDATE_CSV:-}" ] && [ -f "${AB_CANDIDATE_CSV}" ]; then
+    CAND="${AB_CANDIDATE_CSV}"
+    LABEL="${AB_LABEL:-$(basename "$(dirname "${CAND}")")}"
+  fi
+
+  # 2) Descubrimiento automático: exactamente un candidato en experiments
+  if [ -z "$CAND" ]; then
+    CANDS=$(find "$ROOT/reports/mini_accum/experiments" -maxdepth 2 -type f -name "wf_summary_kpis.csv" 2>/dev/null | sed -e '/^$/d')
+    CNT=$(printf "%s\n" "$CANDS" | wc -l | tr -d ' ')
+    if [ "$CNT" -eq 1 ]; then
+      CAND=$(printf "%s\n" "$CANDS" | head -n 1)
+      LABEL="${AB_LABEL:-$(basename "$(dirname "${CAND}")")}"
+    fi
+  fi
+
+  if [ -n "$CAND" ] && [ -f "$CAND" ]; then
+    echo "[A/B] Ejecutando en sombra → A=$(basename "$A") vs B=$(basename "$CAND") | label=$LABEL"
+    if [ -x "$ROOT/scripts/mini_accum/ab_weekly.sh" ]; then
+      "$ROOT/scripts/mini_accum/ab_weekly.sh" "$A" "$CAND" "$LABEL" || echo "[WARN] A/B falló (continuo pipeline)."
+    else
+      echo "[WARN] No existe o no es ejecutable: $ROOT/scripts/mini_accum/ab_weekly.sh (saltando A/B)."
+    fi
+  else
+    echo "[A/B] No se encontró candidato; se omite. (Define AB_CANDIDATE_CSV o coloca exactamente un CSV en reports/mini_accum/experiments/*/wf_summary_kpis.csv)"
+  fi
+) || echo "[WARN] Bloque A/B condicional encontró un error (continuo pipeline)."
