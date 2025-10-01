@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+# --- SAFE HEADER (no cierres la shell) ---
+set +e
+set -o pipefail 2>/dev/null || true
+
+safe_exit() { # usa esto en vez de 'exit'
+  local code=${1:-0}
+  if [ -n "$ZSH_EVAL_CONTEXT" ] && [[ $ZSH_EVAL_CONTEXT == *:file ]]; then return "$code"; fi
+  if [ -n "${BASH_VERSION:-}" ] && [[ ${BASH_SOURCE[0]} != "$0" ]]; then return "$code"; fi
+  exit "$code"
+}
+
+nonfatal(){ "$@" || printf '⚠️  ignorado: %s\n' "$*"; }
+# --- /SAFE HEADER ---
 set -Eeuo pipefail
 
 # Uso:
@@ -37,7 +50,7 @@ if [[ ! -s "$SRC" ]]; then
 fi
 if [[ -z "$SRC" || ! -s "$SRC" ]]; then
   echo "❌ No encontré dictamen TSV legible. (intenté $OUT_TSV y reports/mini_accum/dictamen_*.tsv)" >&2
-  exit 1
+  safe_exit 1
 fi
 
 # 3) Render bonito y robusto a cambios de columnas internas

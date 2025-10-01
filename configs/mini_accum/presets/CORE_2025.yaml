@@ -21,7 +21,7 @@ signals:
     confirm_bars: 2
   exit_passive:
     rule: "ema21 < ema55 and macro_red"
-  cross_buffer_bps: 20
+  cross_buffer_bps: 23
 filters:
   adx:
     enabled: true

@@ -43,3 +43,11 @@ heart_monday "2025-09-15 00:00" 0.08 cg20_t035
 - `reports/heart/diamante_overlay_diamante_btc_costes_freeze_2025-09-08_bars.csv`  
 - `reports/heart/kpis_diamante_btc_costes_freeze_2025-09-08_bars.csv`  
 - `reports/heart/summary_diamante_btc_costes_freeze_2025-09-08_bars.md`
+
+## 2025-09-15 — Enfoque en mini_accum KISS_V1 (sleeving prod-ready)
+- Se pausan pruebas de Corazón (overlay/ξ*/SLIM) y DPCC en producción; quedan en research.
+- Corazón queda como ejecutor/guardrail con contrato mínimo (freshness, health, flip-budget, umbral 1%, clock 4h UTC, kill-switch).
+- Mini_accum: 1 semana paper/testnet → canario 10–20% con KPIs: NetBTC≥HODL, MDD_vs_HODL≤1, FPY en presupuesto.
+- Si 2 semanas consecutivas cumplen KPIs sin alertas → subir a 30–40% o integrar en allocator.
+- Mantener snapshot semanal de configs (FREEZE YAML + commit).
+Rationale: menor complejidad y riesgo de modelo; gobernanza KISS; BULL_HOLD opt-in protege bulls fuertes.

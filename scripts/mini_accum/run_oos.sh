@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
+# --- SAFE HEADER (no cierres la shell) ---
+set +e
+set -o pipefail 2>/dev/null || true
+
+safe_exit() { # usa esto en vez de 'exit'
+  local code=${1:-0}
+  if [ -n "$ZSH_EVAL_CONTEXT" ] && [[ $ZSH_EVAL_CONTEXT == *:file ]]; then return "$code"; fi
+  if [ -n "${BASH_VERSION:-}" ] && [[ ${BASH_SOURCE[0]} != "$0" ]]; then return "$code"; fi
+  exit "$code"
+}
+
+nonfatal(){ "$@" || printf '⚠️  ignorado: %s\n' "$*"; }
+# --- /SAFE HEADER ---
 set -Eeuo pipefail
 CFG="${KISS_CFG:-configs/mini_accum/config.yaml}"
 H4=$(yq -r '.data.ohlc_4h_csv' "$CFG")
-[[ -f "$H4" ]] || { echo "No existe $H4"; exit 1; }
+[[ -f "$H4" ]] || { echo "No existe $H4"; safe_exit 1; }
 CSV_MIN=$(awk -F, 'NR==2{print substr($1,1,10)}' "$H4")
 CSV_MAX=$(tail -n 1 "$H4" | awk -F, '{print substr($1,1,10)}')
 
@@ -25,7 +38,7 @@ print(s.strftime(fmt), e.strftime(fmt))
 PY
 )"
 if [[ "$INT_S" > "$INT_E" ]]; then
-  echo "[SKIP] Sin intersección con CSV ($CSV_MIN..$CSV_MAX)"; exit 0
+  echo "[SKIP] Sin intersección con CSV ($CSV_MIN..$CSV_MAX)"; safe_exit 0
 fi
 
 echo "[RUN] $INT_S → $INT_E  (CSV: $CSV_MIN..$CSV_MAX)"

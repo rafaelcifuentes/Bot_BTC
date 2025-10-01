@@ -39,3 +39,6 @@
 - cap binding alto → revisar `w_cap_total`/clamp/xi*.
 - scale@max >70% → el piso/estimador de vol quizá muy bajo.
 - corr(D,P) > 0.40 sostenido → activar penalización de la pierna débil.
+
+## ℹ️ Nota
+Los criterios completos de adopción por versión y los checkpoints históricos han sido movidos a `docs/mini_accum/Progreso.md` para mejor organización y seguimiento. Por favor, consulte ese archivo para la información completa.

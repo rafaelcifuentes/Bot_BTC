@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+# --- SAFE HEADER (no cierres la shell) ---
+set +e
+set -o pipefail 2>/dev/null || true
+
+safe_exit() { # usa esto en vez de 'exit'
+  local code=${1:-0}
+  if [ -n "$ZSH_EVAL_CONTEXT" ] && [[ $ZSH_EVAL_CONTEXT == *:file ]]; then return "$code"; fi
+  if [ -n "${BASH_VERSION:-}" ] && [[ ${BASH_SOURCE[0]} != "$0" ]]; then return "$code"; fi
+  exit "$code"
+}
+
+nonfatal(){ "$@" || printf '⚠️  ignorado: %s\n' "$*"; }
+# --- /SAFE HEADER ---
 set -Eeuo pipefail
 
 # Uso:
@@ -20,7 +33,7 @@ if (( "$#" > 0 )); then WINDOWS=("$@"); else WINDOWS=(2024H1 2023Q4); fi
 
 if [[ ! -x "$PR" ]]; then
   echo "❌ No encuentro ejecutable: $PR" >&2
-  exit 1
+  safe_exit 1
 fi
 
 STAMP="$(date +%Y%m%d_%H%M%S)"

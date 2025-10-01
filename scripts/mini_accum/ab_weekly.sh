@@ -29,10 +29,9 @@ def load_csv(p):
         df[c] = pd.to_numeric(df[c], errors="coerce")
     df["flips"] = pd.to_numeric(df["flips"], errors="coerce").astype("Int64")
     # boolean sin FutureWarning
-    m = (df["passed"].astype(str).str.strip().str.lower()
-         .map({"true": True,"1": True,"yes": True,"y": True,"t": True,
-               "false": False,"0": False,"no": False,"n": False,"f": False}))
-    df["passed"] = m.fillna(False).astype(bool)
+    df["passed"] = df["passed"].astype(str).str.strip().str.lower().isin(
+        {"true","1","yes","y","t"}
+    ).astype(bool)
     return df.dropna(subset=["sats_mult","mdd_vs_hodl","fpy"])
 
 A = load_csv(A_path)
@@ -47,7 +46,8 @@ def summarize(df):
               .reset_index())
 
 Sa, Sb = summarize(A), summarize(B)
-# Alinear ventanas y aplanar columnas desde el origen (sin keys=...)
+
+# Alinear ventanas y columnas planas
 W = sorted(set(Sa["window"]).union(Sb["window"]))
 Sa = Sa.set_index("window").reindex(W); Sa.index.name = "window"
 Sb = Sb.set_index("window").reindex(W); Sb.index.name = "window"

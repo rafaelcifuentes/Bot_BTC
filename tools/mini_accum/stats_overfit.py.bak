@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Estimadores rápidos y reproducibles:
+
+- PBO (Probability of Backtest Overfitting) vía CSCV usando ventanas WF como folds.
+  Idea: para múltiples splits IS/OOS (combinatoriales), medir cuán a menudo el mejor IS no es bueno OOS.
+
+- DSR (Deflated Sharpe Ratio): si hay 'sharpe' y 'n_obs' (o columnas para estimarlo), lo calculamos.
+  Si no, lo reportamos como N/A (no bloquea pipeline).
+
+- Reality Check (White) y SPA (Hansen): versión simplificada sobre métrica por ventana (sats_mult)
+  usando bootstrap por ventana (block bootstrap degenerado dado WF). Suficiente para detectar
+  data-snooping grosero en la batería de configs. Para RC p-value: max de t-stats vs 0.
+
+Entrada: wf_summary_kpis.csv con columnas mínimas: window, config_id, sats_mult
+"""
+
+import argparse, itertools, numpy as np, pandas as pd
+from pathlib import Path
+from math import sqrt
+rng = np.random.default_rng(2025)
+
+def pbo_cscv(df: pd.DataFrame, windows: list, metric: str="sats_mult", n_samples: int=256):
+    # Splits aleatorios (50/50 aprox) sobre ventanas disponibles.
+    # --- saneo previo ---
+df = df.copy()
+df["window"] = df["window"].astype(str)
+if windows:
+    df = df[df["window"].isin(windows)]
+df[metric] = pd.to_numeric(df[metric], errors="coerce")
+df = df.dropna(subset=["config_id","window", metric])
+df["config_id"] = df["config_id"].astype(str)
+# filtra ids extraños (evita '', 'nan', etc.)
+df = df[df["config_id"].str.match(r"DD\d+_RB\d+_H\d+_G\d+_BULL\d+")]
+# exige al menos 2 configs por ventana para ranking
+valid_wins = df.groupby("window")["config_id"].nunique()
+valid_wins = valid_wins[valid_wins >= 2].index
+df = df[df["window"].isin(valid_wins)]
+if df.empty or len(valid_wins) == 0:
+    raise ValueError("CSCV: datos insuficientes tras saneo (necesitas >=2 configs por ventana).")
+unique_cfgs = sorted(df["config_id"].unique().tolist())
+    W = windows
+    if len(W) < 4:
+        return {"pbo": np.nan, "note": "pocas ventanas para CSCV"}
+    pbo_count, trials = 0, 0
+    for _ in range(n_samples):
+        rng.shuffle(W)
+        mid = len(W)//2
+        is_ws, oos_ws = W[:mid], W[mid:]
+        sub = df[df["window"].isin(is_ws)]
+        # Mejor en IS por mediana del metric
+        g = sub.groupby("config_id")[metric].median().sort_values(ascending=False)
+        if g.empty:
+            continue
+        best_is = g.index[0]
+        # Desempeño OOS de ese best_is vs la mediana OOS global (como referencia)
+        ooss = df[(df["window"].isin(oos_ws)) & (df["config_id"]==best_is)][metric]
+        if ooss.empty:
+            continue
+        # ¿Está debajo de 1 (fracaso) o por debajo de la mediana OOS de todos?
+        oos_all = df[df["window"].isin(oos_ws)].groupby("config_id")[metric].median()
+        under_median = ooss.median() < oos_all.median()
+        pbo_count += int(under_median)
+        trials += 1
+    pbo = pbo_count / trials if trials>0 else np.nan
+    return {"pbo": pbo, "trials": trials}
+
+def dsr_deflated_sharpe(df: pd.DataFrame):
+    # Requiere columnas 'sharpe' y 'n_obs' (o 'ret_mean','ret_std','n_obs' para derivarlo).
+    if {"sharpe","n_obs"}.issubset(df.columns):
+        shp = df.groupby("config_id")[["sharpe","n_obs"]].median()
+    elif {"ret_mean","ret_std","n_obs"}.issubset(df.columns):
+        g = df.groupby("config_id")[["ret_mean","ret_std","n_obs"]].median()
+        g["sharpe"] = g["ret_mean"] / g["ret_std"].replace(0,np.nan)
+        shp = g[["sharpe","n_obs"]]
+    else:
+        return {"dsr_ok": None, "note": "DSR N/A (faltan columnas)"}
+    # Deflación simple tipo Bailey-López de Prado (sin asimetría curtosis por no disponer):
+    # threshold ≈ sqrt((ln(N_strategies))/n_obs) como penalización
+    N = shp.shape[0]
+    shp["thr"] = np.sqrt(np.log(max(N,1))/shp["n_obs"].clip(lower=1))
+    shp["deflated"] = shp["sharpe"] - shp["thr"]
+    dsr_ok = (shp["deflated"] > 0).mean()  # fracción con Sharpe deflactado > 0
+    return {"dsr_ok": dsr_ok, "note": "fracción de configs con Sharpe deflactado > 0"}
+
+def white_reality_spa(df: pd.DataFrame, windows: list, metric: str="sats_mult", B: int=2000):
+    # Construimos una matriz configs x ventanas con el metric (medianas por ventana).
+    cfgs = sorted(df["config_id"].unique())
+    ws = windows
+    M = np.full((len(cfgs), len(ws)), np.nan)
+    for j,w in enumerate(ws):
+        wdf = df[df["window"]==w].groupby("config_id")[metric].median()
+        M[:,j] = [wdf.get(c, np.nan) for c in cfgs]
+    # Remover configs con NaN en exceso
+    valid_rows = ~np.isnan(M).any(axis=1)
+    M = M[valid_rows]
+    cfgs = [c for c,v in zip(cfgs,valid_rows) if v]
+    if M.shape[0] < 2 or M.shape[1] < 3:
+        return {"rc_p": np.nan, "spa_p": np.nan, "note": "Datos insuficientes"}
+    # Métrica en exceso vs 1.0 (sats>1 es bueno)
+    R = M - 1.0
+    mu = R.mean(axis=1)
+    sd = R.std(axis=1, ddof=1).clip(min=1e-9)
+    tstats = mu / (sd/np.sqrt(R.shape[1]))
+    tmax = tstats.max()
+    # Bootstrap simple por permutar columnas (ventanas) -> H0: sin relación config-ventana
+    tb = []
+    for _ in range(B):
+        idx = rng.permutation(R.shape[1])
+        Rb = R[:, idx]
+        mub = Rb.mean(axis=1)
+        sdb = Rb.std(axis=1, ddof=1).clip(min=1e-9)
+        tb.append((mub/(sdb/np.sqrt(Rb.shape[1]))).max())
+    tb = np.array(tb)
+    rc_p = (tb >= tmax).mean()
+
+    # SPA (Hansen) simplificada: p-value para el mejor vs 0 ajustando multiplicidad con bootstrap
+    # Tomamos el mejor índice y comparamos su distribución bootstrap individual
+    i_best = np.argmax(tstats)
+    tb_best = []
+    for _ in range(B):
+        idx = rng.permutation(R.shape[1])
+        Rb = R[i_best, idx]
+        mub = Rb.mean()
+        sdb = Rb.std(ddof=1).clip(min=1e-9)
+        tb_best.append(mub/(sdb/np.sqrt(R.shape[1])))
+    tb_best = np.array(tb_best)
+    spa_p = (tb_best >= tstats[i_best]).mean()
+    return {"rc_p": rc_p, "spa_p": spa_p, "best_cfg": cfgs[i_best]}
+
+def append_md(md_path: Path, block: str):
+    txt = md_path.read_text(encoding="utf-8") if md_path.exists() else ""
+    md_path.write_text(txt + ("\n\n" if txt else "") + block, encoding="utf-8")
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--summary_csv", required=True)
+    ap.add_argument("--out_md_append", required=True)
+    ap.add_argument("--windows", nargs="+", required=True)
+    ap.add_argument("--candidate", required=True)
+    args = ap.parse_args()
+
+    df = pd.read_csv(args.summary_csv)
+    need = {"window","config_id","sats_mult"}
+    if not need.issubset(df.columns):
+        raise ValueError(f"Faltan columnas {need - set(df.columns)} en {args.summary_csv}")
+
+    # PBO/CSCV
+    pbo = pbo_cscv(df.copy(), windows=args.windows, metric="sats_mult", n_samples=2048)
+
+    # DSR (opcional)
+    dsr = dsr_deflated_sharpe(df.copy())
+
+    # Reality Check / SPA
+    rc = white_reality_spa(df.copy(), windows=args.windows, metric="sats_mult", B=1500)
+
+    # Redactar bloque MD
+    lines = []
+    lines.append("## Tests anti-overfitting")
+    lines.append(f"- **PBO/CSCV**: p̂ = {pbo.get('pbo'):.3f}" if pbo.get('pbo')==pbo.get('pbo') else f"- **PBO/CSCV**: N/A ({pbo.get('note')})")
+    lines.append(f"- **DSR**: {dsr.get('dsr_ok'):.2%} configs con Sharpe deflactado > 0" if dsr.get('dsr_ok') is not None else f"- **DSR**: N/A ({dsr.get('note')})")
+    if rc.get("rc_p")==rc.get("rc_p"):
+        lines.append(f"- **Reality Check (White)**: p = {rc['rc_p']:.3f}")
+        lines.append(f"- **SPA (Hansen)**: p = {rc['spa_p']:.3f} (mejor cfg: `{rc.get('best_cfg','?')}`)")
+    else:
+        lines.append(f"- **Reality/SPA**: N/A ({rc.get('note')})")
+
+    # Reglas orientativas de decisión:
+    lines.append("")
+    lines.append("**Criterios orientativos de significancia**")
+    lines.append("- PBO ≤ 0.20; DSR>0 significativo; Reality Check/SPA no rechazan al 5–10%.")
+    lines.append("")
+    lines.append(f"**Candidato:** `{args.candidate}`")
+    append_md(Path(args.out_md_append), "\n".join(lines))
+
+    print("[OK] Tests anti-overfitting añadidos al Roadmap.")
+
+if __name__ == "__main__":
+    main()

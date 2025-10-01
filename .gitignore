@@ -22,4 +22,4 @@ data/ohlc/**/*.csv
 cache/
 logs/
 reports/**/*
-!docs/Mini_accum/checkpoints/**   # preserva snapshots
+!docs/mini_accum/checkpoints/**   # preserva snapshots

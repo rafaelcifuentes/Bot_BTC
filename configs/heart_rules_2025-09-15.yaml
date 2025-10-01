@@ -1,0 +1,97 @@
+profile: slim
+version: 1
+runtime:
+  enable: true
+  use_as: hard_switch
+  mode: switch_immediate
+  macro_tf: 1d
+  op_tf: 4h
+  perla_enabled: false
+  dwell_bars: 0
+  hysteresis_steps: 0
+  safety_cap: 1.0
+rules:
+  ema200:
+    period: 200
+    price_col: close
+    require_close_above: true
+  atr_pct:
+    period: 14
+    normalize_by: close
+    max_pct: 0.09
+    min_pct: 0.0
+logic:
+  on_condition: (ema200.pass and atr_pct.value <= atr_pct.max_pct)
+  off_condition: not(on_condition)
+weights:
+  when_on: 1.0
+  when_off: 0.0
+outputs:
+  export_columns:
+  - w_final
+  - on_condition
+  - atr_pct.value
+  tag: heart_slim_ema200_atrpct_v1
+advanced:
+  meta:
+    enable: true
+    timezone: UTC
+    legacy_compat: true
+  regime:
+    adx1d_len: 14
+    adx1d_min: 18
+    adx4_min: 8
+    ema_fast: 50
+    ema_slow: 200
+    ema50_slope_thr: 0.0
+    atr_pct_window: 100
+    vol_pctl_low: 0.4
+    dwell_bars: 5
+    max_delta_weight: 0.25
+  bias:
+    fg_long_min: -0.15
+    fg_short_max: 0.15
+    funding_bias: 0.005
+    use_as: soft_bias
+  weights_states:
+    verde:
+      diamante: 1.0
+      perla: 0.0
+    amarillo:
+      diamante: 0.8
+      perla: 0.0
+    rojo:
+      diamante: 0.6
+      perla: 0.0
+  weights_legacy:
+    w_strong: 1.0
+    w_neutral: 0.9
+    w_counter: 0.75
+  lq:
+    enable: true
+    use_as: soft_veto
+    dist_close_atr: 0.6
+    min_cluster_score: 0.75
+    mult_soft_veto: 0.7
+    hysteresis_steps: 2
+    safety_cap: 1.0
+    max_delta_per_bar: 0.25
+corr_gate:
+  lookback_bars: 60
+  threshold: 0.35
+  max_penalty: 0.2
+  perf_window_days: 30
+circuit_breakers:
+  vol_daily_pctl: 0.965
+  dd_day: -0.05
+  safety:
+    w_floor_on_signal: 0.45
+    w_cap: 1.0
+    ttl_bars: 1
+  misc:
+    shift_features_by: 1
+    timestamp_tz: UTC
+    outputs:
+      weights_csv: corazon/weights.csv
+      lq_csv: corazon/lq.csv
+ATR_MAX: 0.08

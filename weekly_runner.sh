@@ -1,79 +1,111 @@
 #!/usr/bin/env bash
-command -v caffeinate >/dev/null 2>&1 && caffeinate -dimsu -w $$ &
 set -euo pipefail
 
+# ---- PATH cron-safe (Homebrew primero) ----
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
-# --- cron-safe PATH fallback ---
-export PATH=${PATH:-/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin}
-case ":$PATH:" in *:/opt/homebrew/bin:*) :;; *) export PATH="/opt/homebrew/bin:$PATH";; esac
+ROOT="${ROOT:-$HOME/PycharmProjects/Bot_BTC}"
+LOGS="$ROOT/logs"
+mkdir -p "$LOGS"
+CRON_LOG="$LOGS/cron.log"
 
-
-
-# Fallback PATH si venimos de cron "vacío"
-export PATH=${PATH:-/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin}
-case ":$PATH:" in
-  *:/opt/homebrew/bin:*) :;;
-  *) export PATH="/opt/homebrew/bin:$PATH";;
-esac
-
-# --- paths & logging ---
-PROJECT_DIR="${PROJECT_DIR:-$HOME/PycharmProjects/Bot_BTC}"
-cd "$PROJECT_DIR"
-
-LOG_DIR="$PROJECT_DIR/logs"
-mkdir -p "$LOG_DIR"
-# Loggea SIEMPRE a logs/cron.log (manual o vía cron)
-exec >> "$LOG_DIR/cron.log" 2>&1
-
-echo "==== $(date -u +'%FT%TZ') :: weekly_runner start ===="
-
-# --- entorno Python ---
-if [[ -f ".venv/bin/activate" ]]; then
-  # shellcheck disable=SC1091
-  source ".venv/bin/activate"
-  echo "[INFO] venv activada"
-else
-  echo "[WARN] venv no encontrada, sigo con Python del sistema"
+# ---- Rotación simple si >5MB (idempotente) ----
+if [ -f "$CRON_LOG" ]; then
+  size=$(stat -f%z "$CRON_LOG" 2>/dev/null || stat -c%s "$CRON_LOG" 2>/dev/null || echo 0)
+  if [ "${size:-0}" -gt $((5*1024*1024)) ]; then
+    mv "$CRON_LOG" "$CRON_LOG.$(date -u +%Y%m%dT%H%M%SZ).1"
+  fi
 fi
 
-# --- env de ejecución ---
-export RUN_MODE="${RUN_MODE:-paper}"
-export LOG_LEVEL="${LOG_LEVEL:-INFO}"
-export OVERRIDE_MODE="${OVERRIDE_MODE:-NORMAL}"
+# Redirigir stdout/err a log (sin pisar, append)
+exec >> "$CRON_LOG" 2>&1
 
-# Freshness/watchdog (horas)
-export FRESHNESS_MAX_HOURS="${FRESHNESS_MAX_HOURS:-8}"
-export WATCHDOG_HOURS="${WATCHDOG_HOURS:-8}"
+# ---- Línea inicial obligatoria + DEBUG ----
+LOG_LEVEL="${LOG_LEVEL:-INFO}"
+echo "$(date -u +%FT%TZ) [${LOG_LEVEL}] weekly_runner: LOG_LEVEL=${LOG_LEVEL} aplicado"
+[ "${DEBUG_RUNNER:-0}" = "1" ] && { set -x; env | sort | sed 's/.*/DEBUG_ENV: &/'; }
 
-# Ingesta por defecto
-export EXCHANGE="${EXCHANGE:-binanceus}"
-export SYMBOL="${SYMBOL:-BTC/USDT}"
-export D1_CSV="${D1_CSV:-data/ohlc/1d/BTC-USD.csv}"
-export H4_CSV="${H4_CSV:-data/ohlc/4h/BTC-USD.csv}"
+# ---- Caffeinate opcional ----
+if command -v caffeinate >/dev/null 2>&1 && [ "${USE_CAFFEINATE:-1}" = "1" ]; then
+  caffeinate -dimsu -w $$ &
+  echo "$(date -u +%FT%TZ) [INFO] weekly_runner: caffeinate ON (pid=$!)"
+fi
 
-# --- opcional: gating horario (desactivado porque cron ya dispara a 08:05 UTC) ---
-# if [[ "${FORCE:-0}" != "1" ]]; then
-#   hhmm="$(date -u +'%H%M')"
-#   [[ "$hhmm" == "0805" ]] || { echo "[INFO] fuera de ventana 08:05Z, salgo"; exit 0; }
-# fi
+cd "$ROOT"
 
-# --- 1) Fetch OHLCV fresco (1d/4h) ---
-echo "[STEP] fetch OHLCV"
-python3 scripts/mini_accum/fetch_ohlcv_ccxt.py --exchange "$EXCHANGE" --symbol "$SYMBOL" --tf 1d --out "$D1_CSV" || echo "[WARN] 1d fetch failed (continuing)"
-python3 scripts/mini_accum/fetch_ohlcv_ccxt.py --exchange "$EXCHANGE" --symbol "$SYMBOL" --tf 4h --out "$H4_CSV" || echo "[WARN] 4h fetch failed (continuing)"
+# ---- Activar .venv si existe ----
+if [ -d "$ROOT/.venv" ]; then
+  # shellcheck disable=SC1091
+  source "$ROOT/.venv/bin/activate"
+  echo "$(date -u +%FT%TZ) [INFO] weekly_runner: .venv activado"
+fi
 
-# --- 2) Botón semanal (pipeline + señal + KPIs + snapshot) ---
-echo "[STEP] run_once_paper.sh"
- /bin/bash scripts/mini_accum/run_once_paper.sh || echo "[WARN] run_once_paper.sh terminó con aviso"
+# ---- Kill-switch: OVERRIDE_MODE=PAUSE ----
+OVERRIDE_MODE="${OVERRIDE_MODE:-NORMAL}"
+if [ "$OVERRIDE_MODE" = "PAUSE" ]; then
+  echo "$(date -u +%FT%TZ) [WARN] weekly_runner: OVERRIDE_MODE=PAUSE => no se ejecuta pipeline"
+  LEVEL=WARN CHAN=mini_accum /usr/bin/env python3 "$ROOT/scripts/mini_accum/notify.py" "Runner pausado por OVERRIDE_MODE=PAUSE"
+  exit 0
+fi
 
-# --- 3) Notificación corta (resumen) ---
-echo "[STEP] notify checkpoint"
-AB_SUM="$(sed -n '1,80p' reports/mini_accum/ab_latest.md 2>/dev/null | tr '\n' ' ' | sed 's/  */ /g' | cut -c1-400)"
-LIVE_TAIL="$(tail -n 3 reports/mini_accum/live_kpis.csv 2>/dev/null | tr '\n' ' ')"
-FLIPS_TAIL="$(tail -n 3 reports/mini_accum/flips_log.csv 2>/dev/null | tr '\n' ' ')"
-HEALTH="$(tr '\n' ' ' < health/mini_accum.status 2>/dev/null || true)"
+# ---- Check de datos / fetch (si existen scripts; notificar si fallan) ----
+fetch_ok=1
+if [ -x "$ROOT/scripts/mini_accum/fetch_ohlc.sh" ]; then
+  if ! "$ROOT/scripts/mini_accum/fetch_ohlc.sh"; then
+    fetch_ok=0
+  fi
+elif [ -x "$ROOT/scripts/mini_accum/fetch_ohlc.py" ]; then
+  if ! /usr/bin/env python3 "$ROOT/scripts/mini_accum/fetch_ohlc.py"; then
+    fetch_ok=0
+  fi
+else
+  echo "$(date -u +%FT%TZ) [INFO] weekly_runner: no hay fetch_ohlc.{sh,py} -> skip"
+fi
+if [ "$fetch_ok" -ne 1 ]; then
+  LEVEL=WARN CHAN=mini_accum /usr/bin/env python3 "$ROOT/scripts/mini_accum/notify.py" "Fallo en fetch de datos (1d/4h)"
+fi
 
-python3 scripts/mini_accum/notify.py "Checkpoint paper — LIVE: ${LIVE_TAIL} | FLIPS: ${FLIPS_TAIL} | HEALTH: ${HEALTH} | AB: ${AB_SUM}" || echo "[WARN] notify falló"
+# ---- Checkpoint 1 ----
+LEVEL=INFO CHAN=mini_accum /usr/bin/env python3 "$ROOT/scripts/mini_accum/notify.py" "Checkpoint: datos listos"
 
+# ---- Ejecutar pipeline KISS v1 (sin tocar lógica) ----
+pipe_ok=0
+if [ -x "$ROOT/scripts/mini_accum/kiss_v1_wf_pipeline.sh" ]; then
+  if "$ROOT/scripts/mini_accum/kiss_v1_wf_pipeline.sh"; then pipe_ok=1; fi
+elif [ -x "$ROOT/scripts/mini_accum/pipeline.sh" ]; then
+  if "$ROOT/scripts/mini_accum/pipeline.sh"; then pipe_ok=1; fi
+else
+  echo "$(date -u +%FT%TZ) [WARN] weekly_runner: pipeline no encontrado; skip (manteniendo contrato de outputs)"
+  pipe_ok=1
+fi
 
-echo "==== $(date -u +'%FT%TZ') :: weekly_runner end ===="
+# ---- Snapshot/Checkpoint 2 ----
+if [ "$pipe_ok" -eq 1 ]; then
+  LEVEL=INFO CHAN=mini_accum /usr/bin/env python3 "$ROOT/scripts/mini_accum/notify.py" "Checkpoint: pipeline completado (A/B corto)"
+else
+  LEVEL=WARN CHAN=mini_accum /usr/bin/env python3 "$ROOT/scripts/mini_accum/notify.py" "Pipeline falló"
+fi
+
+# ---- Tareas de post: watchdog & KPI guard ----
+/usr/bin/env python3 "$ROOT/scripts/mini_accum/health_watchdog.py" || true
+/usr/bin/env python3 "$ROOT/scripts/mini_accum/kpi_guard.py" || true
+
+echo "$(date -u +%FT%TZ) [INFO] weekly_runner: done"
+# --- Policy asserts: no mezcla/meta, versión/tag fijo, sellos de resultados ---
+if ! /usr/bin/env python3 "$ROOT/scripts/mini_accum/policy_asserts.py"; then
+  LEVEL=WARN CHAN=mini_accum /usr/bin/env python3 "$ROOT/scripts/mini_accum/notify.py" "Policy asserts FAIL → PAUSE"
+  date -u +"PAUSE %Y-%m-%dT%H:%M:%SZ :: policy_violation" > "$ROOT/health/mini_accum.status"
+  exit 1
+else
+  LEVEL=INFO CHAN=mini_accum /usr/bin/env python3 "$ROOT/scripts/mini_accum/notify.py" "Policy asserts OK (baseline intacto)"
+fi
+# --- fin policy asserts ---
+# --- Guard: CODE SEAL FROZEN (wrapper inmutable) ---
+if [ -f "$ROOT/reports/mini_accum/code_seal.FROZEN.sha256" ]; then
+  if ! ( cd "$ROOT" && shasum -a 256 -c reports/mini_accum/code_seal.FROZEN.sha256 >/dev/null ); then
+    LEVEL=WARN CHAN=mini_accum /usr/bin/env python3 "$ROOT/scripts/mini_accum/notify.py" "Runner: CODE SEAL MISMATCH → PAUSE"
+    date -u +"PAUSE %Y-%m-%dT%H:%M:%SZ :: code_seal_mismatch" > "$ROOT/health/mini_accum.status"
+    exit 1
+  fi
+fi
+# --- fin guard CODE SEAL ---

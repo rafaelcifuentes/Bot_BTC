@@ -1,9 +1,22 @@
 #!/usr/bin/env bash
+# --- SAFE HEADER (no cierres la shell) ---
+set +e
+set -o pipefail 2>/dev/null || true
+
+safe_exit() { # usa esto en vez de 'exit'
+  local code=${1:-0}
+  if [ -n "$ZSH_EVAL_CONTEXT" ] && [[ $ZSH_EVAL_CONTEXT == *:file ]]; then return "$code"; fi
+  if [ -n "${BASH_VERSION:-}" ] && [[ ${BASH_SOURCE[0]} != "$0" ]]; then return "$code"; fi
+  exit "$code"
+}
+
+nonfatal(){ "$@" || printf '⚠️  ignorado: %s\n' "$*"; }
+# --- /SAFE HEADER ---
 set -Eeuo pipefail
 
 KPI=$(ls -t reports/mini_accum/*_kpis__*.csv | head -1)
 FLP=$(ls -t reports/mini_accum/*_flips__*.csv | head -1)
-[ -f "$KPI" ] && [ -f "$FLP" ] || { echo "No encuentro KPIs/FLIPS en reports/mini_accum"; exit 1; }
+[ -f "$KPI" ] && [ -f "$FLP" ] || { echo "No encuentro KPIs/FLIPS en reports/mini_accum"; safe_exit 1; }
 
 TAG=$(basename "$KPI" | sed -E 's/^base_v0_1_([0-9]{8}_[0-9]{4})_kpis__.*/\1/')
 HASH=$(git rev-parse --short=12 HEAD 2>/dev/null || echo "NO-GIT")

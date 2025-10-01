@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+# --- SAFE HEADER (no cierres la shell) ---
+set +e
+set -o pipefail 2>/dev/null || true
+
+safe_exit() { # usa esto en vez de 'exit'
+  local code=${1:-0}
+  if [ -n "$ZSH_EVAL_CONTEXT" ] && [[ $ZSH_EVAL_CONTEXT == *:file ]]; then return "$code"; fi
+  if [ -n "${BASH_VERSION:-}" ] && [[ ${BASH_SOURCE[0]} != "$0" ]]; then return "$code"; fi
+  exit "$code"
+}
+
+nonfatal(){ "$@" || printf '⚠️  ignorado: %s\n' "$*"; }
+# --- /SAFE HEADER ---
 set -Eeuo pipefail
 
 is_mode() {
@@ -44,7 +57,7 @@ pick_file() {
 [[ -z "${file:-}" ]] && file="$(pick_file || true)"
 if [[ -z "${file:-}" || ! -r "$file" ]]; then
   echo "No encontré dictamen TSV legible. Esperaba: reports/mini_accum/dictamen_*.tsv" >&2
-  exit 1
+  safe_exit 1
 fi
 
 header(){ printf 'suffix\twindow\tnetBTC\tdbps\tmdd_vs_HODL\tflips\tPASS\tFAIL\n'; }
@@ -123,5 +136,5 @@ case "$mode" in
     } | column -t -s $'\t'
     ;;
 
-  *) usage; exit 2;;
+  *) usage; safe_exit 2;;
 esac

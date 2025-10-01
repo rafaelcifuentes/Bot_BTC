@@ -1,0 +1,102 @@
+# --- A/B rápido (baseline vs mejor del vecindario) ---
+AB_SUMMARY="$repo_root/reports/mini_accum/walkforward/wf_summary_kpis.csv"
+AB_OUT="$repo_root/reports/mini_accum/ab_latest.md"
+
+if [ -f "$AB_SUMMARY" ]; then
+  echo "[INFO] Generando A/B rápido -> $AB_OUT"
+  "$PY" - <<'PY'
+import os, re, pandas as pd, datetime as dt
+
+AB_SUMMARY = os.environ.get('AB_SUMMARY') or 'reports/mini_accum/walkforward/wf_summary_kpis.csv'
+AB_OUT = os.environ.get('AB_OUT') or 'reports/mini_accum/ab_latest.md'
+BASE = 'DD15_RB1_H30_G200_BULL0'
+NBHD_RE = re.compile(r'^DD(14|15|16)_RB(1|2)_H(30|31|32)_G200_BULL0$')
+
+try:
+    df = pd.read_csv(AB_SUMMARY)
+except Exception as e:
+    print(f"[WARN] No pude leer {AB_SUMMARY}: {e}")
+    raise SystemExit(0)
+
+# Ventanas disponibles
+wins = [str(w) for w in sorted(df['window'].astype(str).unique())]
+
+# Filtrado básico de columnas
+for c in ['sats_mult','mdd_vs_hodl','fpy','config_id','window']:
+    if c not in df.columns:
+        print(f"[WARN] Falta columna {c} en summary; A/B omitido.")
+        raise SystemExit(0)
+
+# Baseline
+base_df = df[df['config_id']==BASE]
+
+# Vecindario (excluye baseline)
+nb = df[df['config_id'].astype(str).apply(lambda s: bool(NBHD_RE.match(s))) & (df['config_id']!=BASE)].copy()
+
+if base_df.empty or nb.empty:
+    print("[WARN] Sin baseline o sin vecindario; A/B omitido.")
+    raise SystemExit(0)
+
+# KPIs agregados
+agg_cols = ['sats_mult','mdd_vs_hodl','fpy']
+
+def kpis(d):
+    return {
+        'median_sats': d['sats_mult'].median(),
+        'fail_rate': (d['sats_mult']<1.0).mean() if len(d)>0 else float('nan'),
+        'median_mdd': d['mdd_vs_hodl'].median(),
+        'median_fpy': d['fpy'].median(),
+        'n': len(d)
+    }
+
+base_k = kpis(base_df)
+
+# Selección del contender por mejor median_sats, desempates por menor mdd y menor fpy
+cands = []
+for cid, g in nb.groupby('config_id'):
+    met = kpis(g)
+    cands.append((cid, met))
+
+if not cands:
+    print("[WARN] Vecindario vacío tras agrupar; A/B omitido.")
+    raise SystemExit(0)
+
+cands.sort(key=lambda x: (-x[1]['median_sats'], x[1]['median_mdd'], x[1]['median_fpy']))
+cont_id, cont_k = cands[0]
+
+# Markdown
+ts = dt.datetime.now().strftime('%Y-%m-%d %H:%M')
+lines = []
+lines.append(f"# A/B KISS v1 — {ts}")
+lines.append("")
+lines.append(f"Ventanas en summary: {', '.join(wins)}")
+lines.append(f"\n**Baseline:** `{BASE}`  |  **Contender (auto):** `{cont_id}`")
+lines.append("")
+lines.append("| KPI | Baseline | Contender | Δ (cont - base) | Mejor |")
+lines.append("|:----|---------:|----------:|---------------:|:------:|")
+
+# sats (↑ mejor)
+d_sats = cont_k['median_sats'] - base_k['median_sats']
+lines.append(f"| median(sats_mult) | {base_k['median_sats']:.3f} | {cont_k['median_sats']:.3f} | {d_sats:+.3f} | ↑ |")
+
+# fail_rate (↓ mejor)
+d_fail = cont_k['fail_rate'] - base_k['fail_rate']
+lines.append(f"| fail_rate (sats<1) | {base_k['fail_rate']:.2%} | {cont_k['fail_rate']:.2%} | {d_fail:+.2%} | ↓ |")
+
+# mdd_vs_hodl (↓ mejor)
+d_mdd = cont_k['median_mdd'] - base_k['median_mdd']
+lines.append(f"| median(mdd_vs_hodl) | {base_k['median_mdd']:.3f} | {cont_k['median_mdd']:.3f} | {d_mdd:+.3f} | ↓ |")
+
+# fpy (↓ mejor)
+d_fpy = cont_k['median_fpy'] - base_k['median_fpy']
+lines.append(f"| median(FPY) | {base_k['median_fpy']:.2f} | {cont_k['median_fpy']:.2f} | {d_fpy:+.2f} | ↓ |")
+
+os.makedirs(os.path.dirname(AB_OUT), exist_ok=True)
+with open(AB_OUT, 'w', encoding='utf-8') as fh:
+    fh.write("\n".join(lines) + "\n")
+
+print(f"[OK] A/B escrito -> {AB_OUT}")
+PY
+else
+  echo "[WARN] No existe summary para A/B: $AB_SUMMARY"
+fi

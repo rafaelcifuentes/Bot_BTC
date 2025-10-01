@@ -657,3 +657,196 @@ PY
   echo "[OK] Artefactos:"
   ls -lh "$OVER" "$KPI" "$MD" 2>/dev/null || true
 }
+
+  local FREEZE_TS="${1:?YYYY-MM-DD 00:00}"
+  local ATR_MAX_SHADOW="${2:?ATR_MAX}"
+  local TAG="${3:-cg20_t035}"
+
+  local D="$(echo "$FREEZE_TS" | awk '{print $1}')"
+  local RULES_SRC="configs/heart_rules.yaml"
+  local RULES_SNAP="configs/heart_rules_${D}.yaml"
+
+  mkdir -p configs corazon reports/heart
+
+  if [[ -f "$RULES_SRC" ]]; then
+    python scripts/heart_rules_snapshot.py "$RULES_SRC" "$RULES_SNAP" "$ATR_MAX_SHADOW" || {
+      echo "[WARN] snapshot de reglas falló; continúo con $RULES_SRC"
+    }
+  else
+    echo "[WARN] No existe $RULES_SRC; continuaré sin snapshot específico."
+  fi
+
+  if [[ ! -x scripts/heart_freeze_shadow.sh ]]; then
+    echo "[ERR] Falta scripts/heart_freeze_shadow.sh o no es ejecutable"
+    return 1
+  fi
+
+  scripts/heart_freeze_shadow.sh "$D" || { echo "[ERR] FREEZE sombra falló"; return 1; }
+
+  # Etiquetas opcionales para comparar variantes
+  if [[ -f "reports/heart/kpis_diamante_btc_costes_freeze_${D}_bars.csv" ]]; then
+    cp "reports/heart/kpis_diamante_btc_costes_freeze_${D}_bars.csv" \
+       "reports/heart/kpis_${D}_${TAG}_atr${ATR_MAX_SHADOW}.csv"
+  fi
+  if [[ -f "reports/heart/summary_diamante_btc_costes_freeze_${D}_bars.md" ]]; then
+    cp "reports/heart/summary_diamante_btc_costes_freeze_${D}_bars.md" \
+       "reports/heart/summary_${D}_${TAG}_atr${ATR_MAX_SHADOW}.md"
+  fi
+
+  echo "[OK] heart_monday ${FREEZE_TS} ATR=${ATR_MAX_SHADOW} TAG=${TAG} (producción permanece en 0.07)"
+}
+runC_smoke_test_weights() {
+  local FREEZE DATE_CSV csv
+  FREEZE="$(date -u +%Y-%m-%d)"
+  csv="corazon/weights_${FREEZE}.csv"
+  if [ -f "$csv" ]; then
+    echo "🧪 Peso diario detectado: $csv"
+    tail -n 3 "$csv"
+    echo
+    python - <<PY
+import pandas as pd
+try:
+    df = pd.read_csv("$csv")
+    assert df['timestamp'].is_monotonic_increasing, "⛔ Timestamps no ordenados"
+    print(f"✅ Filas: {len(df)} | Columnas: {df.columns.tolist()}")
+    print(f"🚦 NaNs:\n{df.isna().sum()}")
+except Exception as e:
+    print(f"⛔ ERROR: {e}")
+PY
+  else
+    echo "⚠️ No se encontró el peso: $csv"
+  fi
+}
+
+# ==========================================
+# Mini-Accum sleeve (unidireccional, KISS)
+# Corazón actúa como ejecutor/guardían.
+# Lee signals/mini_accum/latest.json y
+# ejecuta en modo sombra (DRY-RUN) sin
+# cambiar la decisión del modelo.
+# ==========================================
+
+# Estado / inspección de la señal
+runC_miniaccum_status() {
+  emulate -L zsh
+  set -euo pipefail
+  _repo_check
+  local SIG="${1:-signals/mini_accum/latest.json}"
+  _need "$SIG" "Provee la señal emitida por Mini-Accum (JSON)."
+
+  python - "$SIG" <<'PY'
+import sys, json, datetime as dt
+p = sys.argv[1]
+j = json.load(open(p))
+def g(k, d=None): return j.get(k, d)
+
+ts = g("ts")
+ver = g("version")
+decision = g("decision")
+health = str(g("health","")).upper()
+asset = g("asset_base","BTC-USD")
+
+print(f"[signal] {p}")
+print(f"  ts={ts} version={ver} asset={asset}")
+print(f"  decision={decision} (1=BTC,0=STABLE) health={health}")
+
+try:
+    ts_parsed = dt.datetime.fromisoformat(ts.replace("Z","+00:00"))
+    age_h = (dt.datetime.now(dt.timezone.utc) - ts_parsed).total_seconds()/3600.0
+    print(f"  age_hours={age_h:.2f}")
+except Exception as e:
+    print(f"  age_hours=? (parse err: {e})")
+PY
+}
+
+# Ejecutor en sombra (no coloca órdenes reales)
+# Kill-switches: claves requeridas, health OK/PASS, asset=BTC-USD, señal reciente (<=8h)
+runC_miniaccum_exec_shadow() {
+  emulate -L zsh
+  set -euo pipefail
+  _repo_check
+  local SIG="${1:-signals/mini_accum/latest.json}"
+  _need "$SIG" "Provee la señal emitida por Mini-Accum (JSON)."
+  mkdir -p reports/mini_accum/exec corazon
+
+  python - "$SIG" <<'PY'
+import sys, json, os, datetime as dt
+import pandas as pd
+
+sig_path = sys.argv[1]
+j = json.load(open(sig_path))
+
+required = ["ts","decision","version","health"]
+missing = [k for k in required if k not in j]
+if missing:
+    print(f"[KILL] Señal inválida; faltan claves: {missing}"); sys.exit(1)
+
+health = str(j["health"]).upper()
+if health not in ("OK","PASS"):
+    print(f"[KILL] health={health}"); sys.exit(1)
+
+asset = j.get("asset_base","BTC-USD")
+if asset != "BTC-USD":
+    print(f"[KILL] asset_base={asset} no permitido"); sys.exit(1)
+
+# Recencia
+ts = j["ts"]
+try:
+    ts_parsed = dt.datetime.fromisoformat(ts.replace("Z","+00:00"))
+except Exception as e:
+    print(f"[KILL] ts parse err: {e}"); sys.exit(1)
+
+age_h = (dt.datetime.now(dt.timezone.utc)-ts_parsed).total_seconds()/3600.0
+if age_h > 8:
+    print(f"[KILL] Señal vieja ({age_h:.2f}h) > 8h"); sys.exit(1)
+
+# Decisión esperada (binaria)
+try:
+    decision = int(j["decision"])
+except Exception:
+    print(f"[KILL] decision no numérica: {j['decision']}"); sys.exit(1)
+if decision not in (0,1):
+    print(f"[KILL] decision inválida={decision}"); sys.exit(1)
+
+# Estado previo
+state_f = "corazon/mini_accum_state.json"
+if os.path.exists(state_f):
+    s = json.load(open(state_f))
+    last_pos = int(s.get("last_pos",0))
+    last_ts = s.get("last_ts")
+else:
+    last_pos = 0
+    last_ts = None
+
+action = "HOLD"
+if decision != last_pos:
+    action = "FLIP_TO_BTC" if decision==1 else "FLIP_TO_STABLE"
+
+now = dt.datetime.now(dt.timezone.utc).isoformat()
+
+row = {
+ "ts": now,
+ "signal_ts": ts,
+ "decision": decision,
+ "action": action,
+ "version": j.get("version"),
+ "reason": j.get("reason",""),
+ "health": health
+}
+
+# Registrar preview
+prev_path = "reports/mini_accum/exec/orders_preview.csv"
+try:
+    df = pd.read_csv(prev_path)
+except Exception:
+    df = pd.DataFrame(columns=row.keys())
+df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+df.to_csv(prev_path, index=False)
+
+# Actualizar estado (DRY-RUN)
+with open(state_f,"w") as f:
+    json.dump({"last_pos": decision, "last_ts": now}, f)
+
+print(f"[DRY-RUN] {action} | last_pos={last_pos} -> new={decision} | logged to {prev_path}")
+PY
+}

@@ -22,9 +22,13 @@ console.setFormatter(fmt)
 logging.basicConfig(level=logging.DEBUG, handlers=[handler, console])
 logger = logging.getLogger("mini_accum")
 
-from pathlib import Path
-import logging
-                    format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+import os as _os
+_lvl_name = _os.getenv("LOG_LEVEL", "DEBUG").upper()
+_lvl = getattr(logging, _lvl_name, logging.DEBUG)
+logging.getLogger().setLevel(_lvl)
+logger.setLevel(_lvl)
+logger.info(f"LOG_LEVEL={_lvl_name} aplicado")
+
 # -*- coding: utf-8 -*-
 """
 KISS signal emitter (Python-only)

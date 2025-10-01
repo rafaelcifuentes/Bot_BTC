@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+# --- SAFE HEADER (no cierres la shell) ---
+set +e
+set -o pipefail 2>/dev/null || true
+
+safe_exit() { # usa esto en vez de 'exit'
+  local code=${1:-0}
+  if [ -n "$ZSH_EVAL_CONTEXT" ] && [[ $ZSH_EVAL_CONTEXT == *:file ]]; then return "$code"; fi
+  if [ -n "${BASH_VERSION:-}" ] && [[ ${BASH_SOURCE[0]} != "$0" ]]; then return "$code"; fi
+  exit "$code"
+}
+
+nonfatal(){ "$@" || printf '⚠️  ignorado: %s\n' "$*"; }
+# --- /SAFE HEADER ---
 set -euo pipefail
 
 # Uso: render.sh OUT_YAML XB DW
@@ -10,7 +23,7 @@ MB="${MB:-20}"  # macro_buffer_bps (puedes override con: MB=18 bash ...)
 
 if [[ -z "${OUT}" || -z "${XB}" || -z "${DW}" ]]; then
   echo "Uso: $0 OUT_YAML XB DW   (opcional: MB=XX por env)"
-  exit 2
+  safe_exit 2
 fi
 
 mkdir -p "$(dirname "$OUT")"

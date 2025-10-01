@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve repo root robustly (works even if invoked from zsh via bash)
+if [ -n "${BASH_SOURCE-}" ]; then
+  _src="${BASH_SOURCE[0]}"
+else
+  _src="$0"
+fi
+script_dir="$(cd "$(dirname "$_src")" >/dev/null 2>&1 && pwd)"
+repo_root="$(cd "$script_dir/../.." >/dev/null 2>&1 && pwd)"
+PY="${PY:-python3}"
+
+"$PY" "$repo_root/tools/mini_accum/wf_consolidate.py" \
+  --kpis_glob 'reports/mini_accum/kiss_v1/*kpis__WF_*.csv' \
+  --out_summary 'reports/mini_accum/walkforward/wf_summary_kpis.csv' \
+  --out_best    'reports/mini_accum/walkforward/wf_best_by_window.csv' \
+  --out_md      'reports/mini_accum/walkforward/Roadmap_PDCA.md' \
+  --candidate   'DD15_RB1_H30_G200_BULL0'
+
+# ... (other script content unchanged) ...
+
+"$PY" "$repo_root/tools/mini_accum/wf_consolidate.py" \
+  --kpis_glob 'reports/mini_accum/kiss_v1/*kpis__WF_*202[12]*.csv' \
+  --out_summary 'reports/mini_accum/walkforward/wf_summary_kpis__2122.csv' \
+  --out_best    'reports/mini_accum/walkforward/wf_best_by_window__2122.csv' \
+  --out_md      'reports/mini_accum/walkforward/Roadmap_PDCA.md' \
+  --candidate   'DD15_RB1_H30_G200_BULL0' \
+  --keep_all || true

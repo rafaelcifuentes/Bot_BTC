@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "updated": "2025-10-01",
+  "policy": {
+    "source_of_truth": "docs/mini_accum/*.md",
+    "overlays_dir": "configs/mini_accum/overlays",
+    "promotion_gate": "ΔNetBTC≥+0.02 without worsening MDD/FPY; SPA/RC pass; DSR>0"
+  },
+  "modules": [
+    {
+      "name": "bull_hold",
+      "runbook": "docs/mini_accum/BULL_HOLD.md",
+      "overlay": "configs/mini_accum/overlays/bull_hold.yaml",
+      "status": "opt-in",
+      "planned_version": "v2"
+    },
+    {
+      "name": "hibernation_on_chop",
+      "runbook": "docs/mini_accum/hibernation_on_chop.md",
+      "overlay": "configs/mini_accum/overlays/hibernation_on_chop.yaml",
+      "status": "opt-in",
+      "planned_version": "v2"
+    },
+    {
+      "name": "sl_tp_defensivo",
+      "runbook": "docs/mini_accum/sl_tp_defensivo.md",
+      "overlay": "configs/mini_accum/overlays/sl_tp_defensivo.yaml",
+      "status": "opt-in",
+      "planned_version": "v1.1"
+    }
+  ]
+}

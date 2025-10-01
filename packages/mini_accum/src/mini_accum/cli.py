@@ -128,10 +128,14 @@ def main() -> None:
 
     # Merge D1→4h y filtro temporal
     df = merge_daily_into_4h(df4, d1)
+    # Usar intervalo semiabierto [start, end):
+    # tratamos 'end' como inclusivo a nivel de día, avanzando 1 día y filtrando con '<'
     if args.start:
-        df = df[df["ts"] >= pd.Timestamp(args.start, tz="UTC")]
+        start = pd.Timestamp(args.start, tz="UTC")
+        df = df[df["ts"] >= start]
     if args.end:
-        df = df[df["ts"] <= pd.Timestamp(args.end, tz="UTC")]
+        end_excl = pd.Timestamp(args.end, tz="UTC") + pd.Timedelta(days=1)
+        df = df[df["ts"] < end_excl]
 
     # Costes
     costs = TradeCosts(
