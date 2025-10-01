@@ -1,0 +1,11 @@
+modules:
+  hibernation_on_chop:
+    enabled: false
+    adx_period_d1: 14
+    adx_max_on: 20
+    adx_min_off: 22
+    ema_slope_eps_4h: 0.0005
+    ema_slope_lookback: 24
+    atr_pct_quantile_cutoff: 0.4
+    enforce_no_new_entries: true
+    allow_exits_only: true

@@ -1,0 +1,10 @@
+modules:
+  bull_hold:
+    enabled: false
+    adx_period_d1: 14
+    adx_min_on: 20        # activar si ADX >= 20 con D1>EMA200
+    adx_min_off: 18       # desactivar si ADX < 18 (histeresis)
+    require_above_ema50: false
+    min_hold_bars_4h: 24  # ventanas 4h mínimas para evitar parpadeo
+    disable_exit_active: true
+    allow_passive_exit_on_macro_flip: true

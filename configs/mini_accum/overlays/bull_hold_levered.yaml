@@ -1,0 +1,24 @@
+bull_hold:
+  enabled: true
+  macro:
+    ema_len: 200     # gate bull en D1
+    adx_len: 14
+    adx_min: 20      # exige tendencia
+  sell:
+    confirm_closes_d1: 2  # dos cierres D1 bajo EMA200 para salir
+  dd_cap: 15
+
+leverage:
+  mode: "vol_target"      # "fixed" o "vol_target" (si tu motor soporta)
+  fixed: 1.25             # usado si mode=fixed
+  target_vol_ann: 0.45    # objetivo de vol anual (solo si vol_target)
+  max: 1.5                # tope duro
+  degear_on:
+    adx_below: 20
+    ema200_break_closes: 2
+  costs:
+    borrow_apr: 0.10      # cambiamos a 0.05 / 0.10 / 0.20 en el loop
+    funding_apr: 0.00     # si usas perps, modela aquí
+  risk_limits:
+    max_daily_loss_pct: 5
+    atr_stop_days: 5

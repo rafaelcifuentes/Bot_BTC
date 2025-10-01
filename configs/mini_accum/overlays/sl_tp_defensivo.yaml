@@ -1,0 +1,10 @@
+modules:
+  sl_tp_defensivo:
+    enabled: false
+    atr_period: 14
+    k_sl: 2.5
+    k_tp: 4.0
+    use_breakeven_after_tp1: true
+    smooth_atr_with_ema: true
+    respect_ttl_after_exit: true
+    disable_tp_if_bull_hold: true
