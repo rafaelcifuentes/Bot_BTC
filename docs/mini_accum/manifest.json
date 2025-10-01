@@ -19,7 +19,8 @@
       "runbook": "docs/mini_accum/hibernation_on_chop.md",
       "overlay": "configs/mini_accum/overlays/hibernation_on_chop.yaml",
       "status": "opt-in",
-      "planned_version": "v2"
+      "planned_version": "v2",
+      "placeholder": false
     },
     {
       "name": "sl_tp_defensivo",

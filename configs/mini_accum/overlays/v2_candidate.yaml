@@ -1,0 +1,32 @@
+# configs/mini_accum/overlays/v2_candidate.yaml
+modules:
+  bull_hold:
+    enabled: true
+    adx_period_d1: 14
+    adx_min_on: 20
+    adx_min_off: 18
+    require_above_ema50: false
+    min_hold_bars_4h: 24
+    disable_exit_active: true
+    allow_passive_exit_on_macro_flip: true
+
+  hibernation_on_chop:
+    enabled: true
+    adx_period_d1: 14
+    adx_max_on: 20
+    adx_min_off: 22
+    ema_slope_eps_4h: 0.0005
+    ema_slope_lookback: 24
+    atr_pct_quantile_cutoff: 0.4
+    enforce_no_new_entries: true
+    allow_exits_only: true
+
+  cooldown_after_loss:
+    enabled: true
+    cooldown_bars_4h: 12
+    min_loss_frac_to_trigger: 0.001
+    recent_losses_window: 3
+    recent_losses_threshold: 2
+    extend_factor: 2.0
+    require_macro_flag: false
+    publish_reason_codes: true
