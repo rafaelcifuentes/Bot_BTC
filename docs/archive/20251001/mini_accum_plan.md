@@ -46,23 +46,37 @@
 - **Presupuesto:** **26/año** (hard) y **2/mes** (soft).
 
 ### Módulos Opt-in (solo si aportan)
-1. **Señales 4h (EMA21/55)**  
-   - **Entrada:** macro verde **y** `EMA21_4h > EMA55_4h`.  
-   - **Salida (pasiva):** `EMA21_4h < EMA55_4h`.
-2. **Salida activa (confirmada)**  
-   - En BTC: si `close_4h < EMA21_4h` **y** la **siguiente** vela **no** cierra > EMA21_4h ⇒ **salir** a Stable.
-3. **Regímenes ATR% (Corazón slim)**  
-   - **Verde:** `close_4h > EMA200_D1` **y** `ATR%_D1 ≥ p40`.  
-   - **Rojo:** `close_4h < EMA200_D1` **y** `ATR%_D1 ≥ p40`.  
-   - **Amarillo:** resto ⇒ **Hibernación/PAUSA**.
-4. **Grace TTL (cooldown suave)**  
-   - Tras un flip, durante `ttl_grace=1` vela: exigir señal **fuerte** para revertir (p.ej. `|precio_d1 − EMA200_d1| / ATR_d1 ≥ 0.30`).
-5. **ATR-adaptativo (2 niveles)**  
-   - `ATR% ≥ p60` ⇒ `dwell=5`, **máx 1 flip/24h**.  
-   - `ATR% < p60` ⇒ `dwell=3`, **máx 2 flips/24h`.
-6. **Turnover budget semanal (soft)**  
-   - Techo blando **8 flips/semana**; si se excede, **solo** cambios verde↔rojo.
 
+El bot Mini‑Accum sigue el principio KISS: mantener el núcleo simple y solo incorporar mejoras si **demuestran valor** claro y consistente en pruebas fuera de muestra (OOS) y validaciones estadísticas (SPA, RC, DSR).
+
+A continuación se listan los módulos **Opt-in**, desactivados por defecto, que serán activados **solo si** cumplen todos los criterios de adopción: mejora neta en NetBTC, MDD aceptable, flips anuales bajo control y estabilidad OOS.
+
+| Módulo                | Objetivo principal                                                                 | Estado actual | Versión objetivo | Impacto estimado en NetBTC |
+|----------------------|-------------------------------------------------------------------------------------|---------------|------------------|-----------------------------|
+| 🛡️ SL/TP defensivo    | Protección contra eventos extremos. SL dinámico basado en ATR.                     | 🔧 Diseño     | ✅ v1.1           | +4% a +12%                  |
+| 💤 hibernation_on_chop| Evitar operar en rangos laterales (ADX bajo / pendiente plana)                     | 💤 OFF        | ✅ v2             | +6% a +15%                  |
+| 🚀 BULL_HOLD          | Mantener posiciones más tiempo en bull markets fuertes                             | 💤 OFF        | ✅ v2             | +4% a +10%                  |
+| cooldown_after_loss  | Evita reentrada inmediata tras pérdida (post-stop o cruce fallido)                 | 💤 OFF        | 🔁 v3             | +2% a +5%                   |
+| re-entry buffer       | Espera mínima antes de reabrir tras cerrar una posición reciente                   | 💤 OFF        | 🔁 v3             | +2% a +4%                   |
+| ATR% adaptativo       | Ajustar reglas según régimen de volatilidad (pN de ATR)                            | 💤 OFF        | 🔁 v3/v4          | +1% a +3%                   |
+| turnover_budget       | Penaliza señales con rotación excesiva o sobreoperativa                            | 💤 OFF        | 🔁 v3/v4          | +2% a +4%                   |
+| RSI confirmation      | Confirma entradas en zona de sobreventa (ej: RSI < 50)                             | ❌ Evaluación | 🔁 v3             | +1% a +3%                   |
+| risk_sizing           | Ajustar tamaño según score de riesgo o volatilidad                                 | 💤 OFF        | ⏳ v4+            | +3% a +8%                   |
+| DCA adaptativo        | Recompra agresiva en caídas (ej: -5%, -10%) como overlay                           | ❌ Experimental | ⚠️ v4/v5         | ±0% (alto riesgo overfit)  |
+
+✅ = Aprobado para próxima versión  
+🔁 = Candidato evaluable si justifica su inclusión  
+⏳ = Backlog de bajo riesgo pero complejidad alta  
+⚠️ = Experimental / aún sin evidencia robusta
+
+**Importante**: No se activará ningún módulo sin cumplir los siguientes criterios:
+- Ablation test positivo (mejora aislada).
+- SPA / RC sin rechazo al 5–10%.
+- DSR positivo y estable.
+- No incremento significativo de flips o drawdown.
+- Documentación completa y reproducibilidad garantizada.
+
+Esta tabla se revisa antes de cada versión mayor (v2, v3, v4...) para priorizar mejoras por **impacto neto esperado**, **seguridad operativa** y **alineación con la misión estratégica**: acumular BTC, sin comprometer simplicidad ni robustez.
 > **Criterios de promoción por módulo:**  
 > - **ATR% (slim):** MDD↓ ≥10% **o** flips↓ ≥10% con `Net_BTC_ratio ≥ baseline − 0.5 pp`.  
 > - **Grace TTL:** turnover↓ ≥10% con `Net_BTC_ratio ≈` (±0.5 pp).  
