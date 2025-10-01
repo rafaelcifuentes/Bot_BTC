@@ -27,6 +27,94 @@
       "overlay": "configs/mini_accum/overlays/sl_tp_defensivo.yaml",
       "status": "opt-in",
       "planned_version": "v1.1"
+    },
+    {
+      "name": "atr_pct_adapt",
+      "runbook": "docs/mini_accum/atr_pct_adapt.md",
+      "overlay": "configs/mini_accum/overlays/atr_pct_adapt.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "confirmations_rsi_bias",
+      "runbook": "docs/mini_accum/confirmations_rsi_bias.md",
+      "overlay": "configs/mini_accum/overlays/confirmations_rsi_bias.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "cooldown_after_loss",
+      "runbook": "docs/mini_accum/cooldown_after_loss.md",
+      "overlay": "configs/mini_accum/overlays/cooldown_after_loss.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "dca_adaptativo",
+      "runbook": "docs/mini_accum/dca_adaptativo.md",
+      "overlay": "configs/mini_accum/overlays/dca_adaptativo.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "exit_atr_guardrail",
+      "runbook": "docs/mini_accum/exit_atr_guardrail.md",
+      "overlay": "configs/mini_accum/overlays/exit_atr_guardrail.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "pullback_entry",
+      "runbook": "docs/mini_accum/pullback_entry.md",
+      "overlay": "configs/mini_accum/overlays/pullback_entry.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "reentry_buffer",
+      "runbook": "docs/mini_accum/reentry_buffer.md",
+      "overlay": "configs/mini_accum/overlays/reentry_buffer.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "risk_sizing_by_score",
+      "runbook": "docs/mini_accum/risk_sizing_by_score.md",
+      "overlay": "configs/mini_accum/overlays/risk_sizing_by_score.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "rsi_confirmation",
+      "runbook": "docs/mini_accum/rsi_confirmation.md",
+      "overlay": "configs/mini_accum/overlays/rsi_confirmation.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "trailing_exit_bull",
+      "runbook": "docs/mini_accum/trailing_exit_bull.md",
+      "overlay": "configs/mini_accum/overlays/trailing_exit_bull.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
+    },
+    {
+      "name": "turnover_budget",
+      "runbook": "docs/mini_accum/turnover_budget.md",
+      "overlay": "configs/mini_accum/overlays/turnover_budget.yaml",
+      "status": "opt-in",
+      "planned_version": "v2+",
+      "placeholder": true
     }
   ]
 }
