@@ -1,0 +1,10 @@
+modules:
+  cooldown_after_loss:
+    enabled: false
+    cooldown_bars_4h: 12
+    min_loss_frac_to_trigger: 0.001
+    recent_losses_window: 3
+    recent_losses_threshold: 2
+    extend_factor: 2.0
+    require_macro_flag: false
+    publish_reason_codes: true

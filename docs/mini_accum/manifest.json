@@ -49,8 +49,8 @@
       "runbook": "docs/mini_accum/cooldown_after_loss.md",
       "overlay": "configs/mini_accum/overlays/cooldown_after_loss.yaml",
       "status": "opt-in",
-      "planned_version": "v2+",
-      "placeholder": true
+      "planned_version": "v2",
+      "placeholder": false
     },
     {
       "name": "dca_adaptativo",
