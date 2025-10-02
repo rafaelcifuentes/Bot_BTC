@@ -50,4 +50,4 @@ heart_monday "2025-09-15 00:00" 0.08 cg20_t035
 - Mini_accum: 1 semana paper/testnet → canario 10–20% con KPIs: NetBTC≥HODL, MDD_vs_HODL≤1, FPY en presupuesto.
 - Si 2 semanas consecutivas cumplen KPIs sin alertas → subir a 30–40% o integrar en allocator.
 - Mantener snapshot semanal de configs (FREEZE YAML + commit).
-Rationale: menor complejidad y riesgo de modelo; gobernanza KISS; BULL_HOLD opt-in protege bulls fuertes.
+Rationale: menor complejidad y riesgo de modelo; gobernanza KISS; BULL_HOLD opt-in protege bulls fuertes.- 2025-10-02 21:25:03Z FREEZE V1 baseline 2025-03-01..2025-09-19 (CORE_2025). Tag: KISSv1_BASE_20251002_2124UTC.

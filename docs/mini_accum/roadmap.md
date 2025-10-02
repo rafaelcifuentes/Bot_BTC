@@ -1,3 +1,4 @@
+[FREEZE V1] 2025-10-02 — baseline sellado
 ---
 title: "Mini-Accum KISS — Roadmap (Canónico)"
 version: "v1.0"
