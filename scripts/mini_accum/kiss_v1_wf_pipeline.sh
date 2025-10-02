@@ -104,7 +104,9 @@ echo "[OK] Pipeline KISS v1 completo → $OUT_ROADMAP"
   COST_PER_FLIP="${COST_PER_FLIP:-0.0006}"
 
   if [ ! -f "$OHLC" ] || [ ! -f "$SHADOW" ]; then
-    echo "[TE] SKIP (faltan OHLC=$OHLC o SHADOW=$SHADOW)"; exit 0
+    echo "python "$ROOT/scripts/common/normalize_csv.py" --schema ohlc_4h --in "$ROOT/reports/ohlc_4h/BTC-USD.csv" --out "$ROOT/reports/ohlc_4h/BTC-USD.csv" || echo "[TE] WARN normalize OHLC"
+python "$ROOT/scripts/common/normalize_csv.py" --schema orders_preview --in "$ROOT/reports/mini_accum/exec/orders_preview.csv" --out "$ROOT/reports/mini_accum/exec/orders_preview.csv" || echo "[TE] WARN normalize orders"
+[TE] SKIP (faltan OHLC=$OHLC o SHADOW=$SHADOW)"; exit 0
   fi
 
   python - "$OHLC" "$SHADOW" "$REFHIST" "$WFM" "$FD" "$COST_PER_FLIP" <<'PY'
@@ -135,7 +137,13 @@ def load_pos(path_fallback):
 sh=pd.read_csv(SHADOW); sh["ts"]=pd.to_datetime(sh["ts"], utc=True)
 rf, src_ref = load_pos(SHADOW)
 
-def weekly(net_src):
+    def weekly(s, w):
+    # [TE KISS] Guard: índice UTC, único y ordenado antes de reindex
+    import pandas as pd
+    if not isinstance(s, pd.Series):
+        s = pd.Series(s)
+    s.index = pd.to_datetime(s.index, utc=True, errors='coerce')
+    s = s[~s.index.duplicated(keep='last')].sort_index()
     ev=net_src[net_src["ts"]<=t1].copy().sort_values("ts")
     prev=net_src[net_src["ts"]<t0].tail(1)
     if len(prev)==1: ev=pd.concat([prev,ev],ignore_index=True)
