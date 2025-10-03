@@ -51,3 +51,4 @@ heart_monday "2025-09-15 00:00" 0.08 cg20_t035
 - Si 2 semanas consecutivas cumplen KPIs sin alertas → subir a 30–40% o integrar en allocator.
 - Mantener snapshot semanal de configs (FREEZE YAML + commit).
 Rationale: menor complejidad y riesgo de modelo; gobernanza KISS; BULL_HOLD opt-in protege bulls fuertes.- 2025-10-02 21:25:03Z FREEZE V1 baseline 2025-03-01..2025-09-19 (CORE_2025). Tag: KISSv1_BASE_20251002_2124UTC.
+- 2025-10-03 02:34:37Z CANARY V1.1 (SLTP post) .. (CORE_2025) → PASS (gates PDCA).
