@@ -1,178 +1,276 @@
-#!/bin/bash
+> Histórico completo (cuando se recupere): ver [`docs/mini_accum/Progreso_HISTORICO.md`](Progreso_HISTORICO.md).
+> Atajos: [Ver histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) · [Ver histórico V2.0](Progreso_HISTORICO.md#v20--histórico-recuperado)
 
-set -euo pipefail
-
-PY=${PY:-python3}
-
-echo "Starting KISS_v1 walk-forward pipeline..."
-
-# Run baseline tests for WF windows
-for w in "2024-07-01 2024-12-31 H2_2024" "2025-01-01 2025-03-31 Q1_2025" "2020-01-01 2022-12-31 OOS_2020_2022"; do
-  set -- $w; s=$1; e=$2; t=$3
-  echo "Running baseline for window $t ($s to $e)..."
-  $PY scripts/mini_accum/kiss_v1.py \
-    --config configs/mini_accum/kiss_v1.yaml \
-    --mode pt --gate_sma 200 --gate_mode sell --dd_hard_pct 30 \
-    --dd_pct 16 --rb_pct 3 --bull_hold_sma 0 \
-    --start $s --end $e \
-    --suffix ${t}_PT_G200_DD16_RB3_H30_BULL0
-done
-
-echo "Baseline runs completed."
-
-# Additional pipeline steps would go here
-# ...
-
-echo "Pipeline finished successfully."
-
-# --- Consolidado 2021/2022 (baseline, sin filtrar) ---
-if ls reports/mini_accum/kiss_v1/*kpis__WF_*202[12]*.csv >/dev/null 2>&1; then
-  ${PY:-python3} tools/mini_accum/wf_consolidate.py \
-    --kpis_glob 'reports/mini_accum/kiss_v1/*kpis__WF_*202[12]*.csv' \
-    --out_summary 'reports/mini_accum/walkforward/wf_summary_kpis__2122.csv' \
-    --out_best    'reports/mini_accum/walkforward/wf_best_by_window__2122.csv' \
-    --out_md      'reports/mini_accum/walkforward/Roadmap_PDCA.md' \
-    --candidate   'DD15_RB1_H30_G200_BULL0' \
-    --keep_all || true
-  echo "[OK] Consolidado 21/22 (keep_all) -> wf_summary_kpis__2122.csv"
-else
-  echo "[WARN] No hay KPIs 2021/2022 en reports/mini_accum/kiss_v1/"
-fi
-
-# 🛡️ Criterios de adopción por versión
-
-	• ✅ NetBTC ≥ baseline  
-	• ✅ MDD ≤ baseline + 0.05  
-	• ✅ FPY dentro del presupuesto (≤ 26/año)  
-	• ✅ SPA / Reality Check: no rechazo al 5–10%  
-	• ✅ DSR (Deflated Sharpe Ratio) positivo y estable en todas las ventanas  
-	• ✅ No degradación de reproducibilidad ni estabilidad (OOS)  
-	• ✅ Documentación clara en docs/ y versionamiento controlado  
-	• ✅ La versión debe mostrar una mejora significativa en el rendimiento frente a la anterior.  
-	• ✅ No debe presentar drawdowns mayores a los aceptables definidos.  
-	• ✅ La estabilidad del modelo debe ser consistente en diferentes períodos de prueba.  
-
-# 🛡️ Criterios de adopción por versión
-
-• La versión debe mostrar una mejora significativa en el rendimiento frente a la anterior.  
-• No debe presentar drawdowns mayores a los aceptables definidos.  
-• La estabilidad del modelo debe ser consistente en diferentes períodos de prueba.  
-
-### 🧪 Herramientas de Validación Estadística
-
-| Herramienta                     | ¿Qué es?                                                                     | ¿Para qué sirve?                                                                                   |
-|---------------------------------|------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| SPA (Superior Predictive Ability test) | Test estadístico que compara el modelo contra alternativas nulas.           | Verifica que el modelo tiene habilidad predictiva real y no es resultado del azar.                 |
-| Reality Check (White)           | Variante más conservadora del SPA; considera múltiples comparaciones simultáneas. | Detecta si hay sobreajuste al elegir la mejor estrategia de muchas candidatas.                    |
-| DSR (Deflated Sharpe Ratio)     | Ajuste al Sharpe Ratio según el número de estrategias evaluadas.              | Previene falsos positivos al penalizar el Sharpe de estrategias seleccionadas entre muchas.       |
-
-## Sleeving prod-ready — KISS v1 (baseline: DD15_RB1_H30_G200_BULL0)
-
-### 0) Pre-flight (1 vez)
-- [ ] Tag/versión fijada: `KISSv1_BASE_20250915_1642_final`
-- [ ] Costs on: fee=6 bps, slip=6 bps (stress: 10/20 bps)
-- [ ] Freeze semanal activo (lunes, 4h UTC)
-- [ ] A/B corto al final del pipeline (normal y LEV si aplica)
-- [ ] BULL_HOLD documentado como opt-in (no baseline)
-
-### 1) Wrapper de producción (skeleton)
-- [ ] **Ingesta**: ccxt (BinanceUS), OHLCV D1/4h en UTC, sin huecos
-- [ ] **Scheduler**: cron/daemon cada 4h (ejecutar al *open* de la siguiente vela)
-- [ ] **Persistencia**: estado (`position_pct_btc ∈ {0,1}`), última señal, versión
-- [ ] **Logs**: rotación diaria + nivel DEBUG para órdenes simuladas
-- [ ] **Health**: heartbeat/latidos + watchdog (reinicio si >2 ticks sin señal)
-- [ ] **Kill-switch**: `override_mode` (PAUSA inmediata y segura)
-- [ ] **Outputs mínimos** *(contrato de integración)*:
-  - `signals/mini_accum/latest.json` → `{ts_utc, position_pct_btc, reason, version}`
-  - `reports/mini_accum/live_kpis.csv` → KPIs semanales (NetBTC vs HODL, FPY, flips)
-  - `health/mini_accum.status` → `OK|WARN|PAUSE` + timestamp
-
-**DoD wrapper**:
-- [ ] Reproducibilidad ±2–3% vs backtest semanal
-- [ ] Latencia de decisión < 30s; idempotencia de órdenes simuladas
-- [ ] Kill-switch probado (forzar PAUSA y volver a NORMAL)
-
-### 2) Paper/Testnet — 7 días
-- [ ] `RUN_MODE=paper` con costes on (6+6 bps), reloj 4h UTC
-- [ ] Alertas: flip, error ingesta, watchdog, desvío KPIs
-- [ ] Dashboard simple: estado, NetBTC vs HODL, FPY, flips
-
-**Criterios de pase a Canario**:
-- [ ] Tracking error semanal ≤ **±3%** vs backtest
-- [ ] FPY dentro de presupuesto (≤26/año; **soft 2/mes**)
-- [ ] 0 incidentes críticos (ingesta/ejecución/estado)
-
-### 3) Canario — 10–20% capital
-- [ ] Rollout con capital limitado (10–20%)
-- [ ] Freeze semanal + A/B automático
-- [ ] BULL_HOLD opt-in **manual** solo si bull tendencial fuerte
-- [ ] Guardarraíles: sin leverage, sin shorts
-
-**Criterios de ampliación (a 30–40% o integración en Corazón)**:
-- [ ] 2 semanas consecutivas con KPIs OK:
-  - NetBTC semanal ≥ HODL
-  - MDD_vs_HODL ≤ 1
-  - FPY en rango
-  - Sin alertas críticas
-
-### 4) Operación continua
-- [ ] Reporte semanal: `Estado semanal` (NetBTC, fail_rate, MDD_vs_HODL, FPY)
-- [ ] A/B corto post-pipeline (regla KISS: Δ≥+0.02 sin empeorar MDD/FPY → **revisión**)
-- [ ] SPA/RC (cuando esté listo el módulo real): **no rechazado** al 5–10%
-- [ ] PBO/CSCV y DSR permanecen en verde
-
-### 5) Rollback / Seguridad
-- [ ] `override_mode: PAUSE` documentado y probado
-- [ ] Backup diario de estado y reports
-- [ ] Runbook de recuperación (replay desde último estado consistente)
-
-### 6) Documentación
-- [ ] `docs/mini_accum/BULL_HOLD.md` (runbook)
-- [ ] `docs/Progreso.md` → sección “Estado semanal”
-- [ ] Roadmap_PDCA.md actualizado tras cada run (freezes + A/B + SPA/RC stub)
-
-## Checkpoint semanal — mini_accum KISS v1 (paper)
-Fecha run: 2025-09-18 03:11 UTC
-Datos: D1 last=2025-09-18 00:00, H4 last=2025-09-18 00:00 → FRESCOS (OK)
-Señal: position_pct_btc=1.0 (macro_green=True, trend_up=True), version=KISSv1_BASE_20250915_1642_final
-LIVE KPIs (últimas 5):
-2025-09-18T02:57:28Z,paper,BTC/USDC,1.0,3,3
-2025-09-18T03:04:30Z,paper,BTC/USDC,1.0,3,3
-2025-09-18T03:07:39Z,paper,BTC/USDC,1.0,3,3
-2025-09-18T03:08:36Z,paper,BTC/USDC,1.0,3,3
-2025-09-18T03:11:40Z,paper,BTC/USDC,1.0,3,3
-FLIPS:
-2025-09-18T01:49:48Z,0.0→1.0,test-buy
-2025-09-18T01:55:05Z,1.0→0.0,test-sell
-2025-09-18T02:12:08Z,0.0→1.0,macro_green=True,trend_up=True
-HEALTH: OK (no-op)
-
-A/B corto:
-Δ median(sats_mult)=+0.019 (< +0.02) con peor FPY en contender → mantener baseline.
-Estado paper (semana): ✅ 1/2 checkpoints OK
-
-## Paper — Semana 1 (APROBADA)
-- Checkpoints: Miércoles y Jueves 08:00 ET — ambos OK
-- Freshness: D1=2025-09-18 00:00Z, H4=2025-09-18 12:00Z (sin stale)
-- Señal: position_pct_btc=1.0 (macro_green=True, trend_up=True)
-- A/B: Δ median(sats_mult)=+0.019 (< +0.02) → mantener baseline
-- Rotación: FPY en rango; flips estables; sin errores
-- Health: OK
-**Veredicto:** Semana 1 aprobada. Siguiente: Semana 2 (Lun/Thu 08:00 ET). Si OK → canario 10–20%.
-
+**Actualizado:** 2025-10-04
 
 ---
 
-## 📌 Checkpoints Históricos — Mini‑Accum KISS v1
+# Progreso al 2025-09-09 — V1.0 (prudente‑xbuf25) y plan V2.0
 
-> Seguimiento consolidado de las evaluaciones semanales de producción (`RUN_MODE=paper`), estado del bot y decisiones de go/no-go.
+**DONE**
+- Núcleo v0.1 implementado y congelado (macro D1 EMA200, 21/55 4h, salida activa confirmada, pasiva por cruce, dwell, costes).
+- Normalización de tiempo (timestamp/ts UTC, orden y deduplicación) para evitar `KeyError: 'timestamp'` y claves duplicadas.
+- Runner y artefactos:
+  - CLI `mini-accum-backtest` operativo (start/end) + renombrado con sufijo vía `REPORT_SUFFIX` y/o script `rename_last_reports.py`.
+  - Diagnóstico de presupuesto semanal (BUY/semana, cap por semana, violaciones = 0).
+- Presupuesto dinámico por ATR (2‑verde / 1‑resto): activo y validado (sin violaciones del cap).
+- Buffer de cruce anti‑microcruces `signals.cross_buffer_bps` (probado 0/10/15/25; preset actual **xbuf25**).
+- Trazabilidad: `experiments_log.csv` + freeze de entorno (`env/requirements‑YYYYMMDD.txt`) + checksums OHLC.
+- OOS ejecutado 2022–2023 (sin violaciones de cap).
+- Tag local `v0.1-prudente-xbuf25` creado.
 
-### Semana 1 — Aprobada ✅  
-📆 Fecha: 2025‑09‑18 (jueves)  
-🧪 Checkpoints: Miércoles y Jueves 08:00 ET — ambos OK  
-🧠 Señal: `position_pct_btc=1.0` (macro_green=True, trend_up=True)  
-📈 Δ median(sats_mult)=+0.019 (< +0.02) → mantener baseline  
-📊 FPY en rango, sin errores ni incidentes  
-🔍 Health: OK  
-📂 Archivos: `checkpoints/2025-09-18_0800ET/`  
-📝 Veredicto: Semana 1 aprobada. Siguiente checkpoint: Semana 2 (Lun/Thu 08:00 ET).  
+**NOTAS DE DESEMPEÑO (últimos runs)**
+- Variantes xbuf (dinATR + dwell6): `net_btc_ratio ≈ 0.59–0.61`, `mdd_model ≈ 0.232–0.243`, `flips/año ≈ 58–69`.
+- Cumple MDD vs HODL (`≈0.75–0.80 ≤ 0.85`).
+- Aún **no cumple**: `net_btc_ratio ≥ 1.05` ni `flips/año ≤ 26` (objetivos del plan).
+
+**TODO (por prioridad)**
+1) **OOS formal** por ventanas del plan (guardar KPIs por ventana):
+   - 2022H2, 2023Q4, 2024H1 → tabla con `net_btc_ratio`, `mdd_model`, `mdd_vs_hodl`, `flips/año`.
+2) **Reducir turnover** manteniendo MDD:
+   - Ablations rápidas: dwell 4 vs 6 (actual) y xbuf 25/35.
+   - Probar confirmación de salida más estricta (p. ej. `confirm_bars=2`) y/o *macro_persist* (N días > EMA200).
+   - Enforzar **hard 26/año** en CLI (ya está en core sim; exponer `flips_blocked_hard` en summary).
+3) **Módulos opt‑in** (ablation con KPIs OOS):
+   - ATR “pausa amarilla” (slim): debe bajar flips ≥10% o MDD ≥10% con `net_btc_ratio ≈`.
+   - Grace TTL: cooldown suave tras flip; objetivo: turnover −10% con ratio ≈.
+   - Hibernación por *chop* (≥2 cruces 21/55 en 40 barras).
+4) Documentar preset “prudente‑xbuf25” en el plan (snippet YAML) y dejar BASE separado.
+5) Integración final del sufijo en CLI (`--suffix`) y remover duplicado de `_rename_last_reports` en el runner.
+6) CI mínima (lint + test de humo) y tests de I/O/EMA/merge D1→4h.
+7) Git remoto y push del tag (o crear …‑r1 si re‑anclas).
+8) Resumen de KPIs en markdown: incluir `flips_blocked_hard` y deltas vs baseline.
+
+**Presets**
+- Preset actual (**prudente‑xbuf25**): dinATR (2/1), dwell=6, `cross_buffer_bps=25`, `yb=5`, `p=40`.  
+  *Objetivo:* bajar aún más flips/año **sin romper MDD**; mejorar `net_btc_ratio` hacia **1.05**.
+
+---
+
+## Resumen ejecutivo (V1.0)
+
+✅ **DONE**
+- Core v0.1 congelado y replicable.
+- Sufijo de reportes automatizado + diagnóstico de cap semanal.
+- Din‑ATR (2/1) funcionando, sin violaciones.
+- Anti‑microcruces (xbuf25) incorporado.
+- Logging, freeze, checksums; OOS 2022–2023 corrido.
+
+🔜 **TO‑DO (acción inmediata)**
+1) Correr OOS por ventanas del plan y tabular KPIs.
+2) Ablations para bajar flips: dwell 6→4/8 y xbuf 25→35.
+3) Probar *macro_persist* ligero (ej. 1–2 días > EMA200) y/o `confirm_bars=2`.
+4) Exponer `flips_blocked_hard` en el summary y consolidar `--suffix` en CLI.
+5) Push remoto + tag.
+
+### TODO (próxima sesión)
+- GitHub (SSH): terminar alta de clave y cambiar remoto a SSH; luego `git push` y `git push --tags`.
+- OOS formal: correr ventanas 2022H2 / 2023Q4 / 2024H1 con preset prudente xbuf25 y registrar KPIs.
+- CLI: integrar `--suffix` directo en `mini_accum/cli.py` (ahora lo cubre `rename_last_reports.py`).
+- Tests: *smoke* de weekly cap (BUY≤cap) y de `cross_buffer_bps`.
+- Docs: reflejar `cross_buffer_bps` en plan y YAML (xbuf25) y resultados de ablation xbuf0/10/15/25.
+
+**¿Cómo vamos?**
+- Infra/packaging & reproducibilidad: **~85%**  
+  Paquete instalable, CLI funcionando, runner con sufijo (rename), logging de experimentos, freeze de entorno, comprobaciones de datos, weekly cap dinámico por ATR y `cross_buffer_bps` activos.
+- Core v0.1 (reglas congeladas): **~90%**  
+  Macro D‑1, 21/55 4h, salida activa confirmada, dwell, costes, presupuesto hard.
+- Validación cuantitativa (ablation + OOS): **~30–40%**  
+  Corridas 2024–2025 y 2022–2023 hechas; falta batería OOS formal (2022H2 / 2023Q4 / 2024H1), consolidar KPIs y anotar en el log.
+- Docs/CI/tests: **~40%**  
+  Plan y progreso empezados; faltan tests unitarios (cap semanal, cross buffer, integridad datos) y CI simple.
+
+**Progreso global aproximado:** ~**60%** del proyecto v0.1 “prudente”.
+
+---
+
+## ¿Rinde? (honesto y directo)
+- Con el preset prudente (dyn‑ATR + dwell=6 + xbuf=25) los últimos KPIs que mostraste están en `net_btc_ratio ≈ 0.60–0.61` y `MDD_model ≈ 0.23` vs HODL `0.306` (≈ **−24%** de MDD frente a HODL).
+- Qué pasa: Mejoramos el drawdown (bien), pero no superamos HODL y el *turnover* anual sigue por encima del soft/hard (`≈57–70/año` vs **26** objetivo).
+- **Conclusión hoy:** 1/3 de umbrales pasa (MDD ✔️), pero `Net_BTC_ratio` y `flips/año` no. Aún no es un bot “rentable vs HODL” según el criterio del plan.
+
+**No doy plazos.** El bloque crítico es la batería OOS + ajustes de flips; cuando eso pase umbrales, el resto (docs/tests/CI) es ejecución.
+
+---
+
+## Recomendación práctica (mañana)
+- Correr OOS con el preset actual y guardar KPIs en `experiments_log.csv`.
+- Probar `yb=5` (amarillo más ancho) y `dwell=8` (o `xbuf=15`) para intentar −10–20% flips manteniendo MDD ≈.
+- Registrar todo (rename con sufijo) y actualizar `docs/mini_accum/Progreso.md`.
+
+---
+
+> ℹ️ **Nota**: La siguiente sección (V1.1 y posteriores) ya existía. Se mantiene intacta y continúa debajo.
+---
+
+# 2025-10-03 Mini-Accum V1.1 — SL/TP defensivo (ATR) · Promoción a canario (opt-in)
+
+**Resumen**
+- Método: ATR(14). SL=2×ATR, TP=3×ATR, TTL reentry configurable.
+- Costes: CORE_2025.
+- Ventanas evaluadas: 2025-Q3 (neutro), 2023-08 mini-crash (se activa).
+
+**Resultados clave**
+- 2025-Q3: Δmult=+0.0000, ΔROI_anual=0.00%, ΔFPY=0 → sin impacto (OK).
+- 2023-08: Δmult≈–0.0068 (PASS), ΔROI_anual≈–3.41% (FAIL SLO estricto),
+  ΔMDD ↓ (mejora), ΔFPY ≈ +6/año (**FAIL** vs +2/año).
+
+**SLO**
+- Pérdida acotada: Δmult ≥ –0.010 ✅ ; ΔROI_anual ≥ –0.03 ❌ (–0.0341)
+- Riesgo: ΔMDD ≤ 0 ✅ ; ΔFPY ≤ +2 ❌ (≈ +6/año)
+- SPA/Reality-Check: pendiente (criterio PASS ≥ 0.60)
+
+**Decisión**
+- Promover a **canario opt-in**, con guardrails:
+  - ΔMDD(30d) > 0 → rollback
+  - ΔFPY(30d) > +2 → rollback
+  - ΔROI_anual(30d) < –4.0% → rollback
+  - Mantener CORE sin cambios hasta SPA/RC ≥ 0.60 y 1–2 semanas sin violar guardrails.
+
+### Tabla SLO por ventana
+
+| Ventana (BTC-USD 4h) | Config CAND | Δmult | ΔROI_anual | ΔMDD | ΔFPY | SLO |
+|---|---|---:|---:|---:|---:|---|
+| 2025-07-01 → 2025-09-13 (Q3-2025) | CORE_2025 + ATR(14) ×{2.5,3.0,3.5,4.0} | +0.0000 | +0.00% | ≈ 0 | 0 | **PASS** |
+| 2023-08-01 → 2023-09-30 (mini-crash) | CORE_2025 + **SL=2×ATR**, TP=3×ATR (post) | −0.0068 | −3.41% | ↓ (mejora) | ≈ **+6/año** | **MIXED** (falla ΔROI_anual y ΔFPY) |
+
+> Nota: ΔMDD exacto puede verificarse con el snippet de MDD de más abajo usando las rutas de “Datos usados”.
+
+### Datos usados (reproducibilidad)
+
+**Q3-2025 (2025-07-01 → 2025-09-13)**
+- Equity base (CORE): `reports/mini_accum/base_v0_1_20251004_0650_equity__CORE_2025.csv`
+- Equity CAND (ATR×3.0): `reports/mini_accum/base_v0_1_20251004_0650_equity__CORE_2025_ATR14x3_0.csv`
+- Flips base: `reports/mini_accum/base_v0_1_20251004_0650_flips__CORE_2025.csv`
+- Flips CAND: `reports/mini_accum/base_v0_1_20251004_0650_flips__CORE_2025_ATR14x3_0.csv`
+
+**Ago-2023 (2023-08-01 → 2023-09-30)**
+- Equity base (CORE): `reports/mini_accum/base_v0_1_20251004_0731_equity__CORE_2025.csv`
+- Equity post (SL=2×ATR, TP=3×ATR): `reports/mini_accum/post_20251004_032956_equity____ATR2x3_post.csv`
+- Flips base: `reports/mini_accum/base_v0_1_20251004_0729_flips__CORE_2025.csv`
+- Flips post: `reports/mini_accum/post_20251004_032956_flips____ATR2x3_post.csv`
+- Overlay usado: `configs/mini_accum/presets/_kt_tmp/SLTP_overlay_ATR14_SL2_TP3.yaml`
+
+### Snippet KISS para capturar rutas automáticamente
+
+```zsh
+setopt extendedglob nullglob
+# Q3-2025
+BASE_EQ_Q3=(reports/mini_accum/*_equity__CORE_2025.csv(NOm[1]))
+CAND_EQ_Q3=(reports/mini_accum/*_equity__CORE_2025_ATR14x3_0.csv(NOm[1]))
+BASE_FLIPS_Q3=(reports/mini_accum/*_flips__CORE_2025.csv(NOm[1]))
+CAND_FLIPS_Q3=(reports/mini_accum/*_flips__CORE_2025_ATR14x3_0.csv(NOm[1]))
+
+# Ago-2023 (post)
+BASE_EQ_AUG=(reports/mini_accum/*_equity__CORE_2025.csv(NOm[1]))
+POST_EQ_AUG=(reports/mini_accum/post_*_equity__*__ATR2x3_post.csv(NOm[1]))
+BASE_FLIPS_AUG=(reports/mini_accum/*_flips__CORE_2025.csv(NOm[1]))
+POST_FLIPS_AUG=(reports/mini_accum/post_*_flips__*__ATR2x3_post.csv(NOm[1]))
+
+print -r -- "$BASE_EQ_Q3"; print -r -- "$CAND_EQ_Q3"
+print -r -- "$BASE_EQ_AUG"; print -r -- "$POST_EQ_AUG"
+[[ -s "$BASE_EQ_Q3" && -s "$CAND_EQ_Q3" && -s "$BASE_EQ_AUG" && -s "$POST_EQ_AUG" ]] || echo "[ERR] faltan equities"
+```
+
+**Acciones recomendadas**
+- Probar ATR SL=**2.5×** (TP=3×) **o** `reentry_ttl=8–12` velas para reducir ΔFPY sin degradar MDD.
+- Mantener los guardrails canario; promover a CORE solo si SPA/RC ≥ 0.60 y ΔFPY(30d) ≤ +2.
+
+**Repro**
+- `sltp_post.py` y comandos de métricas incluidos en el PR.
+
+- Chequeo rápido de MDD (robusto a rutas vacías):
+```python3 - "$BASE_EQ" "$POST_EQ" 2023-08-01 2023-09-30 <<'PY'
+import sys, os, pandas as pd
+def s(p):
+    if not p or not os.path.exists(p): 
+        print(f"[ERR] no existe: {p!r}", file=sys.stderr); sys.exit(2)
+    df=pd.read_csv(p); ts=pd.to_datetime(df.get('timestamp',df.get('ts')), utc=True)
+    eq=df.get('equity_btc', df.get('equity')); return pd.Series(eq.values, index=ts).dropna()
+b=s(sys.argv[1]).loc[sys.argv[3]:sys.argv[4]]
+p=s(sys.argv[2]).loc[sys.argv[3]:sys.argv[4]]
+f=lambda x: (x/x.cummax()-1).min()
+print(f"MDD_base={f(b):.2%} | MDD_post={f(p):.2%} | ΔMDD={f(p)-f(b):+.2%}")
+PY
+```
+
+### Checklist exprés para cerrar V1.1
+- Re-ejecuciones **limpias** de **Q3-2024** y **Q2-2025** con **sufijos únicos por ventana** (evita NaN/mismatch).
+- **SPA/Reality-Check** en **Ago-2023** y **Q3-2024** (criterio PASS ≥ 0.60).
+- **PR final**: overlays congelados, guardrails canario, flag `V1_1_SLTP_DEFENSIVE`, tag `mini-accum-v1.1-canary` y changelog breve.
+
+---
+
+## V1.0 — Resumen y aprendizajes (restaurar/pegar aquí)
+**Histórico:** [Ver histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado)
+
+> ⚠️ Este bloque consolida el progreso de **V1.0**. Si ya recuperaste el histórico, pégalo aquí o en `docs/mini_accum/Progreso_HISTORICO.md` y enlázalo.
+
+**Objetivo / alcance (V1.0)**
+- [Pendiente de restaurar → ver histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado)
+
+**KPIs (baseline V1.0)**
+- [Δmult, ROI anual, MDD, FPY, ventanas evaluadas].
+- Fuente: ver histórico V1.0 (equities/flips)
+
+**Decisiones cerradas**
+- [lista desde histórico]
+
+**Lecciones y pendientes para V2.0**
+- [lista desde histórico]
+
+
+## V2.0 — Estado y gaps
+**Histórico:** [Ver histórico V2.0](Progreso_HISTORICO.md#v20--histórico-recuperado)
+
+**Meta V2.0 (tentativa)**
+- [definir aquí el objetivo de V2.0 con una o dos frases]
+
+**Gaps vs V1.1**
+- [añade puntos concretos que faltan respecto a V1.1]
+
+**Experimentos planificados**
+- [ ] SPA/RC multisets (Ago-2023, Q3-2024) — criterio PASS ≥ 0.60
+- [ ] Afinado SL ATR **2.5×** (TP=3×) y/o `reentry_ttl=8–12` — meta: ΔFPY ≤ +2/año sin empeorar MDD
+- [ ] Barridos adicionales de ventanas con chop
+- [ ] Seguimiento canario 30d con guardrails (ΔMDD ≤ 0, ΔFPY ≤ +2, ΔROI_anual ≥ −4%)
+
+
+## Plan de trabajo comparativo (V1.0 → V1.1 → V2.0)
+
+| Área | V1.0 | V1.1 (actual) | Target V2.0 | Estado / próximas acciones |
+|---|---|---|---|---|
+| SL/TP | [histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) | ATR(14), **SL=2×**, **TP=3×**, `fix_on_entry` | Evaluar **SL=2.5×**; `reentry_ttl=8–12` | En canario; medir ΔFPY y MDD 30d |
+| Consistencia (SPA/RC) | [histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) | **Pendiente** (PASS ≥ 0.60) | PASS multisets | Correr SPA/RC en Ago-2023 y Q3-2024 |
+| Rotación (FPY) | [histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) | ≤ baseline en Q3-2025; ~**+6/año** en Ago-2023 | ≤ baseline **+2/año** | Test TTL y SL 2.5× |
+| Drawdown (MDD) | [histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) | ↓ (mejora) en Ago-2023 | ≤ baseline | Seguimiento canario 30d |
+| Operativa / módulos | [histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) | Sin impacto en Q3-2025 | Estabilidad en chop | Barridos adicionales |
+
+> Cuando recuperes el histórico, reemplaza los campos `[restaurar]` con datos exactos y añade enlaces a los reportes/artefactos correspondientes.
+
+### Histórico anterior (restaurar)
+> Este archivo fue sobrescrito con el bloque de V1.1. Para **recuperar TODO lo que había antes** y mantenerlo junto con lo nuevo, usa cualquiera de estos métodos y pega aquí el contenido recuperado (o guárdalo como `docs/mini_accum/Progreso_HISTORICO.md` y enlázalo).
+
+#### Opción A — Git (recomendado)
+```bash
+# mostrar la versión previa (un commit antes de HEAD)
+git show HEAD^:docs/mini_accum/Progreso.md > /tmp/Progreso_old.md
+
+# si quieres una versión de una fecha o commit específico:
+git log -- docs/mini_accum/Progreso.md
+git show &lt;commit&gt;:docs/mini_accum/Progreso.md > docs/mini_accum/Progreso_HISTORICO.md
+
+# abrir diff para merge manual
+git difftool --no-prompt HEAD -- docs/mini_accum/Progreso.md
+```
+
+#### Opción B — PyCharm Local History
+1. Click derecho sobre `docs/mini_accum/Progreso.md` → **Local History** → **Show History**.  
+2. Selecciona la versión anterior y **Revert/Copy** su contenido.
+3. Péga el histórico en esta sección o crea `Progreso_HISTORICO.md`.
+
+> Una vez pegado, conserva estructura:
+> - `## Histórico hasta YYYY-MM-DD` (contenido previo)
+> - `## 2025-10-03 Mini-Accum V1.1 …` (bloque nuevo)
+
+---
