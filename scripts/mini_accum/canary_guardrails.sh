@@ -12,38 +12,52 @@ PREFERRED_SUFFIXES="${PREFERRED_SUFFIXES:-}"
 
 latest() { local pat="$1"; ls -1t ${pat} 2>/dev/null | head -n1 || true; }
 
-discover() {
-  local want_atr="$1" # "yes" para cand, "no" para base
-  local kind="$2"     # "equity" | "flips"
-  local suf
-  IFS=' ' read -r -a sufs <<< "${PREFERRED_SUFFIXES:-}"
-  if [[ ${#sufs[@]} -eq 0 ]]; then
-    sufs=( "__Q2_2025_ATR2x3" "__Q2_2025" "__Q3_2024_ATR2x3" "__Q3_2024" "__CORE_2025_ATR14x2_0" "__CORE_2025" )
+# --- discovery por sufijos (respeta PREFERRED_SUFFIXES) ---
+IFS=' ' read -r -a SUFS <<< "${PREFERRED_SUFFIXES:-}"
+
+_pick_equity() { # $1=role base|cand -> echo filepath or empty
+  local role="$1" suf f=""
+  if ((${#SUFS[@]})); then
+    for suf in "${SUFS[@]}"; do
+      # suf debe incluir su "__..." completo; el patrón NO añade "__"
+      # base: evitar sufijos con ATR; cand: requerir ATR
+      if [[ "$role" == "base" && "$suf" == *ATR* ]]; then continue; fi
+      if [[ "$role" == "cand" && "$suf" != *ATR* ]]; then continue; fi
+      f=$(latest "reports/mini_accum/*_equity${suf}.csv")
+      [[ -n "$f" ]] && { echo "$f"; return; }
+    done
   fi
-  for suf in "${sufs[@]}"; do
-    if [[ "$want_atr" == "yes" && "$suf" != *ATR* ]]; then continue; fi
-    if [[ "$want_atr" == "no"  && "$suf" == *ATR* ]]; then continue; fi
-    local pick
-    if [[ "$kind" == "equity" ]]; then
-      pick=$(latest "reports/mini_accum/*_equity__${suf}.csv")
-    else
-      pick=$(latest "reports/mini_accum/*_flips__${suf}.csv")
-    fi
-    [[ -n "$pick" ]] && { echo "$pick"; return 0; }
-  done
-  # Fallbacks
-  if [[ "$kind" == "equity" ]]; then
-    [[ "$want_atr" == "yes" ]] && latest "reports/mini_accum/*_equity__CORE_2025_ATR14x2_0.csv" || latest "reports/mini_accum/*_equity__CORE_2025.csv"
+  # Fallbacks CORE
+  if [[ "$role" == "base" ]]; then
+    latest "reports/mini_accum/*_equity__CORE_2025.csv"
   else
-    [[ "$want_atr" == "yes" ]] && latest "reports/mini_accum/*_flips__CORE_2025_ATR14x2_0.csv" || latest "reports/mini_accum/*_flips__CORE_2025.csv"
+    latest "reports/mini_accum/*_equity__CORE_2025_ATR14x2_0.csv"
   fi
 }
 
+_pick_flips() { # $1=role base|cand
+  local role="$1" suf f=""
+  if ((${#SUFS[@]})); then
+    for suf in "${SUFS[@]}"; do
+      if [[ "$role" == "base" && "$suf" == *ATR* ]]; then continue; fi
+      if [[ "$role" == "cand" && "$suf" != *ATR* ]]; then continue; fi
+      f=$(latest "reports/mini_accum/*_flips${suf}.csv")
+      [[ -n "$f" ]] && { echo "$f"; return; }
+    done
+  fi
+  if [[ "$role" == "base" ]]; then
+    latest "reports/mini_accum/*_flips__CORE_2025.csv"
+  else
+    latest "reports/mini_accum/*_flips__CORE_2025_ATR14x2_0.csv"
+  fi
+}
+# --- /discovery por sufijos ---
+
 # Descubrimiento (si no vienen por ENV)
-[[ -z "$BASE_EQ"    ]] && BASE_EQ="$(discover no  equity)"
-[[ -z "$CAND_EQ"    ]] && CAND_EQ="$(discover yes equity)"
-[[ -z "$BASE_FLIPS" ]] && BASE_FLIPS="$(discover no  flips)"
-[[ -z "$CAND_FLIPS" ]] && CAND_FLIPS="$(discover yes flips)"
+[[ -z "$BASE_EQ"    ]] && BASE_EQ="$(_pick_equity base)"
+[[ -z "$CAND_EQ"    ]] && CAND_EQ="$(_pick_equity cand)"
+[[ -z "$BASE_FLIPS" ]] && BASE_FLIPS="$(_pick_flips base)"
+[[ -z "$CAND_FLIPS" ]] && CAND_FLIPS="$(_pick_flips cand)"
 
 echo "[DEBUG] BASE_EQ=$BASE_EQ"
 echo "[DEBUG] CAND_EQ=$CAND_EQ"
