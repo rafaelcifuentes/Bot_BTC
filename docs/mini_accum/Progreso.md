@@ -186,3 +186,6 @@
 - Mantener CORE sin cambios hasta cumplir SPA/RC ≥ 0.60 y 1–2 semanas sin violar guardrails.
 - Documentar en cada PR: rutas de equities/flips usadas, overlays congelados y changelog.
 - 2025-10-05: V1.0 Shadow Certified (sin canario). Baseline de referencia congelado para evaluación de V1.1.
+## Progreso Mini-Accum KISS
+
+- 2025-10-05: V1.0 Shadow Certified (sin canario). Baseline de referencia congelado para evaluación de V1.1.
