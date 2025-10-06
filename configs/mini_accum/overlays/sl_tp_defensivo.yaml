@@ -1,10 +1,21 @@
-modules:
-  sl_tp_defensivo:
-    enabled: false
-    atr_period: 14
-    k_sl: 2.5
-    k_tp: 4.0
-    use_breakeven_after_tp1: true
-    smooth_atr_with_ema: true
-    respect_ttl_after_exit: true
-    disable_tp_if_bull_hold: true
+# Mini-Accum KISS v1.1 — Overlay SL/TP defensivo (conservador)
+meta:
+  name: "sl_tp_defensivo"
+  version: "v1.1"
+  desc: "SL conservador (ATR14*2.0), TP moderado (ATR14*3.5); sin leverage, sin short"
+
+# Guardarraíles (no tocar la esencia KISS)
+risk:
+  leverage: 1.0          # sin leverage
+  allow_short: false     # no shorts
+
+# SL/TP defensivo (ATR)
+sl_tp:
+  enabled: true
+  atr_period: 14
+  stop_loss_mult: 2.0    # SL suave
+  take_profit_mult: 3.5  # TP moderado
+  trailing: false        # opcional (v1.1 posterior)
+
+# Integridad KISS intacta
+preserve_kiss: true
