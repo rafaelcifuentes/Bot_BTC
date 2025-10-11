@@ -1,0 +1,17 @@
+# Preset candidato V1.1 (KISS + SL/TP defensivo)
+meta:
+  title: "CORE_2025 V1.1 candidate"
+  version: "v1.1-candidate"
+  note: "KISS baseline + overlay SL/TP defensivo; sin leverage, sin short"
+
+base_preset: "configs/mini_accum/presets/CORE_2025.yaml"  # baseline v1.0 estable
+
+overlays:
+  - "configs/mini_accum/overlays/sl_tp_defensivo.yaml"
+
+# Regla de gobernanza para A/B:
+# Promover a revisión si Δ median(sats_mult) ≥ +0.02 sin empeorar median_mdd_vs_hodl ni median_fpy
+ab_gate:
+  delta_sats_min: 0.02
+  no_worse_mdd: true
+  no_worse_fpy: true

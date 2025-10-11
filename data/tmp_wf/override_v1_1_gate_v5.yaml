@@ -1,0 +1,29 @@
+cat > data/tmp_wf/override_v1_1_gate_v5.yaml <<'YML'
+signals:
+  ema_fast: 21
+  ema_slow: 55
+
+gates_v2:
+  hard_inhibitors:
+    adx_min: 42                  # endurece entrada (menos flips en rango)
+  cooldown_after_loss:
+    cooldown_bars_4h: 6          # pausa tras pérdidas
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 8  # mínimo de velas entre flips (4h)
+
+exits:
+  active:
+    confirm_bars: 3
+    max_wait_bars_after_confirm: 1
+
+modules:
+  atr_regime:
+    enabled: true
+    percentile_p: 88
+
+costs:
+  fee_bps_per_side: 3
+  slip_bps_per_side: 2
+  spread_bps: 10
+YML
