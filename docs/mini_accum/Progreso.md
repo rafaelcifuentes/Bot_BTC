@@ -345,3 +345,10 @@ Leyenda prob.: **Alta (≥70%)**, **Media (40–60%)**, **Baja (≤30%)**.
 - Cands: SLTP 10×30 y 12×40 → sats=0.903167, mdd_vs_hodl=0.394118, flips=5.
 - Lift vs base: -20.67% (req. ≥ +5%). MDD mejora, pero falla criterio de éxito (NetBTC/SATS).
 - Acción: mantener KISS v1 BASE en PROD; overlays SLTP **OFF** (experimento).
+
+## 2025-10-11 — Cierre v1.2 y Release PROD
+- v1.2 (SLTP 10×30, 12×40) → FAIL (lift ~ –20.67%).
+- Se congela KISS v1 BASE (RB1/H30/G200/BULL0) en PROD.
+- Tag release: 
+- Gate queda como guardián por defecto (≥ +5%, MDD ≤ base; robustez si aplica).
+- Añadido assert_kpi_has_sats para evitar falsos positivos.
