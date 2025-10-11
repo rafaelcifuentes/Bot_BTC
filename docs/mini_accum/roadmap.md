@@ -37,6 +37,25 @@ status: "CANÓNICO"
 - risk_sizing_by_score
 - exit_atr_guardrail
 - dca_adaptativo
+
+## 📏 Cómo medimos éxito (KPIs canónicos)
+- **NetBTC (sats_mult) vs HODL** — fuente única de verdad para ROI en satoshis.
+- **MDD vs HODL** — comparamos magnitud y deltas; no aceptamos empeorar el riesgo.
+- **FPY (flips por año)** — control de sobre‑operación.
+- **SPA / Reality Check** — promovemos solo si **p_consistent ≥ 0.60**.
+- (Opcional, estricto) **Robustez** — Spearman ≥ 0.95 y PBO ≤ 0.30.
+
+### Regla de oro ACCUM
+> Si no supera HODL en NetBTC (a igual o menor riesgo), **no se promueve**.
+
+### Filosofía del Bot
+“No predecimos el mercado. Solo actuamos cuando hay consenso técnico claro y confirmación macro.
+No operamos por operar. No acumulamos pérdidas, acumulamos satoshis.”
+
+### Gate de promoción (KISS)
+- Requisito de **lift**: ΔNetBTC ≥ **+5%** vs base.
+- **Riesgo**: no empeorar MDD ni FPY.
+- **Trazabilidad**: snapshot WF/OOS + one‑pager antes de etiquetar PROD.
 - pullback_entry
 - trailing_exit_bull
 - confirmations_rsi_bias
