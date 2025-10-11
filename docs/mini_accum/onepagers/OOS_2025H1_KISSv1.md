@@ -37,3 +37,8 @@
 - OOS 2025H1: sats_mult=1.138462 (+13.85% 6m), mdd_vs_hodl=0.741494, flips=2
 - Overlay SL/TP 12×24: lift=+0.00%, MDD Δ=0.000000 → **FAIL gate (≥+5% requerido)**
 - Acción: mantener v1 base en PROD; SL/TP queda **OFF (experimento)**.
+
+## 2025-10-11 — KISS v1 (RB1/H30) mantiene liderazgo
+- v1.1 (H29/H31/RB2): lift ≤ 0% → FAIL gate (≥+5%).
+- v1.2 (SL/TP estático): sin candidatos válidos; 12×24 = +0.00% → queda OFF.
+- Decisión: conservar v1 base en PROD (DD15/RB1/H30/G200/BULL0).
