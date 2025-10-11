@@ -339,3 +339,9 @@ Leyenda prob.: **Alta (≥70%)**, **Media (40–60%)**, **Baja (≤30%)**.
 ## 2025-10-11 — v1.2 (SL/TP estático) aparcado
 - Faltan helpers (mk_overlay/merge_cfg) y no hubo sufijo SLTP en artefactos.
 - Decisión: mantener v1 base en PROD; overlays quedan en **experimento**.
+
+## 2025-10-11 — v1.2 (SL/TP estático) A/B OOS 2025H1 → FAIL gate
+- Base: RB1/H30/G200/DD15/BULL0 → sats=1.138462, mdd_vs_hodl=0.741494, flips=2.
+- Cands: SLTP 10×30 y 12×40 → sats=0.903167, mdd_vs_hodl=0.394118, flips=5.
+- Lift vs base: -20.67% (req. ≥ +5%). MDD mejora, pero falla criterio de éxito (NetBTC/SATS).
+- Acción: mantener KISS v1 BASE en PROD; overlays SLTP **OFF** (experimento).
