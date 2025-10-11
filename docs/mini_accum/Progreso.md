@@ -1,4 +1,5 @@
->> Atajos: [Ver histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) · [Ver histórico V2.0](Progreso_HISTORICO.md#v20--histórico-recuperado)
+<file name=Progreso.md path=docs/mini_accum>
+>>> Atajos: [Ver histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) · [Ver histórico V2.0](Progreso_HISTORICO.md#v20--histórico-recuperado)
 
 # Progreso al 2025-09-09 — V1.0 (prudente‑xbuf25) y plan V2.0
 
@@ -189,3 +190,33 @@
 ## Progreso Mini-Accum KISS
 - 2025-10-05: V1.0 Shadow Certified (sin canario). Baseline de referencia congelado para evaluación de V1.1.
 - 2025-10-06 v1.1 listo para A/B y canario
+
+## 2025-10-11 — Decisión KISS v1 (RB1/H30/G200/DD15/BULL0): mantener BASE
+
+**OOS 2025H1 — BASE canónica:**  
+- sats_mult = 1.138462  (≈ +13.85% en 6m)  
+- mdd_vs_hodl = 0.741494  
+- flips_total = 2  
+
+**Overlays estáticos v1.2 (10×30 y 12×40) — OOS 2025H1:**  
+- sats_mult ≈ 0.903167  → **lift ≈ −20.67% vs BASE**  
+- mdd_vs_hodl ≈ 0.394  (mejor riesgo), flips ≈ 5  
+- Gate: **FAIL** (requerido lift ≥ +5% y MDD ≤ BASE)
+
+**v1.1 (H29/H31 y/o RB2):** lift ≤ 0% o negativo → **FAIL**.
+
+**Acción:** mantener **KISS v1 BASE** en PROD; overlays quedan **OFF** (experimento).  
+**Regla de oro ACCUM:** promover solo si NetBTC &gt; HODL **al mismo o menor MDD**.
+</file>
+## 2025-10-11 — Decisión: mantener **KISS v1 BASE**; overlays OFF
+- **Base OOS 2025H1 (DD15/RB1/H30/G200/BULL0)**:
+  - sats_mult = 1.138462  (≈ +13.85% en 6m)
+  - mdd_vs_hodl = 0.741494
+  - flips_total = 2
+- **Overlays estáticos (10×30 y 12×40) OOS 2025H1**:
+  - sats_mult ≈ 0.903167  → lift ≈ -20.67% vs base  ❌
+  - mdd_vs_hodl ≈ 0.394  (mejor riesgo), flips ≈ 5
+  - Gate: **FAIL** (lift < +5% ⇒ no promueve, aunque el MDD mejore)
+- **v1.1 (H29/H31 y/o RB2)**: lift ≤ 0% o negativo → **FAIL**.
+- **Acción**: mantener **RB1/H30/G200/DD15/BULL0** en PROD; overlays quedan **OFF**.
+- **Regla de oro ACCUM**: promover solo si NetBTC > HODL **al mismo o menor MDD**.
