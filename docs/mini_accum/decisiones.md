@@ -38,3 +38,7 @@
 - BASE OOS 2025H1: sats=1.138462, mdd_vs_hodl=0.741494, flips=2
 - v1.2 WF_2025:     sats=0.917246, mdd_vs_hodl=0.394118, flips=9
 - Lift vs BASE: –19.43% (req. ≥ +5%). Acción: mantener BASE; v1.2 OFF.
+
+## 2025-10-11 — Gate v1.2 vs BASE (WF_2025)
+- BASE OOS 2025H1: sats=1.138462; CAND v1.2 WF_2025: sats=0.917246
+- Lift: –19.43%  → FAIL (umbral +5%); acción: mantener BASE; v1.2 OFF
