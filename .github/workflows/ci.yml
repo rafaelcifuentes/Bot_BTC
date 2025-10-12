@@ -1,24 +1,58 @@
-name: ci
+name: CI
 on: [push, pull_request]
+
 jobs:
-  test:
+  test-and-kpis:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Python para lint/tests y (opcional) para pandas/numpy de helpers
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - name: Install package
+        with:
+          python-version: '3.11'
+
+      - name: Install zsh
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Create venv & install deps
         run: |
           python -m venv .venv
           source .venv/bin/activate
+          python -V
           pip install -U pip
+          # deps del paquete + herramientas
           pip install -e packages/mini_accum
           pip install pytest ruff
+          # deps usados por helpers.zsh (assert_kpi_has_sats usa pandas/numpy)
+          pip install pandas numpy
+
       - name: Lint
         run: |
           source .venv/bin/activate
           ruff check packages/mini_accum/src
+
       - name: Tests
         run: |
           source .venv/bin/activate
           pytest packages/mini_accum/tests -q
+
+      # --- Checks operativos del bot (KISS CI) ---
+      - name: KPI sanity (anti-NaN)
+        shell: zsh {0}
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          [[ -f scripts/mini_accum/helpers.zsh ]] && source scripts/mini_accum/helpers.zsh
+          [[ -x scripts/ci/check_kpis.sh ]] || chmod +x scripts/ci/check_kpis.sh
+          scripts/ci/check_kpis.sh
+
+      - name: Gate latest (no bloqueante)
+        shell: zsh {0}
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          [[ -f scripts/mini_accum/helpers.zsh ]] && source scripts/mini_accum/helpers.zsh
+          [[ -x scripts/ci/gate_latest.sh ]] || chmod +x scripts/ci/gate_latest.sh
+          # Quita "|| true" si quieres que el gate falle el CI cuando no pasa
+          scripts/ci/gate_latest.sh || true
