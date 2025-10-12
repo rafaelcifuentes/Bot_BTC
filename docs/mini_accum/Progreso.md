@@ -370,3 +370,4 @@ Leyenda prob.: **Alta (≥70%)**, **Media (40–60%)**, **Baja (≤30%)**.
 ## 2025-10-11 — Gate v1.2 vs BASE (WF_2025)
 - BASE OOS 2025H1: sats=1.138462; CAND v1.2 WF_2025: sats=0.917246
 - Lift: –19.43%  → FAIL (umbral +5%); acción: mantener BASE; v1.2 OFF
+[INFO] WF_2022 y WF_2023 quedan pendientes por datos (skip intencional)
