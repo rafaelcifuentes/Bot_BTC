@@ -361,3 +361,8 @@ Leyenda prob.: **Alta (≥70%)**, **Media (40–60%)**, **Baja (≤30%)**.
 - v1.2 WF 2025: sats=0.917246, mdd_vs_hodl=0.394118, flips=9.
 - Lift vs BASE: –19.43% (req. ≥ +5%). MDD mejora, pero no cedemos sats → **NO PROMOVER**.
 - Acción: v1.2 **OFF**; mantener **KISS v1 BASE** en PROD.
+
+## 2025-10-11 — v1.2 (WF_2025) FAIL gate
+- BASE OOS 2025H1: sats=1.138462, mdd_vs_hodl=0.741494, flips=2
+- v1.2 WF_2025:     sats=0.917246, mdd_vs_hodl=0.394118, flips=9
+- Lift vs BASE: –19.43% (req. ≥ +5%). Acción: mantener BASE; v1.2 OFF.
