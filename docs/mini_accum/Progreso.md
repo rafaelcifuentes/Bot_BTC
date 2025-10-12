@@ -352,3 +352,6 @@ Leyenda prob.: **Alta (≥70%)**, **Media (40–60%)**, **Baja (≤30%)**.
 - Tag release: 
 - Gate queda como guardián por defecto (≥ +5%, MDD ≤ base; robustez si aplica).
 - Añadido assert_kpi_has_sats para evitar falsos positivos.
+
+## 2025-10-11 — v1.2 (WF 2022/2023/2025) ejecutado
+- Tabla NetBTC por ventana (objetivo ≥1.0). Gate OOS 2025H1 vs BASE si disponible.
