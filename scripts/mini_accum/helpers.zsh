@@ -1,95 +1,178 @@
-kiss_top(){ local p="$1" top="${2:-20}";
-python3 - "$p" "$top" <<'PY'
-import sys,glob,pandas as pd
-pat=sys.argv[1]; top=int(sys.argv[2])
-rows=[]
-for f in sorted(glob.glob(pat)):
-    try: df=pd.read_csv(f,nrows=1)
-    except Exception as e: 
-        print(f"[WARN] no pude leer {f}: {e}", file=sys.stderr); 
-        continue
-    r=df.iloc[0].to_dict()
-    def g(*ks, default=None):
-        for k in ks:
-            if k in r: return r[k]
-        return default
-    d={
-      'sats_mult': float(g('sats_mult','net_btc_vs_hodl', default='nan')),
-      'mdd_vs_hodl': float(g('mdd_vs_hodl','mdd_vs_hodl_ratio', default='nan')),
-      'fpy': float(g('flips_per_year', default='nan')),
-      'flips_total': float(g('flips_total', default='nan')),
-      'file': f
-    }
-    rows.append(d)
-if not rows:
-    print('[ERR] No se pudieron extraer KPIs', file=sys.stderr); sys.exit(1)
-T=pd.DataFrame(rows).sort_values('sats_mult',ascending=False).head(top).reset_index(drop=True)
-print(T.to_string(index=False))
-PY
-}
-
-kiss_rank_micro(){ local base="${1:-}"; setopt local_options null_glob
-  [[ -z "$base" ]] && { local a=(reports/mini_accum/kiss_v1/*_kpis__PT_G200_DD15_RB*_H*_BULL0*.csv)
-                         base=$([[ ${#a} -gt 0 ]] && echo reports/mini_accum/kiss_v1 || echo reports/mini_accum); }
-  kiss_top "${base}/*_kpis__PT_G200_DD15_RB*_H*_BULL0*.csv" 20
-}
-
+if [[ -n "${BASH_VERSION:-}" ]]; then
+  echo "[WARN] helpers.zsh requiere zsh; omitiendo porque estás en bash" >&2
+  return 0 2>/dev/null || exit 0
+fi
+emulate -L zsh
 kiss_kpi(){ local f="$1"; [[ -f "$f" ]] || { echo "uso: kiss_kpi path/to/_kpis__.csv"; return 1; }
 python3 - "$f" <<'PY'
 import pandas as pd, sys
-df=pd.read_csv(sys.argv[1], nrows=1); r=df.iloc[0]
-gm=lambda *k: next((r[x] for x in k if x in r), None)
-sats=float(gm('sats_mult','net_btc_vs_hodl'))
-mdd=float(gm('mdd_vs_hodl','mdd_vs_hodl_ratio'))
-flips=int(gm('flips_total') or 0)
+df=pd.read_csv(sys.argv[1], nrows=1); r=df.iloc[0].to_dict()
+
+def get_first(*keys):
+    for k in keys:
+        if k in r and pd.notna(r[k]):
+            v = r[k]
+            try:
+                return float(v)
+            except Exception:
+                try:
+                    return float(str(v).replace(',', '').strip())
+                except Exception:
+                    return float('nan')
+    return float('nan')
+
+sats  = get_first('sats_mult','net_btc_vs_hodl','net_btc_ratio','net_btc','netBTC','net_btc_oos','sats_vs_hodl','roi_sats','roi_vs_hodl')
+mdd   = get_first('mdd_vs_hodl','mdd_vs_hodl_ratio')
+flips = r.get('flips_total', r.get('flips', r.get('trades_total', 0)))
+try:
+    flips = int(flips) if pd.notna(flips) and str(flips).strip()!='' else 0
+except Exception:
+    flips = 0
+
 print(f"sats_mult={sats:.6f}  mdd_vs_hodl={mdd:.6f}  flips_total={flips}  file={sys.argv[1]}")
 PY
 }
 
-# OOS 2025H1 — usa MODO POSICIONAL para evitar el bug del env inline
-kiss_oos_2025H1(){ local h="${1:-30}" rb="${2:-1}" dd="${3:-15}" gate=200
-  local preset="configs/mini_accum/presets/CORE_2025.yaml"
-  local suf="G${gate}_DD${dd}_RB${rb}_H${h}_BULL0"
-  bash scripts/mini_accum/run_oos.sh 2025-01-01 2025-06-30 "$preset" "$suf"
+
+# --- Assert: KPI tiene alguna métrica de sats válida ---
+# uso: assert_kpi_has_sats path/to/_kpis__.csv
+assert_kpi_has_sats () {
+  local f="$1"
+  [[ -f "$f" ]] || { echo "[ASSERT] KPI no existe: $f"; return 1; }
+  python3 - "$f" <<'PY'
+import pandas as pd, numpy as np, sys, re
+path=sys.argv[1]
+df=pd.read_csv(path, nrows=1)
+if df.shape[0]==0:
+    print("[ASSERT] FAIL: KPI vacío.")
+    sys.exit(1)
+r=df.iloc[0].to_dict()
+
+def to_float(x):
+    if x is None:
+        return np.nan
+    try:
+        return float(x)
+    except Exception:
+        try:
+            return float(re.sub(r'[,\s%]', '', str(x)))
+        except Exception:
+            return np.nan
+
+keys = ['sats_mult','net_btc_vs_hodl','net_btc_ratio','net_btc','netBTC','net_btc_oos','sats_vs_hodl','roi_sats','roi_vs_hodl']
+vals = [to_float(r.get(k)) for k in keys]
+ok = any(np.isfinite(v) and not np.isnan(v) for v in vals)
+
+print("[ASSERT] OK: KPI con métrica de sats." if ok else "[ASSERT] FAIL: KPI sin métrica de sats (todas NaN).")
+sys.exit(0 if ok else 1)
+PY
 }
 
-# Gate de lift y riesgo (+robustez opcional)
-kiss_gate_lift(){ local base_glob="$1" cand_glob="$2" min_lift="${3:-5}" strict="${4:-0}"
+# --- Utilidad: tomar el último archivo que matchea un glob ---
+# uso: pick_latest "reports/mini_accum/*_kpis__OOS_*.csv"
+pick_latest () {
+  local pattern="$1"
   setopt local_options null_glob
-  [[ -z "$base_glob" || -z "$cand_glob" ]] && { echo "uso: kiss_gate_lift BASE_GLOB CAND_GLOB [min_lift%] [strict 0|1]"; return 1; }
+  local arr=($~pattern)
+  if [[ ${#arr} -eq 0 ]]; then
+    echo ""
+  else
+    echo "${arr[-1]}"
+  fi
+}
+
+# --- Gate seguro (verifica sats antes de evaluar lift) ---
+# uso: safe_gate BASE.csv CAND.csv [label]  (usa umbral 5% y strict=0)
+safe_gate () {
+  local BASE="$1" CAND="$2" LABEL="${3:-CAND}"
+  [[ -f "$BASE" ]] || { echo "[GATE:${LABEL}] base no existe: $BASE"; return 1; }
+  [[ -f "$CAND" ]] || { echo "[GATE:${LABEL}] cand no existe: $CAND"; return 1; }
+
+  # Aserciones de métricas de sats (evita falsos positivos y NaN)
+  assert_kpi_has_sats "$BASE"  >/dev/null || { echo "[GATE:${LABEL}] skip (BASE sin sats)"; return 1; }
+  assert_kpi_has_sats "$CAND"  >/dev/null || { echo "[GATE:${LABEL}] skip (KPI sin sats)";  return 1; }
+
+  # Trazabilidad básica
+  kiss_kpi "$BASE"
+  kiss_kpi "$CAND"
+
+  # Gate KISS (≥ +5%, no estricto por defecto)
+  kiss_gate_lift "$BASE" "$CAND" 5 0
+}
+
+# Gate de lift entre dos KPIs (BASE vs CAND)
+# uso: kiss_gate_lift BASE_GLOB CAND_GLOB [min_lift%=5] [strict=0|1]
+kiss_gate_lift () {
+  local base_glob="$1" cand_glob="$2" min_lift="${3:-5}" strict="${4:-0}"
+  setopt local_options null_glob
+
+  [[ -z "$base_glob" || -z "$cand_glob" ]] && {
+    echo "uso: kiss_gate_lift BASE_GLOB CAND_GLOB [min_lift%] [strict 0|1]"
+    return 1
+  }
+
   local base_files=($~base_glob) cand_files=($~cand_glob)
   [[ ${#base_files} -eq 0 ]] && { echo "[ERR] no hay matches para BASE_GLOB: $base_glob"; return 1; }
   [[ ${#cand_files} -eq 0 ]] && { echo "[ERR] no hay matches para CAND_GLOB: $cand_glob"; return 1; }
+
   local base="${base_files[-1]}" cand="${cand_files[-1]}"
+
   python3 - "$base" "$cand" "$min_lift" "$strict" <<'PY'
-import os, sys, pandas as pd, numpy as np
+import os, sys, re, pandas as pd, numpy as np
+
 base, cand, min_lift, strict = sys.argv[1], sys.argv[2], float(sys.argv[3]), int(sys.argv[4])
+
+def to_float(x):
+    if x is None:
+        return np.nan
+    try:
+        return float(x)
+    except Exception:
+        try:
+            return float(re.sub(r'[,\s%]', '', str(x)))
+        except Exception:
+            return np.nan
 
 def read_kpis(path):
     df = pd.read_csv(path, nrows=1)
-    r = df.iloc[0]
-    def g(*ks):
-        for k in ks:
-            if k in r and pd.notna(r[k]): return r[k]
-    return dict(
-        sats=float(g('sats_mult','net_btc_vs_hodl') or np.nan),
-        mdd=float(g('mdd_vs_hodl','mdd_vs_hodl_ratio') or np.nan),
-        flips=int(g('flips_total') or 0),
-        file=path
-    )
+    r = df.iloc[0].to_dict()
+    def g(keys):
+        for k in keys:
+            if k in r and pd.notna(r[k]):
+                return r[k]
+        return None
 
-B = read_kpis(base); C = read_kpis(cand)
+    # Campos alternativos (robustos) para cada métrica
+    sats  = to_float(g(['sats_mult','net_btc_vs_hodl','net_btc_ratio','net_btc','netBTC','net_btc_oos','sats_vs_hodl','roi_sats','roi_vs_hodl']))
+    mdd   = to_float(g(['mdd_vs_hodl','mdd_vs_hodl_ratio','mdd_ratio','max_drawdown_vs_hodl']))
+    flips_raw = g(['flips_total','flips','trades_total'])
+    try:
+        flips = int(float(str(flips_raw).strip())) if flips_raw not in (None,'') else 0
+    except Exception:
+        flips = 0
+
+    return dict(sats=sats, mdd=mdd, flips=flips, file=path)
+
+B = read_kpis(base)
+C = read_kpis(cand)
+
+# Prints básicos para trazabilidad
+print(f"[BASE] sats={B['sats'] if not np.isnan(B['sats']) else float('nan'):.6f}  mdd={B['mdd'] if not np.isnan(B['mdd']) else float('nan'):.6f}  flips={B['flips']}  file={B['file']}")
+print(f"[CAND] sats={C['sats'] if not np.isnan(C['sats']) else float('nan'):.6f}  mdd={C['mdd'] if not np.isnan(C['mdd']) else float('nan'):.6f}  flips={C['flips']}  file={C['file']}")
+
+# Validaciones mínimas
 if np.isnan(B['sats']) or np.isnan(C['sats']):
-    print("[ERR] KPI inválido (sats_mult) en base o candidato", file=sys.stderr); sys.exit(1)
+    # Sin métrica de sats no hay decisión de lift — mantenemos FAIL pero sin traceback
+    print("[GATE] FAIL: candidato/base sin métricas de sats (sats_mult/net_btc_vs_hodl). No trazable para promoción.")
+    sys.exit(1)
 if np.isnan(B['mdd']) or np.isnan(C['mdd']):
-    print("[ERR] KPI inválido (mdd_vs_hodl) en base o candidato", file=sys.stderr); sys.exit(1)
+    print("[GATE] FAIL: candidato/base sin métrica de MDD. No trazable para control de riesgo.")
+    sys.exit(1)
 
-lift = (C['sats']/B['sats'] - 1.0)*100.0
+lift = (C['sats']/B['sats'] - 1.0) * 100.0
 mdd_delta = C['mdd'] - B['mdd']
-risk_ok = mdd_delta <= 0.0 + 1e-12  # menor o igual MDD vs base (menor es mejor)
+risk_ok = mdd_delta <= 1e-12  # menor o igual MDD vs base
 
-print(f"[BASE] sats={B['sats']:.6f}  mdd={B['mdd']:.6f}  flips={B['flips']}  file={B['file']}")
-print(f"[CAND] sats={C['sats']:.6f}  mdd={C['mdd']:.6f}  flips={C['flips']}  file={C['file']}")
 print(f"[DIFF] lift={lift:+.2f}%  mdd_delta={mdd_delta:+.6f}")
 
 # Robustez opcional
@@ -99,7 +182,7 @@ if spearman_csv and os.path.isfile(spearman_csv):
     try:
         D = pd.read_csv(spearman_csv)
         numcols = [c for c in D.columns if pd.api.types.is_numeric_dtype(D[c])]
-        okcols = [c for c in numcols if D[c].notna().sum()>=2]
+        okcols = [c for c in numcols if D[c].notna().sum() >= 2]
         if len(okcols) >= 2:
             s = D[okcols].rank(method="average")
             rho = s[okcols[0]].corr(s[okcols[1]], method="spearman")
@@ -140,8 +223,34 @@ def decide():
         if not risk_ok: return (1,"FAIL: MDD empeora vs base")
         return (0,"PASS")
 
-code,msg = decide()
+code, msg = decide()
 print(f"[GATE] {msg} | lift≥{min_lift:.2f}%  risk_ok={risk_ok}  spearman_ok={spearman_ok}  pbo_ok={pbo_ok}")
 sys.exit(code)
 PY
+}
+# --- renombra el último batch de artefactos añadiendo un sufijo seguro ---
+rename_last_reports(){ # uso: rename_last_reports "__WF_2025_v1_2"
+  local suf="$1"
+  local base="$(ls -1t reports/mini_accum/*_equity.csv 2>/dev/null | head -n1)"
+  [[ -z "$base" ]] && { echo "[WARN] No hay artefactos para renombrar"; return 1; }
+  local pfx="${base%_equity.csv}"
+  for kind in equity kpis summary flips; do
+    local src="${pfx}_${kind}.csv"; [[ "$kind" == "summary" ]] && src="${pfx}_${kind}.md"
+    [[ -f "$src" ]] || continue
+    local ext=$([[ "$kind" == "summary" ]] && echo md || echo csv)
+    local dst="${pfx}_${kind}${suf}.${ext}"
+    mv "$src" "$dst" && echo "[OK] ${kind} → ${dst}"
+  done
+}
+# --- Gate y log: no promueve si falla el guardián ---
+# uso: gate_or_log BASE.csv CAND.csv "label"
+gate_or_log () {
+  local BASE="$1" CAND="$2" LABEL="$3"
+  if [[ -z "$CAND" ]]; then
+    echo "[INFO] No hay candidato para $LABEL"
+    return 0
+  fi
+  if ! safe_gate "$BASE" "$CAND" "$LABEL"; then
+    echo "[LOG] $LABEL : FAIL gate (mantener BASE)"
+  fi
 }
