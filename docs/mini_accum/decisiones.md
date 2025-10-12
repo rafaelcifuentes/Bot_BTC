@@ -42,3 +42,10 @@
 ## 2025-10-11 — Gate v1.2 vs BASE (WF_2025)
 - BASE OOS 2025H1: sats=1.138462; CAND v1.2 WF_2025: sats=0.917246
 - Lift: –19.43%  → FAIL (umbral +5%); acción: mantener BASE; v1.2 OFF
+
+## 2025-10-12 — Gate FAIL v2.0 (WF_2025)
+- BASE: reports/mini_accum/base_v0_1_20251011_0320_kpis__OOS_2025H1_G200_DD15_RB1_H30_BULL0.csv
+- CAND: reports/mini_accum/base_v0_1_20251012_0050_kpis__WF_2025_v2_0.csv
+- Resultado: **FAIL** (lift −19.43% < +5% req.; MDD mejora pero no supera criterio de lift)
+- Métricas: sats_BASE=1.138462, sats_CAND=0.917246, ΔMDD=−0.347376, flips: base=2 cand=9
+- Decisión: mantener KISS v1 BASE en PROD; **v2.0 OFF (opt-in)**; seguir iterando en rama.
