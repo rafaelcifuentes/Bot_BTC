@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import numpy as np
+
 import argparse
 import os
 from typing import Optional
@@ -10,6 +12,7 @@ import yaml
 
 from .io import load_ohlc, merge_daily_into_4h
 from .sim import simulate, TradeCosts
+from dataclasses import dataclass  # adicionado para V2
 
 __all__ = ["main"]
 
@@ -118,6 +121,36 @@ def main() -> None:
 
     with open(args.config, "r") as f:
         cfg = yaml.safe_load(f)
+        # --- alias: soporta 'modules.v2' como fuente de disciplina si no hay 'discipline' ---
+        _mods_v2 = ((cfg.get("modules") or {}).get("v2") or {}) if isinstance(cfg, dict) else {}
+        if _mods_v2 and not cfg.get("discipline"):
+            cfg["discipline"] = {
+                "bull_hold": (_mods_v2.get("bull_hold") or {}),
+                "cooldown_after_loss": (_mods_v2.get("cooldown_after_loss") or {}),
+                "hibernation_on_chop": (_mods_v2.get("hibernation_on_chop") or {}),
+            }
+        # --- v2.0 discipline: lectura segura de config (todo OFF por defecto) ---
+        disc = (cfg.get("discipline") or {}) if isinstance(cfg, dict) else {}
+
+        bull = disc.get("bull_hold", {}) or {}
+        cool = disc.get("cooldown_after_loss", {}) or {}
+        hib  = disc.get("hibernation_on_chop", {}) or {}
+
+        D_PARAMS = {
+            "bull_enabled":     bool(bull.get("enabled", False)),
+            "bull_min_bars":    int(bull.get("min_bars_after_entry", 2)),
+            "bull_adx_min":     float(bull.get("adx_min", 25)),
+
+            "cool_enabled":     bool(cool.get("enabled", False)),
+            "cool_bars":        int(cool.get("cooldown_bars", 12)),
+
+            "hib_enabled":      bool(hib.get("enabled", False)),
+            "hib_adx_max":      float(hib.get("adx_max", 20)),
+            "hib_min_bars":     int(hib.get("min_bars", 6)),
+        }
+
+        # Lo pasamos al motor; si el motor no lo usa, todo queda NO-OP
+        cfg["_discipline"] = D_PARAMS
 
     rep_dir = cfg["backtest"]["reports_dir"]
     os.makedirs(rep_dir, exist_ok=True)
@@ -126,8 +159,38 @@ def main() -> None:
     df4 = load_ohlc(cfg["data"]["ohlc_4h_csv"], cfg["data"]["ts_col"], cfg["data"]["tz_input"])
     d1 = load_ohlc(cfg["data"]["ohlc_d1_csv"], cfg["data"]["ts_col"], cfg["data"]["tz_input"])
 
-    # Merge D1→4h y filtro temporal
+    # Merge D1→4h
     df = merge_daily_into_4h(df4, d1)
+
+    # --- TOP v1: asegurar d_sma200 (SMA(200) sobre close diario) ---
+    # Lo calculamos a partir de d_close ya mergeado y lo proyectamos a cada vela 4h.
+    if 'd_sma200' not in df.columns and 'd_close' in df.columns:
+        day = pd.to_datetime(df['ts']).dt.floor('D')
+        # Último close del día (serie diaria)
+        daily_last = pd.Series(df['d_close'].values, index=day).groupby(level=0).last()
+        sma200 = daily_last.rolling(200, min_periods=200).mean()
+        # Mapear por día a cada fila 4h y rellenar hacia delante
+        df['d_sma200'] = day.map(sma200)
+        df['d_sma200'] = df['d_sma200'].ffill()
+
+
+    # --- TOP v1: asegurar d_sma200 diaria mergeada al 4h ---
+    # Si el merge previo no la incluyó, la calculamos desde el diario y la unimos por asof (backward).
+    if 'd_sma200' not in df.columns:
+        try:
+            d_daily = d1[['ts', 'close']].copy()
+            # asegurar frecuencia diaria y último close del día
+            d_daily = d_daily.set_index('ts').resample('1D').last().reset_index()
+            d_daily.rename(columns={'close': '_d_close'}, inplace=True)
+            # SMA200 estricta (no exponencial); min_periods=200 para evitar “precalentamiento” sesgado
+            d_daily['d_sma200'] = d_daily['_d_close'].rolling(window=200, min_periods=200).mean()
+            d_daily = d_daily[['ts', 'd_sma200']].sort_values('ts')
+
+            # merge_asof para alinear cada vela 4h con el último valor diario disponible (backward)
+            df = pd.merge_asof(df.sort_values('ts'), d_daily, on='ts', direction='backward')
+        except Exception as e:
+            print(f"[WARN] d_sma200 not merged: {e}")
+
     # Usar intervalo semiabierto [start, end):
     # tratamos 'end' como inclusivo a nivel de día, avanzando 1 día y filtrando con '<'
     if args.start:
@@ -136,6 +199,37 @@ def main() -> None:
     if args.end:
         end_excl = pd.Timestamp(args.end, tz="UTC") + pd.Timedelta(days=1)
         df = df[df["ts"] < end_excl]
+
+    # === ADX helper (usado por disciplina v2.0) ===
+    def _compute_adx_inplace(df: pd.DataFrame, period: int = 14) -> None:
+        # Requiere columnas high, low, close
+        if not {'high', 'low', 'close'}.issubset(df.columns):
+            return
+        high, low, close = df['high'], df['low'], df['close']
+        up = high.diff()
+        down = -low.diff()
+        plus_dm = np.where((up > down) & (up > 0), up, 0.0)
+        minus_dm = np.where((down > up) & (down > 0), down, 0.0)
+        tr = pd.concat([
+            (high - low).abs(),
+            (high - close.shift()).abs(),
+            (low - close.shift()).abs()
+        ], axis=1).max(axis=1)
+        atr = tr.ewm(span=period, adjust=False).mean()
+        plus_di = 100.0 * pd.Series(plus_dm, index=df.index).ewm(span=period, adjust=False).mean() / atr.replace(0, np.nan)
+        minus_di = 100.0 * pd.Series(minus_dm, index=df.index).ewm(span=period, adjust=False).mean() / atr.replace(0, np.nan)
+        dx = ((plus_di - minus_di).abs() / (plus_di + minus_di).replace(0, np.nan)) * 100.0
+        adx = dx.ewm(span=period, adjust=False).mean()
+        df['adx'] = adx.bfill().fillna(0.0)
+
+    # === Activación condicional: si disciplina v2.0 está ON y no hay 'adx', lo calculamos ===
+    disc = (cfg.get('discipline') or {})
+    need_adx = any(bool((disc.get(k) or {}).get('enabled', False)) for k in
+                   ('bull_hold', 'cooldown_after_loss', 'hibernation_on_chop'))
+    if need_adx and 'adx' not in df.columns:
+        # Si hay periodo ADX definido en YAML de filtros, úsalo; si no, 14
+        adx_period = int((cfg.get('filters', {}) or {}).get('adx', {}).get('period', 14))
+        _compute_adx_inplace(df, period=adx_period)
 
     # Costes
     costs = TradeCosts(
@@ -171,6 +265,17 @@ def main() -> None:
         f.write("## KPIs\n")
         for k, v in kpis.items():
             f.write(f"- **{k}**: {v}\n")
+        # v2.0 Discipline (si aplica)
+        dp = cfg.get("_discipline", {})
+        f.write("\n## v2.0 Discipline (si aplica)\n")
+        f.write(f"- bull_hold: enabled={dp.get('bull_enabled', False)}, "
+                f"min_bars_after_entry={dp.get('bull_min_bars', 2)}, "
+                f"adx_min={dp.get('bull_adx_min', 25)}\n")
+        f.write(f"- cooldown_after_loss: enabled={dp.get('cool_enabled', False)}, "
+                f"cooldown_bars={dp.get('cool_bars', 12)}\n")
+        f.write(f"- hibernation_on_chop: enabled={dp.get('hib_enabled', False)}, "
+                f"adx_max={dp.get('hib_adx_max', 20)}, "
+                f"min_bars={dp.get('hib_min_bars', 6)}\n")
 
     print(f"[OK] {eq_path}")
     print(f"[OK] {kpi_path}")
