@@ -6,7 +6,7 @@ signals:
     enabled: true
     confirm_bars: 2
     max_wait_bars_after_confirm: 6
-    age_valve_enabled: false   # <- clave para no forzar ventas por “tiempo”
+    age_valve_enabled: false   # <- clave para no forzar ventas por "tiempo"
 anti_whipsaw:
   dwell_bars_min_between_flips: 32
   pause_after_flip_bars: 8

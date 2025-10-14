@@ -28,7 +28,7 @@ signals:
   exit_active:
     rule: "close < ema_fast"
     confirm_bars: 1
-    # Desactiva la “válvula por edad”
+    # Desactiva la "válvula por edad"
     max_wait_bars_after_confirm: 9999
 
 anti_whipsaw:

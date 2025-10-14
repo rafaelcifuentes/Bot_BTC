@@ -21,7 +21,7 @@ costs:
 # NUEVO: presupuesto de flips
 flip_budget:
   hard_per_year: 26        # límite duro anual
-  soft_per_week: 1         # límite “soft” semanal (comentario si no aplica)
+  soft_per_week: 1         # límite "soft" semanal (comentario si no aplica)
   soft_weekly: 1           # redundante por si el loader usa este nombre
 
 signals:

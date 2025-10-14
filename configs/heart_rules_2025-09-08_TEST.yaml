@@ -16,7 +16,7 @@ meta:
 regime:
   # === Tus campos (legacy, compatibles) ===
   adx1d_len: 14
-  adx1d_min: 18      # ADX diario “fuerte” (confirmación macro)
+  adx1d_min: 18      # ADX diario "fuerte" (confirmación macro)
   adx4_min: 8      # ADX 4h mínimo para evitar rango muy comprimido
   ema_fast: 50
   ema_slow: 200
@@ -24,7 +24,7 @@ regime:
   # === Nuevos (plan macro) ===
   ema50_slope_thr: 0.0       # >0 alcista, <0 bajista (umbral bajo)
   atr_pct_window: 100        # ventana pctl para ATR%
-  vol_pctl_low: 0.40         # p40 define rangos “calmos”
+  vol_pctl_low: 0.40         # p40 define rangos "calmos"
   dwell_bars: 5              # histéresis: mínimo 6 velas en un estado
   max_delta_weight: 0.25     # límite de cambio por barra para evitar flip-flop
 
@@ -44,7 +44,7 @@ weights_states:
   amarillo: { diamante: 0.80, perla: 0.00 }   # neutral pro-diamante sin cap total
   rojo:     { diamante: 0.60, perla: 0.00 }   # contra-régimen conservador pero con exposición
 
-# Mantenemos tus pesos “tipos” por compatibilidad (opcional en tu generador actual)
+# Mantenemos tus pesos "tipos" por compatibilidad (opcional en tu generador actual)
 weights_legacy:
   w_strong:  1.00
   w_neutral: 0.90   # <- antes 0.85
@@ -56,12 +56,12 @@ weights_legacy:
 lq:
   enable: true
   use_as: "soft_veto"       # soft_veto | bias
-  dist_close_atr: 0.6       # “cerca” = 0.6 × ATR_4h
+  dist_close_atr: 0.6       # "cerca" = 0.6 × ATR_4h
   min_cluster_score: 0.75    # fuerza mínima del cluster opuesto
   mult_soft_veto: 0.70      # reduce peso un 30% si riesgo alto
   hysteresis_steps: 2       # exigir 2 velas para cambiar estado LQ
   safety_cap: 1.00          # no subir por encima del w_cap actual
-  max_delta_per_bar: 0.25   # permite subir/bajar más rápido sin “dientes de sierra”
+  max_delta_per_bar: 0.25   # permite subir/bajar más rápido sin "dientes de sierra"
 # -------------------------------
 # 4) Gate de Correlación
 # -------------------------------
@@ -75,7 +75,7 @@ corr_gate:
 # 5) Guardarraíles de Riesgo Global
 # -------------------------------
 freeze_xi_star:
-  update_day: "Monday"      # “congelar” ξ* semanal desde reporter/overlay
+  update_day: "Monday"      # "congelar" ξ* semanal desde reporter/overlay
   xi_star_cap: 1.70
 
 circuit_breakers:
@@ -88,7 +88,7 @@ circuit_breakers:
 safety:
   w_floor_on_signal: 0.50   # mínimo al tener señal válida (opcional; puede relajarse)
   w_cap: 1.00               # cap de peso por estrategia (antes de cap total del Allocator)
-  ttl_bars: 1               # si una señal/peso está “viejo” (>1 barra), reducir a 0 por seguridad
+  ttl_bars: 1               # si una señal/peso está "viejo" (>1 barra), reducir a 0 por seguridad
 
 # ... resto del archivo ...
 

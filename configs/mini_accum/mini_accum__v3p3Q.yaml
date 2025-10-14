@@ -17,7 +17,7 @@ signals:
   cross_buffer_bps: 45
   macro_buffer_bps: 15
   entry: ema21 > ema55 and macro_green
-  # vender sólo si hay debilidad micro Y macro rojo (evita “soltar” en bull)
+  # vender sólo si hay debilidad micro Y macro rojo (evita "soltar" en bull)
   exit_active:
     rule: (close < ema21 and next_close <= next_ema21) and macro_red
     confirm_bars: 3
