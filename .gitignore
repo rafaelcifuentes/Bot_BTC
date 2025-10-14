@@ -24,3 +24,8 @@ logs/
 reports/**/*
 !docs/mini_accum/checkpoints/**   # preserva snapshots
 data/tmp_wf/*.yaml
+
+# Copias de trabajo (no tocar PROD)
+configs/mini_accum/_shadow_v1/
+!reports/mini_accum/_freezes/**
+!reports/mini_accum/_freezes/**

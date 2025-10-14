@@ -1,0 +1,82 @@
+# Mini-Accum v2.0 — E3d_adx22 (superset v1 + ADX gate ON @22)
+
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
+  ts_col: ts
+  tz_input: UTC
+
+backtest:
+  reports_dir: reports/mini_accum/WF_2025/v2_0
+  seed_btc: 1.0
+
+costs:
+  fee_bps_per_side: 5
+  slip_bps_per_side: 5
+
+signals:
+  ema_fast: 21
+  ema_slow: 55
+  cross_buffer_bps: 0
+  exit_active:
+    enabled: true
+    confirm_bars: 1
+    max_wait_bars_after_confirm: 2
+    age_valve_enabled: false
+
+filters:
+  adx:
+    enabled: true     # ADX gate ON
+    period: 14
+    min: 22
+  exit_atr:
+    enabled: false
+    period: 14
+    mult: 1.5
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 2
+  pause_after_flip_bars: 0
+  pause_affects_sell: false
+
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 52
+  soft_per_week: 1
+
+modules:
+  atr_regime:
+    enabled: false
+    percentile_p: 36
+    yellow_band_pct: 0.10
+    pause_affects_sell: false
+  xb_adaptive:
+    enabled: false
+  v2:
+    bull_hold:
+      enabled: true
+      min_bars_after_entry: 2
+      adx_min: 22
+    cooldown_after_loss:
+      enabled: true
+      cooldown_bars: 12
+    hibernation_on_chop:
+      enabled: false    # este preset prueba SOLO ADX gate
+
+risk:
+  hard_dd_pct: 0.15
+
+rebalancing:
+  frequency: "1W"
+
+horizon:
+  h_bars: 30
+
+execution:
+  gamma_bps: 200
+  bull_bias_bps: 0
+
+macro_sma: 200
+bull_bias: 0
+
+tag: DD15_RB1_H30_G200_BULL0

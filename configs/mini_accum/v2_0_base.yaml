@@ -1,0 +1,61 @@
+tag: v2_0_DD15_RB1_H30_G200_BULL0_D0
+
+ohlc_4h_csv: "data/ohlc/4h/BTC-USD.csv"
+ohlc_1d_csv: "data/ohlc/1d/BTC-USD.csv"
+reports_dir: "reports/mini_accum"
+
+signals:
+  entry:
+    rule: "ema21 > ema55 and macro_green"
+  exit_active:
+    rule: "close < ema21 and macro_red"
+    confirm_bars: 2
+    max_wait_bars_after_confirm: 2
+  exit_passive:
+    rule: "ema21 < ema55 and macro_red"
+
+filters:
+  adx:
+    enabled: true
+    period: 14
+    min: 25
+  atr_regime:
+    enabled: false
+    percentile_p: 70
+
+# v1 risk
+risk:
+  hard_dd_pct: 0.15
+  h_bars: 30
+  rebalance:
+    frequency: "1W"
+
+costs:
+  fee_bps_per_side: 3
+  slip_bps_per_side: 2
+  spread_bps: 10
+  gamma_bps: 200
+  bull_bias_bps: 0
+
+dwell_bars_min_between_flips: 0
+
+# ===== v2.0: disciplina/estado ====
+discipline:
+  bull_hold:
+    enabled: true
+    # Mantén BUY si el régimen sigue muy fuerte; evita salir por ruido.
+    rule: "macro_green and adx >= 25"
+    min_bars_after_entry: 2
+    adx_min: 25
+
+  cooldown_after_loss:
+    enabled: true
+    # Tras una pérdida, enfría X velas 4h (p. ej., 12=2 días).
+    cooldown_bars: 12
+
+  hibernation_on_chop:
+    enabled: true
+    # Pausa entradas cuando el mercado está choppy (tendencia débil).
+    adx_max: 20
+    min_bars: 6
+

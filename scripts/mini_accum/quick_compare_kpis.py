@@ -3,7 +3,7 @@
 Comparador de KPIs (PF, MDD, Vol) entre dos runs (p.ej., ATR 0.07 vs 0.08).
 
 Uso:
-  python scripts/quick_compare_kpis.py <kpis_07.csv> <kpis_08.csv>
+  python scripts/mini_accum/quick_compare_kpis.py <kpis_07.csv> <kpis_08.csv>
 
 También funciona si el orden es inverso; puedes especificar con --old y --new.
 

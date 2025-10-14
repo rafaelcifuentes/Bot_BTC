@@ -1,0 +1,69 @@
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/wf_yearly/1d/BTC-USD_1d_WF_2022.csv
+  ts_col: ts
+  tz_input: UTC
+backtest:
+  reports_dir: reports/mini_accum/WF_2022/v2_0
+risk:
+  hard_dd_pct: 15
+rebalancing:
+  frequency: 1
+horizon:
+  h_bars: 30
+filters:
+  macro_sma: null
+  exit_atr:
+    enabled: false
+execution:
+  gamma_bps: 0
+  bull_bias_bps: 0
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+discipline:
+  bull_hold:
+    enabled: false
+    min_bars_after_entry: 1
+    adx_min: 25
+  cooldown_after_loss:
+    enabled: true
+    cooldown_bars: 8
+  hibernation_on_chop:
+    enabled: false
+    adx_max: 20
+    min_bars: 6
+  exit_active:
+    enabled: true
+    confirm_bars: 1
+    max_wait_bars_after_confirm: 2
+strategy:
+  params:
+    adx_len: 22
+    ema_fast: 12
+    ema_slow: 26
+    rsi_len: 14
+    adx_min: 22
+preset: E1
+signals:
+  ema_fast: 12
+  ema_slow: 26
+  rsi_len: 14
+  adx_len: 22
+  adx_min: 22
+  exit_active:
+    enabled: true
+    confirm_bars: 1
+    max_wait_bars_after_confirm: 2
+  rsi_buy: 35
+  rsi_sell: 65
+bar: 1d
+v2:
+  bull_hold:
+    enabled: false
+    min_bars_after_entry: 1
+  cooldown_after_loss:
+    enabled: true
+    cooldown_bars: 8
+  exit_atr:
+    enabled: false

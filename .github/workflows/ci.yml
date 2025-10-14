@@ -47,3 +47,14 @@ jobs:
         env:
           GATE_STRICT: '1'
         run: scripts/ci/gate_latest.sh
+
+      - name: Append gate doc to Progreso.md (no merge si falla)
+        if: ${{ failure() || success() }}
+        run: |
+          echo "" >> docs/mini_accum/Progreso.md
+          echo "## $(date +%F) — Gate $([ "${{ job.status }}" = "success" ] && echo PASS || echo FAIL) (v2.0)" >> docs/mini_accum/Progreso.md
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git add docs/mini_accum/Progreso.md || true
+          git commit -m "CI: anota resultado gate v2.0" || true
+          git push || true
