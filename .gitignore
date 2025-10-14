@@ -32,3 +32,7 @@ configs/mini_accum/_shadow_v1/
 
 # editor/tmp artifacts
 *.tmp.*
+
+# track canonical freezes
+!reports/mini_accum/_freezes/
+!reports/mini_accum/_freezes/*.freeze.txt
