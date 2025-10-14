@@ -29,3 +29,6 @@ data/tmp_wf/*.yaml
 configs/mini_accum/_shadow_v1/
 !reports/mini_accum/_freezes/**
 !reports/mini_accum/_freezes/**
+
+# editor/tmp artifacts
+*.tmp.*
