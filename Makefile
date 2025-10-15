@@ -1,62 +1,52 @@
-SHELL := /usr/bin/env bash
-.SHELLFLAGS := -eu -o pipefail -c
-.ONESHELL:
-MAKEFLAGS += --no-builtin-rules
+E1_S_MIN ?= 2.9
+E1_M_MAX ?= 0.12
+V1_S_MIN ?= 1.0
+V1_M_MAX ?= 1.0
 
-FREEZES := reports/mini_accum/_freezes/E1_Y2_2022.freeze.txt \
-           reports/mini_accum/_freezes/V1TOP_2023.freeze.txt \
-           reports/mini_accum/_freezes/V1TOP_2024.freeze.txt \
-           reports/mini_accum/_freezes/V1TOP_2025H1.freeze.txt
+.PHONY: help deploy-help deploy-plan deploy-select deploy-status
+.DEFAULT_GOAL := help
 
-.PHONY: smoke seal retag check gate stress-costs
+# Aliases: reenvían a mk/deploy.mk
+deploy-help deploy-plan deploy-select deploy-status:
+	$(MAKE) -f mk/deploy.mk -s $@
 
-smoke:
-	@echo "[YAML allowlist]"
-	@if [ -f .yaml_validate_allowlist ]; then \
-		{ while IFS= read -r f; do \
-			[ -z "$$f" ] && continue; \
-			python3 -c 'import sys,yaml,pathlib;p=pathlib.Path(sys.argv[1]);yaml.safe_load(p.open("r",encoding="utf-8"));print("[OK]",p)' "$$f"; \
-		  done; } < .yaml_validate_allowlist; \
-	else \
-		echo "(skip) .yaml_validate_allowlist no existe"; \
-	fi
-	@$(MAKE) -s seal </dev/null
-	@$(MAKE) -s retag </dev/null
-	@$(MAKE) -s check </dev/null
-	@echo "✅ Smoke 1→5 OK"
+help:
+	printf "%s\n" \
+	"" \
+	"# plan/selector/estado (ya probados):" \
+	"make -f mk/deploy.mk -s deploy-plan" \
+	"make -f mk/deploy.mk -s deploy-select" \
+	"make -f mk/deploy.mk -s deploy-status" \
+	"" \
+	"# conmutador SPORT/DRIVE por fricción viva:" \
+	"echo \"2/2\" > deploy/live_fee_slip" \
+	"make -f mk/deploy.mk -s deploy-select" \
+	"make -f mk/deploy.mk -s deploy-status   # SPORT / PROD_KISSv1_2024" \
+	"" \
+	"echo \"2/3\" > deploy/live_fee_slip" \
+	"make -f mk/deploy.mk -s deploy-select" \
+	"make -f mk/deploy.mk -s deploy-status   # DRIVE / PROD_KISSv1_2023" \
+	"" \
+	"Targets:" \
+	"  gate                 - corre gate y volcado" \
+	"  stress               - corre gate + stress-costs" \
+	"  stress-q             - solo resumen final de stress" \
+	"  stress-tail          - últimas ~40 filas tabuladas" \
+	"  stress-summary       - min/max por política (S_ADJ)" \
+	"  stress-head          - tabla headroom S/M con umbrales" \
+	"  stress-head-save     - idem y guarda en STRESS_HEAD.txt" \
+	"  stress-prob          - % de escenarios donde se mantienen KPIs" \
+	"  stress-prob-save     - idem y guarda en STRESS_PROB.txt" \
+	"  deploy-help          - ayuda despliegue DRIVE/SPORT" \
+	"  deploy-plan          - escribe PLAN.txt y plan.vars" \
+	"  deploy-select        - activa DRIVE/SPORT según live_fee_slip" \
+	"  deploy-status        - muestra modo/tag activos" \
+	"  help                 - este mensaje" \
+	"" \
+	"Variables (umbrales; puedes sobreescribir con VAR=valor):" \
+	"  E1_S_MIN     = $${E1_S_MIN:-2.9}" \
+	"  E1_M_MAX     = $${E1_M_MAX:-0.12}" \
+	"  V1_S_MIN     = $${V1_S_MIN:-1.0}" \
+	"  V1_M_MAX     = $${V1_M_MAX:-1.0}"
 
-seal:
-	@for f in $(FREEZES); do \
-	  [ -f "$$f" ] || { echo "[MISS] $$f"; continue; }; \
-	  yq -i \
-	    '.version = (.version // 1) | .costs.fee_bps_per_side = 2.0 | .costs.slip_bps_per_side = 1.0 | \
-	     .kpis.sats_mult = (.kpis.sats_mult // .sats_mult // "NA") | \
-	     .kpis.mdd_vs_hodl = (.kpis.mdd_vs_hodl // .mdd_vs_hodl // "NA") | \
-	     .kpis.flips = (.kpis.flips // .flips // 0) | \
-	     .data_hashes.data_1d_sha256 = (.data_hashes.data_1d_sha256 // .data_1d_sha256 // "NA") | \
-	     .data_hashes.data_4h_sha256 = (.data_hashes.data_4h_sha256 // .data_4h_sha256 // "NA") | \
-	     del(.sats_mult, .mdd_vs_hodl, .flips, .data_1d_sha256, .data_4h_sha256)' "$$f"; \
-	  printf '[SEALED] %s -> NetBTC=%s  MDD=%s  1D=%s 4H=%s  costs=%s/%s bps\n' "$$f" \
-	    "$$(yq -r '.kpis.sats_mult' "$$f")" \
-	    "$$(yq -r '.kpis.mdd_vs_hodl' "$$f")" \
-	    "$$(yq -r '.data_hashes.data_1d_sha256' "$$f")" \
-	    "$$(yq -r '.data_hashes.data_4h_sha256' "$$f")" \
-	    "$$(yq -r '.costs.fee_bps_per_side' "$$f")" \
-	    "$$(yq -r '.costs.slip_bps_per_side' "$$f")"; \
-	done
-
-retag:
-	@scripts/mini_accum/dev/retag_safe.sh
-
-check:
-	@scripts/mini_accum/dev/check_freeze_tags.sh
-
-gate:
-	@mkdir -p reports/mini_accum
-	@{ \
-	  echo "== $$(date -u +'%Y-%m-%dT%H:%M:%SZ') thresholds: E1_S_MIN=$${E1_S_MIN:-2.9} E1_M_MAX=$${E1_M_MAX:-0.12} V1_S_MIN=$${V1_S_MIN:-1.0} V1_M_MAX=$${V1_M_MAX:-1.0} =="; \
-	  scripts/mini_accum/dev/gate.sh; \
-	} | tee -a reports/mini_accum/GATE_STATUS.txt
-stress-costs:
-	@mkdir -p reports/mini_accum
-	@bash scripts/mini_accum/dev/stress_costs.sh 2>&1 | tee reports/mini_accum/STRESS_COSTS.txt
+include mk/stress.mk
