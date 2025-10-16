@@ -1,7 +1,0 @@
-== 2025-10-14T22:12:41Z thresholds: E1_S_MIN=2.9 E1_M_MAX=0.12 V1_S_MIN=1.0 V1_M_MAX=1.0 ==
-PROD_E1_Y2_2022    | policy=E1 | S=2.921250  (≥2.9) | M=0.104540  (≤0.12) | PASS
-PROD_KISSv1_2023   | policy=V1 | S=2.641397  (≥1.0) | M=0.936073  (≤1.0) | PASS
-PROD_KISSv1_2024   | policy=V1 | S=1.613240  (≥1.0) | M=0.768424  (≤1.0) | PASS
-PROD_KISSv1_2025H1 | policy=V1 | S=1.138462  (≥1.0) | M=0.741494  (≤1.0) | PASS
-----
-PASS=4  FAIL=0
