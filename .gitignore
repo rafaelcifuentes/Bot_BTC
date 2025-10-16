@@ -41,13 +41,11 @@ Makefile.*bak*
 mk/*.bak.*
 mk/stress.mk.__new
 scripts/live/
-backups/
 .githooks/pre-commit.bak.*
 Makefile.fix_bak.*
 mk/*.bak.*
 mk/stress.mk.__new
 scripts/live/
-backups/
 reports/**
 reports/mini_accum/ONE_PAGER.md
 reports/mini_accum/GATE_STATUS.txt
@@ -56,3 +54,7 @@ artifacts/
 data/
 
 !backups/weekly_backup.sh
+/backups/**
+!/backups/
+!/backups/weekly_backup.sh
+!/backups/.backup_exclude

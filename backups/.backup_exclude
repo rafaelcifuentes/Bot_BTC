@@ -1,0 +1,6 @@
+*.pkl
+*.joblib
+*.tar.gz
+*.tgz
+*.zip
+# (añade patrones si detectas otros binarios grandes)
