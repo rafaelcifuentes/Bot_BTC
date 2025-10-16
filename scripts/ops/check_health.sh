@@ -1,54 +1,53 @@
 #!/usr/bin/env bash
 set -euo pipefail
-export LC_ALL=C
 
-# --- Config por defecto (overridable via env) ---
-NETBTC_MIN=${NETBTC_MIN:-1.0}
-E1_M_MAX=${E1_M_MAX:-0.12}
-V1_M_MAX=${V1_M_MAX:-1.0}
-FPY_CAP=${FPY_CAP:-12}
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.."; pwd)"
+cd "$REPO_ROOT"
 
-# --- Tag activo y freeze ---
-TAG="$(tr -d '\r\n' < deploy/ACTIVE.tag 2>/dev/null || true)"
-if [ -z "${TAG:-}" ]; then
-  echo "[ERR] deploy/ACTIVE.tag vacío o ausente"
-  exit 2
-fi
+TAG="$(tr -d '\r' < deploy/ACTIVE.tag | head -n1 | xargs || true)"
+[ -n "${TAG:-}" ] || { echo "[ERR] ACTIVE.tag vacío o ilegible"; exit 2; }
 
-FREEZE="reports/mini_accum/_freezes/${TAG}.freeze.yaml"
-if [ ! -f "$FREEZE" ]; then
-  echo "[ERR] No encontré freeze para TAG=$TAG en reports/mini_accum/_freezes"
-  exit 2
-fi
+: "${NETBTC_MIN:=1.0}"
+: "${V1_M_MAX:=1.0}"
+: "${E1_M_MAX:=0.12}"
+: "${FPY_CAP:=12}"
 
-# --- Extraer KPIs (coerción numérica) ---
-num_yq () { awk -F: -v key="$1" 'index($1,key){gsub(/[[:space:]]/,"",$2); print ($2+0)}' "$FREEZE"; }
-SATS="$(num_yq sats_mult)"
-MDD="$(num_yq mdd_vs_hodl)"
-FLIPS="$(num_yq flips)"
+resolve_freeze_and_kind() {
+  case "$1" in
+    PROD_E1_Y2_2022)     echo "reports/mini_accum/_freezes/E1_Y2_2022.freeze.txt E1";;
+    PROD_KISSv1_2023)    echo "reports/mini_accum/_freezes/V1TOP_2023.freeze.txt V1";;
+    PROD_KISSv1_2024)    echo "reports/mini_accum/_freezes/V1TOP_2024.freeze.txt V1";;
+    PROD_KISSv1_2025H1)  echo "reports/mini_accum/_freezes/V1TOP_2025H1.freeze.txt V1";;
+    *)                   return 1;;
+  esac
+}
 
-# --- Tipo de preset: V1 o E1 ---
-KIND=$([[ "$TAG" == *"E1"* ]] && echo "E1" || echo "V1")
-M_MAX=$([ "$KIND" = "E1" ] && echo "$E1_M_MAX" || echo "$V1_M_MAX")
+read -r FRZ KIND <<<"$(resolve_freeze_and_kind "$TAG")" || { 
+  echo "[ERR] TAG=$TAG sin mapping conocido"; exit 2; }
 
-# --- Comparadores numéricos puros ---
-lt(){ awk -v A="$1" -v B="$2" 'BEGIN{exit ((A+0)<(B+0))?0:1}'; }
-gt(){ awk -v A="$1" -v B="$2" 'BEGIN{exit ((A+0)>(B+0))?0:1}'; }
+FRZ_ABS="$REPO_ROOT/$FRZ"
+[ -s "$FRZ_ABS" ] || { echo "[ERR] No encontré freeze para TAG=$TAG en $FRZ_ABS"; exit 2; }
 
-# --- Checks ---
+# --- Extracción robusta: primero YAML, luego fallback clave=valor ---
+yaml_get_num() { grep -E "^[[:space:]]*$1:[[:space:]]*[0-9.]+$" "$FRZ_ABS" | sed -E "s/.*$1:[[:space:]]*([0-9.]+)/\1/" | head -n1; }
+kv_get_num()   { awk -F= -v k="$1" '$1~k{gsub(/[[:space:]]/,"",$2);print $2;exit}' "$FRZ_ABS"; }
+
+SATS="$(yaml_get_num 'sats_mult' || true)";     [ -n "$SATS" ] || SATS="$(kv_get_num 'NetBTC' || true)"
+MDD="$(yaml_get_num 'mdd_vs_hodl' || true)";    [ -n "$MDD"  ] || MDD="$(kv_get_num 'MDD_vs_HODL' || true)"
+FLIPS="$(yaml_get_num 'flips' || true)";        [ -n "$FLIPS" ] || FLIPS="$(kv_get_num 'flips' || true)"
+
+SATS="${SATS:-0}"; MDD="${MDD:-0}"; FLIPS="${FLIPS:-0}"
+
+M_MAX="$V1_M_MAX"; [ "$KIND" = "E1" ] && M_MAX="$E1_M_MAX"
+
 FAIL=0
-if lt "$SATS" "$NETBTC_MIN"; then
-  echo "[ALERT] NetBTC=$SATS < $NETBTC_MIN"
-  FAIL=1
-fi
-if gt "$MDD" "$M_MAX"; then
-  echo "[ALERT] MDD_vs_HODL=$MDD > $M_MAX ($KIND)"
-  FAIL=1
-fi
-if gt "$FLIPS" "$FPY_CAP"; then
-  echo "[ALERT] flips=$FLIPS > cap=$FPY_CAP"
-  FAIL=1
-fi
+cmp_float(){ awk "BEGIN{exit !($1)}"; }
 
-echo "[HEALTH] TAG=$TAG kind=$KIND  NetBTC=$SATS  MDD=$MDD  flips=$FLIPS  caps: NETBTC_MIN=$NETBTC_MIN M_MAX=$M_MAX FPY_CAP=$FPY_CAP"
+cmp_float "$SATS >= $NETBTC_MIN" || { echo "[ALERT] NetBTC=$SATS < $NETBTC_MIN"; FAIL=1; }
+cmp_float "$MDD <= $M_MAX"       || { echo "[ALERT] MDD_vs_HODL=$MDD > $M_MAX ($KIND)"; FAIL=1; }
+cmp_float "$FLIPS <= $FPY_CAP"   || { echo "[ALERT] flips=$FLIPS > cap=$FPY_CAP"; FAIL=1; }
+
+printf "[HEALTH] TAG=%s kind=%s  NetBTC=%s  MDD=%s  flips=%s  caps: NETBTC_MIN=%s M_MAX=%s FPY_CAP=%s\n" \
+  "$TAG" "$KIND" "$SATS" "$MDD" "$FLIPS" "$NETBTC_MIN" "$M_MAX" "$FPY_CAP"
+
 exit "$FAIL"
