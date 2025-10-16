@@ -52,3 +52,7 @@ reports/**
 reports/mini_accum/ONE_PAGER.md
 reports/mini_accum/GATE_STATUS.txt
 reports/mini_accum/STRESS_*.txt
+artifacts/
+data/
+
+!backups/weekly_backup.sh
