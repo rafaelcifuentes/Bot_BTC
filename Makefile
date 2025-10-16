@@ -6,6 +6,8 @@ V1_M_MAX ?= 1.0
 .PHONY: help deploy-help deploy-plan deploy-select deploy-status
 .DEFAULT_GOAL := help
 
+# Evitamos TABs en recetas
+
 # Aliases: reenvían a mk/deploy.mk
 deploy-help deploy-plan deploy-select deploy-status:
 	$(MAKE) -f mk/deploy.mk -s $@
