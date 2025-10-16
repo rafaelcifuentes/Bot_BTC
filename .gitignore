@@ -42,3 +42,9 @@ mk/*.bak.*
 mk/stress.mk.__new
 scripts/live/
 backups/
+.githooks/pre-commit.bak.*
+Makefile.fix_bak.*
+mk/*.bak.*
+mk/stress.mk.__new
+scripts/live/
+backups/
