@@ -58,3 +58,5 @@ data/
 !/backups/
 !/backups/weekly_backup.sh
 !/backups/.backup_exclude
+scripts/mini_accum/dev/
+mk/*.fix_bak.*
