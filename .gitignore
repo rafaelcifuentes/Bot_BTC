@@ -48,3 +48,7 @@ mk/*.bak.*
 mk/stress.mk.__new
 scripts/live/
 backups/
+reports/**
+reports/mini_accum/ONE_PAGER.md
+reports/mini_accum/GATE_STATUS.txt
+reports/mini_accum/STRESS_*.txt
