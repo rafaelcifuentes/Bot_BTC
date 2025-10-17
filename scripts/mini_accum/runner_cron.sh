@@ -1,3 +1,4 @@
+[ -f "$HOME/PycharmProjects/Bot_BTC/.env.signals" ] && . "$HOME/PycharmProjects/Bot_BTC/.env.signals"
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="${ROOT:-$HOME/PycharmProjects/Bot_BTC}"
