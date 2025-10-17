@@ -6,3 +6,7 @@
 - Tag activo: DRIVE_2023
 - Evidencia: logs/preflight.log, logs/deploy.log
 
+## 2025-10-17T18:16:16Z — Go-Live
+- Tag activo: DRIVE_2023
+- Evidencia local: logs/preflight.log, logs/deploy.log (no versionados)
+
