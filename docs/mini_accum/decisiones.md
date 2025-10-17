@@ -457,3 +457,13 @@
 [GATE] FAIL: KPI sin métrica trazable de equity/net (e.g. sats_mult).
 ```
 
+## 2025-10-17T23:37:30Z — Gate v2.0 (mini-accum, oos24H1)
+```
+[DBG] BASE_KPI=docs/mini_accum/checkpoints/20251017_1908UTC/base_v0_1_20250912_0943_kpis__v3p3N2g-F2-Q4_E3-oos24H1.csv
+[DBG] CAND_KPI=docs/mini_accum/checkpoints/20251017_1908UTC/base_v0_1_20250912_1002_kpis__v3p3N2g-F2-Q4_E3-oos24H1.csv
+[DBG] BASE_EQ=/tmp/base_eq_oos24.csv
+[DBG] CAND_EQ=/tmp/cand_eq_oos24.csv
+[DBG] LIFT_MIN=5
+[GATE] FAIL: KPI sin métrica trazable de equity/net y no se pasó --base-eq/--cand-eq.
+```
+
