@@ -450,3 +450,10 @@
 - OOS 2022: NetBTC ~ 2.916 · MDD_vs_HODL ~ 0.1055 · flips = 8
 - Freeze: reports/mini_accum/_freezes/E1_Y2_2022.freeze.txt
 - Uso operativo: aplicar sólo en Year+2 post-halving; resto de años = KISS v1 TOP.
+## 2025-10-17T23:27:06Z — Gate v2.0 (mini-accum)
+```
+[DBG] keys BASE: {'sats': None, 'mdd': None, 'fpy': 'flips_per_year', 'flips': 'flips_total'}
+[DBG] keys CAND: {'sats': None, 'mdd': None, 'fpy': 'flips_per_year', 'flips': 'flips_total'}
+[GATE] FAIL: KPI sin métrica trazable de equity/net (e.g. sats_mult).
+```
+
