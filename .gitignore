@@ -67,3 +67,9 @@ deploy/live_fee_slip
 signals/*                 # ignora todo dentro...
 !signals/.gitignore       # ...menos el .gitignore
 !signals/README.md        # ...y el README
+
+# -- signals runtime: sólo metadatos versionados --
+!signals/
+signals/*
+!signals/.gitignore
+!signals/README.md
