@@ -59,7 +59,7 @@ fi
 if [[ -n "${EXT_BACKUP_DIR:-}" ]]; then
   DEST="${EXT_BACKUP_DIR%/}/$STAMP"
   mkdir -p "$DEST" 2>/dev/null || true
-  if rsync -ah --info=progress2 "$BK"/ "$DEST"/; then
+  if rsync -ah --progress "$BK"/ "$DEST"/; then
     echo "[OK] Copia externa en: $DEST" | tee "$BK/EXTERNAL_COPY.txt"
   else
     echo "[WARN] No pude copiar a EXT_BACKUP_DIR='$EXT_BACKUP_DIR' (continuo con backup local)" | tee "$BK/EXTERNAL_COPY.txt"
