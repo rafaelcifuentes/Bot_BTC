@@ -60,3 +60,4 @@ data/
 !/backups/.backup_exclude
 scripts/mini_accum/dev/
 mk/*.fix_bak.*
+deploy/live_fee_slip
