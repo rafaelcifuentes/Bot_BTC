@@ -15,3 +15,8 @@
 - Línea: `2025-10-17T19:57:36Z,DRIVE_2023,HOLD,70042,smoke-insert-awx`
 - Opt-in: archivo CSV (SLACK_WEBHOOK = vacío por ahora)
 
+## 2025-10-17T20:30:46Z — Primer latido de señales (v2.1-ops)
+- Modo: LIVE | Tag: DRIVE_2023
+- Línea: `2025-10-17T19:57:36Z,DRIVE_2023,HOLD,70042,smoke-insert-awx`
+- Opt-in: archivo CSV (SLACK_WEBHOOK = vacío por ahora)
+
