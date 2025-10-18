@@ -1,0 +1,58 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+reports/
+.env
+!reports/mini_accum/*__DEMO_PASS.*
+# --- allow publishing PASS artefacts only ---
+!reports/mini_accum/
+reports/mini_accum/*
+!reports/mini_accum/*__DEMO_PASS.*
+# -------------------------------------------
+
+# mini_accum live artifacts
+signals/
+health/
+reports/mini_accum/*state*.json
+reports/mini_accum/*kpis.csv
+logs/
+# data/artefactos locales
+data/ohlc/**/*.csv
+cache/
+logs/
+reports/**/*
+!docs/mini_accum/checkpoints/**   # preserva snapshots
+data/tmp_wf/*.yaml
+
+# Copias de trabajo (no tocar PROD)
+configs/mini_accum/_shadow_v1/
+!reports/mini_accum/_freezes/**
+!reports/mini_accum/_freezes/**
+
+# editor/tmp artifacts
+*.tmp.*
+
+# track canonical freezes
+!reports/mini_accum/_freezes/
+!reports/mini_accum/_freezes/*.freeze.txt
+.githooks/pre-commit.bak.*
+Makefile.*bak*
+mk/*.bak.*
+mk/stress.mk.__new
+scripts/live/
+backups/
+.githooks/pre-commit.bak.*
+Makefile.fix_bak.*
+mk/*.bak.*
+mk/stress.mk.__new
+scripts/live/
+backups/
+reports/**
+reports/mini_accum/ONE_PAGER.md
+reports/mini_accum/GATE_STATUS.txt
+reports/mini_accum/STRESS_*.txt
+artifacts/
+data/
+
+!backups/weekly_backup.sh

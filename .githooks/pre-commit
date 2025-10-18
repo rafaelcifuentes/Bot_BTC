@@ -12,3 +12,9 @@ for f in $CHANGED; do
   fi
 done
 [ $ok -eq 1 ] || exit 1
+# --- README git-transcript guard ---
+if [[ -f README.md ]] && grep -Eq '^(Enumerating objects|Counting objects|Delta compression using|Compressing objects|Writing objects|Total [0-9]|remote: Resolving deltas|To github\.com:)' README.md; then
+  echo "[pre-commit] README contiene salida de git/terminal. Límpialo antes de commitear."
+  exit 1
+fi
+# --- END ---
