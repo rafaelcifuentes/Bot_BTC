@@ -73,3 +73,17 @@ signals/*                 # ignora todo dentro...
 signals/*
 !signals/.gitignore
 !signals/README.md
+# --- local & artifacts ---
+.venv*/
+.venv_bad_*/
+btc_4h.csv
+corazon/
+docs/mini_accum/checkpoints/
+reports_exp_sent/
+experiments_log*.csv
+minigrid_*_results*.csv
+minigrid_gate_results.csv
+registry_runs.csv
+trades_oos.csv
+docs/**/flips_log_*.csv
+docs/**/live_kpis_*.csv
