@@ -467,3 +467,13 @@
 [GATE] FAIL: KPI sin métrica trazable de equity/net y no se pasó --base-eq/--cand-eq.
 ```
 
+## 2025-10-18T00:06:48Z — Gate mini-accum v2.0 (oos24H1 real)
+```
+[DBG] BASE_KPI=docs/mini_accum/checkpoints/20251017_1908UTC/WF_2023_kpis__v1_2.csv
+[DBG] CAND_KPI=docs/mini_accum/checkpoints/20251017_1908UTC/WF_2024_kpis__v1_2.csv
+[DBG] BASE_EQ=
+[DBG] CAND_EQ=
+[DBG] LIFT_MIN=5
+[DBG] LABELS: BASE=WF_2023 CAND=WF_2024
+```
+
