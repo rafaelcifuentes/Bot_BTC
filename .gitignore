@@ -87,3 +87,10 @@ registry_runs.csv
 trades_oos.csv
 docs/**/flips_log_*.csv
 docs/**/live_kpis_*.csv
+.env.exchange.testnet
+.env.exchange.testnet
+
+# Large archives
+*.tgz
+*.tar.gz
+code_HEAD.tgz
