@@ -28,6 +28,7 @@ print(f"{ts()} INFO mini_accum: LOG_LEVEL=INFO aplicado")
 
 # --- Chequeo de frescura de señal ---
 sig_path = os.path.join(ROOT, "signals", "mini_accum", "latest.json")
+STALE_H = float(os.getenv('STALE_HOURS', '24'))
 age_h = None
 try:
     with open(sig_path, "r", encoding="utf-8") as f:
