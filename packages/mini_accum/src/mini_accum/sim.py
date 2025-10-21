@@ -33,14 +33,19 @@ class TradeCosts:
 
 def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFrame, dict]:
     """
-    Backtest binario BTC↔USDC:
-      - Señal: EMA_fast > EMA_slow (con banda cross_buffer_bps) y macro verde (D1 close > D1 EMA200)
-      - Salidas: activa con confirmación (confirm_bars) y pasiva por cruce (ema_fast<ema_slow)
-      - Anti-whipsaw:
+    Backtest binario BTC↔USDC (KISS v1 + hooks v2 opt-in):
+      - Señal v1: EMA_fast > EMA_slow (con banda cross_buffer_bps) y macro verde (D1 close > D1 EMA200)
+      - Salidas v1: activa con confirmación (confirm_bars) y pasiva por cruce (ema_fast<ema_slow)
+      - Anti-whipsaw v1:
           * dwell mínimo entre flips (dwell_bars_min_between_flips)
           * pausa tras flip (pause_after_flip_bars), opcionalmente también bloquea ventas (pause_affects_sell)
-      - Presupuesto anual (flip_budget.hard_per_year) y throttle semanal soft de BUY (flip_budget.soft_per_week)
-      - Régimen ATR con “yellow band” (modules.atr_regime.{enabled,percentile_p,yellow_band_pct,pause_affects_sell})
+      - Presupuesto v1: hard_per_year y throttle semanal soft de BUY (soft_per_week)
+      - Régimen v1: atr_regime + xb_adaptive (ambos opt-in)
+      - Guard v1: exit_atr (opt-in)
+      - Hooks v2 (opt-in, por defecto OFF):
+          * bull_hold: bloquea SELL en macro fuerte (D1 close > EMA200*(1+margin))
+          * cooldown_after_loss: tras vender por debajo del último BUY, bloquea BUY N barras
+          * hibernation_on_chop: bloquea BUY si la pendiente de EMA55 es plana (por bps)
       - Ejecución: al OPEN de la siguiente vela
     Requiere en df4: ['ts','open','high','low','close','d_close','d_ema200'] (merge previo).
     """
@@ -65,16 +70,45 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
     df = df4.copy()
 
     # --- EMAs 4h + cross buffer en bps ---
-    ema_fast = int(cfg['signals']['ema_fast'])
-    ema_slow = int(cfg['signals']['ema_slow'])
+    # Soporta YAML antiguo (`signals`) y nuevo (`strategy.params`).
+    signals = cfg.get('signals')
+    if not isinstance(signals, dict):
+        signals = cfg.get('strategy', {}).get('params', {})
+    if not signals:
+        raise KeyError('signals')
+
+    def _gi(d, k):
+        if k not in d:
+            raise KeyError(f"signals.{k}")
+        return int(d[k])
+
+    ema_fast = _gi(signals, 'ema_fast')
+    ema_slow = _gi(signals, 'ema_slow')
+
     df['ema21'] = df['close'].ewm(span=ema_fast, adjust=False).mean()
     df['ema55'] = df['close'].ewm(span=ema_slow, adjust=False).mean()
 
-    xbps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0)) / 10_000.0
+    xbps = float((signals or {}).get('cross_buffer_bps', 0.0)) / 10_000.0
     up_thr = (1.0 + xbps)
     down_thr = (1.0 - xbps)
     df['trend_up'] = df['ema21'] > (df['ema55'] * up_thr)
     df['trend_dn'] = df['ema21'] < (df['ema55'] * down_thr)
+
+    # --- v2: pre-cálculos de hibernación por slope EMA55 (opt-in) ---
+    v2cfg = (cfg.get('modules', {}) or {}).get('v2', {}) or {}
+    hib_cfg = v2cfg.get('hibernation_on_chop', {}) or {}
+    hib_enabled = bool(hib_cfg.get('enabled', False))
+    ema_slope_period = int(hib_cfg.get('ema_slope_period', 20))
+    ema_slope_bps = float(hib_cfg.get('ema_slope_bps', 5.0))
+
+    if hib_enabled:
+        ema_ref = df['ema55']
+        ema_prev = ema_ref.shift(ema_slope_period)
+        # pendiente normalizada en bps: (EMA - EMA_prev)/EMA_prev * 10k
+        slope_bps = ((ema_ref - ema_prev) / ema_prev.replace(0, np.nan)) * 10_000.0
+        df['chop_zone'] = slope_bps.abs() < ema_slope_bps
+    else:
+        df['chop_zone'] = False
 
     # --- Exit guardrail by ATR (optional, controlled by YAML: filters.exit_atr.{enabled,period,mult}) ---
     ex_atr_cfg = (cfg.get('filters', {}) or {}).get('exit_atr', {}) or {}
@@ -94,9 +128,15 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
         # Allow passive exit only if close < ema21 - k*ATR
         df['exit_guard_ok'] = df['close'] < (df['ema21'] - mult_atr * atr)
 
-    # Macro (debe venir del merge diario)
+    # Macro (preferir SMA200 diaria si viene del merge; fallback a EMA200)
     if 'macro_green' not in df.columns:
-        df['macro_green'] = df['d_close'] > df['d_ema200']
+        if 'd_sma200' in df.columns:
+            df['macro_green'] = df['d_close'] > df['d_sma200']
+        elif 'd_ema200' in df.columns:
+            df['macro_green'] = df['d_close'] > df['d_ema200']
+        else:
+            # fallback neutro (todo rojo) para no inventar macro
+            df['macro_green'] = False
 
     # --- Anti-whipsaw (pausa y dwell) ---
     aw = cfg.get('anti_whipsaw', {}) or {}
@@ -105,7 +145,7 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
     pause_affects_sell = bool(aw.get('pause_affects_sell', False))
 
     # --- Exit Active params (seguros si faltan en el YAML) ---
-    exit_cfg = cfg.get('signals', {}).get('exit_active', {}) or {}
+    exit_cfg = (signals or {}).get('exit_active', {}) or {}
     active_exit_enabled = bool(exit_cfg.get('enabled', True))
     confirm_bars = int(exit_cfg.get('confirm_bars', 1))
     max_wait_after_confirm = int(exit_cfg.get('max_wait_bars_after_confirm', 2))
@@ -143,8 +183,6 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
         df['atr_yellow'] = False
 
     # --- XB adaptativo por ATR (opcional) ---
-    # Si está habilitado, recomputa trend_up/trend_dn usando un buffer por-vela
-    # determinado por el régimen ATR (quiet / yellow / loud).
     xb_cfg = (cfg.get('modules', {}) or {}).get('xb_adaptive', {}) or {}
     if bool(xb_cfg.get('enabled', False)):
         # Helper: convertir bps a fracción
@@ -152,7 +190,7 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
             return float(v) / 10_000.0
 
         # Valores por régimen; si faltan, caen al cross_buffer global
-        default_bps = float(cfg.get('signals', {}).get('cross_buffer_bps', 0.0))
+        default_bps = float((signals or {}).get('cross_buffer_bps', 0.0))
         xb_quiet = _bps_to_frac(xb_cfg.get('quiet_bps', default_bps))
         xb_yellow = _bps_to_frac(xb_cfg.get('yellow_bps', default_bps))
         xb_loud = _bps_to_frac(xb_cfg.get('loud_bps', default_bps))
@@ -167,6 +205,18 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
         df['trend_up'] = df['ema21'] > (df['ema55'] * up_thr_row)
         df['trend_dn'] = df['ema21'] < (df['ema55'] * down_thr_row)
 
+    # --- v2: estado para bull-hold y cooldown (opt-in) ---
+    bull_cfg = v2cfg.get('bull_hold', {}) or {}
+    bull_enabled = bool(bull_cfg.get('enabled', False))
+    bull_margin = float(bull_cfg.get('margin_bps', 0.0)) / 10_000.0
+
+    cool_cfg = v2cfg.get('cooldown_after_loss', {}) or {}
+    cool_enabled = bool(cool_cfg.get('enabled', False))
+    cool_bars = int(cool_cfg.get('bars', 0))
+
+    last_buy_price: Optional[float] = None
+    cooldown_until_i = -1
+
     # --- Capital inicial ---
     seed_btc = float(cfg['backtest'].get('seed_btc', 1.0))
     btc = seed_btc
@@ -177,13 +227,13 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
         usd = btc * first_open
         btc = 0.0
 
-    # --- Estado de control ---
+    # --- Estado de control v1 ---
     bars_since_flip = dwell_min  # permitir flip inicial
     pause_until_i = -1  # índice (inclusive) hasta el que dura la pausa tras flip
 
     flips_exec_ts: List[pd.Timestamp] = []
     flips_blocked_hard = 0
-    last_buys: deque[pd.Timestamp] = deque()  # para throttle semanal soft (ventana 7 días)
+    last_buys: deque[pd.Timestamp] = deque()  # para throttle semanal soft (ventana 7d)
 
     # Órdenes programadas (+ razones persistentes para el flip)
     schedule_buy_i: Optional[int] = None
@@ -222,6 +272,7 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
                 bars_since_flip = 0
                 executed = 'BUY'
                 exec_reason_cur = schedule_buy_reason or 'BUY_trend'
+                last_buy_price = float(row['open'])  # v2: recuerda precio de compra
                 if pause_after_flip_bars > 0:
                     pause_until_i = max(pause_until_i, i + pause_after_flip_bars)
             schedule_buy_i = None
@@ -237,6 +288,11 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
                 bars_since_flip = 0
                 executed = 'SELL'
                 exec_reason_cur = schedule_sell_reason or 'SELL_cross_or_active'
+                # v2: si salimos bajo el último BUY → cooldown
+                if last_buy_price is not None and cool_enabled:
+                    if float(row['open']) < float(last_buy_price):
+                        cooldown_until_i = i + cool_bars
+                last_buy_price = None
                 if pause_after_flip_bars > 0:
                     pause_until_i = max(pause_until_i, i + pause_after_flip_bars)
             schedule_sell_i = None
@@ -254,11 +310,41 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
         can_buy = can_dwell and (not under_pause)  # la pausa siempre afecta compras
         can_sell = can_dwell and (not under_pause if pause_affects_sell else True)
 
+        # Si había oportunidad (macro+trend) pero NO se agenda BUY, documentamos el motivo
+        if position == 'STABLE' and schedule_buy_i is None and (macro_green and trend_up):
+            if blocked_reason_cur is None:
+                if not can_dwell:
+                    blocked_reason_cur = 'dwell'
+                elif under_pause:
+                    blocked_reason_cur = 'pause'
+                elif atr_enabled and bool(df['atr_yellow'].iat[i]):
+                    blocked_reason_cur = 'atr_yellow'
+                # Nota: ADX u otros filtros externos no se marcan aquí porque no viven en simulate();
+                # si quieres, podemos propagar un flag precomputado en df (ej. df['gate_all_ok'])
+
+        # Gating por ATR yellow band...
+
         # Gating por ATR yellow band (si está activo)
         if atr_enabled and bool(df['atr_yellow'].iloc[i]):
             can_buy = False
             if atr_blocks_sell:
                 can_sell = False
+
+        # --- v2: hibernación en chop (bloquea buys) ---
+        if hib_enabled and bool(df['chop_zone'].iat[i]):
+            can_buy = False
+
+        # --- v2: cooldown tras pérdida (bloquea buys) ---
+        if cool_enabled and i < cooldown_until_i:
+            can_buy = False
+
+        # --- v2: bull-hold (bloquea sells en macro fuerte) ---
+        if bull_enabled and position == 'BTC':
+            macro_strong = macro_green and (row['d_close'] > (row['d_ema200'] * (1.0 + bull_margin)))
+            if macro_strong:
+                can_sell = False
+                # evita armar/continuar salida activa en bull fuerte
+                pending_exit_i = None
 
         # ======= Salida ACTIVA =======
         if active_exit_enabled and position == 'BTC' and (row['close'] < row['ema21']) and (pending_exit_i is None):

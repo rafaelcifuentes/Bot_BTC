@@ -23,7 +23,7 @@ costs:
 flip_budget:
   enforce_hard_yearly: true
   hard_per_year: 26        # mantenlo, ya no deberías agotarlo en febrero
-  soft_per_week: 1         # límite “soft” semanal (comentario si no aplica)
+  soft_per_week: 1         # límite "soft" semanal (comentario si no aplica)
   soft_weekly: 1           # redundante por si el loader usa este nombre
   soft_roundtrips_per_week: 1  # si ves demasiadas recompras, sube a 0 (sin throttle) o 1 según convenga
 
@@ -33,7 +33,7 @@ signals:
   cross_buffer_bps: 36
   exit_active:
     rule: "close < ema_fast"
-    confirm_bars: 1        # antes 0 → evita “ping-pong” intradía
+    confirm_bars: 1        # antes 0 → evita "ping-pong" intradía
     max_wait_bars_after_confirm: 2   # nuevo (usa el default si no lo pones)
     dynamic_confirm_by_atr:
       enabled: false

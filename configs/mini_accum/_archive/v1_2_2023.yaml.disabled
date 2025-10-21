@@ -1,0 +1,40 @@
+---
+tag: v1_2_DD15_RB1_H30_G200_BULL0_D0
+
+ohlc_4h_csv: ""data/tmp_wf/BTC-USD_4h_WF_2023.csv""
+ohlc_1d_csv: "data/ohlc/1d/BTC-USD.csv"
+reports_dir: ""reports/mini_accum/WF_2023/v1_2""
+
+signals:
+  entry:
+    rule: "ema21 > ema55 and macro_green"
+  exit_active:
+    rule: "close < ema21 and macro_red"
+    confirm_bars: 2
+    max_wait_bars_after_confirm: 2
+  exit_passive:
+    rule: "ema21 < ema55 and macro_red"
+
+filters:
+  adx:
+    enabled: true
+    period: 14
+    min: 25
+  atr_regime:
+    enabled: false
+    percentile_p: 70
+
+risk:
+  hard_dd_pct: 0.15
+  h_bars: 30
+  rebalance:
+    frequency: "1W"
+
+costs:
+  fee_bps_per_side: 3
+  slip_bps_per_side: 2
+  spread_bps: 10
+  gamma_bps: 200
+  bull_bias_bps: 0
+
+dwell_bars_min_between_flips: 0

@@ -1,0 +1,42 @@
+backtest:
+  reports_dir: reports/mini_accum/WF_YYYY/v2_0
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
+  ts_col: ts
+  tz_input: UTC
+discipline:
+  bull_hold:
+    adx_min: 25
+    enabled: false
+    min_bars_after_entry: 2
+  cooldown_after_loss:
+    cooldown_bars: 12
+    enabled: false
+  hibernation_on_chop:
+    adx_max: 22
+    enabled: true
+    min_bars: 6
+execution:
+  bull_bias_bps: 0
+  gamma_bps: 0
+filters:
+  macro_sma: 200
+horizon:
+  h_bars: 30
+rebalancing:
+  frequency: 1
+risk:
+  hard_dd_pct: 15
+strategy:
+  params:
+    adx_len: 22
+    ema_fast: 21
+    ema_slow: 55
+preset: E3d_adx22
+signals:
+  ema_fast: 21
+  ema_slow: 55

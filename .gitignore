@@ -24,3 +24,73 @@ logs/
 reports/**/*
 !docs/mini_accum/checkpoints/**   # preserva snapshots
 data/tmp_wf/*.yaml
+
+# Copias de trabajo (no tocar PROD)
+configs/mini_accum/_shadow_v1/
+!reports/mini_accum/_freezes/**
+!reports/mini_accum/_freezes/**
+
+# editor/tmp artifacts
+*.tmp.*
+
+# track canonical freezes
+!reports/mini_accum/_freezes/
+!reports/mini_accum/_freezes/*.freeze.txt
+.githooks/pre-commit.bak.*
+Makefile.*bak*
+mk/*.bak.*
+mk/stress.mk.__new
+scripts/live/
+.githooks/pre-commit.bak.*
+Makefile.fix_bak.*
+mk/*.bak.*
+mk/stress.mk.__new
+scripts/live/
+reports/**
+reports/mini_accum/ONE_PAGER.md
+reports/mini_accum/GATE_STATUS.txt
+reports/mini_accum/STRESS_*.txt
+artifacts/
+data/
+
+!backups/weekly_backup.sh
+/backups/**
+!/backups/
+!/backups/weekly_backup.sh
+!/backups/.backup_exclude
+scripts/mini_accum/dev/
+mk/*.fix_bak.*
+deploy/live_fee_slip
+
+# -- signals runtime: versionar solo metadatos --
+!signals/                 # permite descender al directorio
+signals/*                 # ignora todo dentro...
+!signals/.gitignore       # ...menos el .gitignore
+!signals/README.md        # ...y el README
+
+# -- signals runtime: sólo metadatos versionados --
+!signals/
+signals/*
+!signals/.gitignore
+!signals/README.md
+# --- local & artifacts ---
+.venv*/
+.venv_bad_*/
+btc_4h.csv
+corazon/
+docs/mini_accum/checkpoints/
+reports_exp_sent/
+experiments_log*.csv
+minigrid_*_results*.csv
+minigrid_gate_results.csv
+registry_runs.csv
+trades_oos.csv
+docs/**/flips_log_*.csv
+docs/**/live_kpis_*.csv
+.env.exchange.testnet
+.env.exchange.testnet
+
+# Large archives
+*.tgz
+*.tar.gz
+code_HEAD.tgz

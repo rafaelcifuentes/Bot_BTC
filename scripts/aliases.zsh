@@ -1,0 +1,1 @@
+gate25(){ local C=$(pick_latest "reports/mini_accum/*_kpis__WF_2025_*.csv"); local B=$(pick_latest "reports/mini_accum/*_kpis__OOS_2025H1_G200_DD15_RB1_H30_BULL0.csv"); gate_or_log "$B" "$C" "WF_2025_vs_BASE_2025H1"; }
