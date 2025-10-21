@@ -5,9 +5,10 @@ import os
 import sys
 import json
 from datetime import datetime, timezone
+import datetime as dt
 
 def ts() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 # --- Config (Binance-only for now; KISS) ---
 ROOT = os.environ.get("ROOT") or os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
@@ -28,15 +29,48 @@ print(f"{ts()} INFO mini_accum: LOG_LEVEL=INFO aplicado")
 
 # --- Chequeo de frescura de señal ---
 sig_path = os.path.join(ROOT, "signals", "mini_accum", "latest.json")
+
+def _load_latest(path:str):
+    try:
+        return json.load(open(path))
+    except Exception:
+        return {}
+
+
+def _pick_latest_ts(j, sig_path):
+    import datetime, os, json, math
+    from datetime import timezone
+    candidates = []
+    def add_iso(k):
+        v=j.get(k)
+        if isinstance(v,str) and v:
+            try: candidates.append(dt.datetime.fromisoformat(v.replace('Z','+00:00')))
+            except: pass
+        elif isinstance(v,(int,float)) and math.isfinite(v):
+            try: candidates.append(dt.datetime.fromtimestamp(v,tz=dt.timezone.utc))
+            except: pass
+    for k in ("ts_utc","ts_iso","ts","timestamp","updated_at","decided_at"):
+        add_iso(k)
+    # fallback: mtime del archivo
+    try:
+        mt=os.path.getmtime(sig_path)
+        candidates.append(dt.datetime.fromtimestamp(mt,tz=dt.timezone.utc))
+    except: pass
+    if not candidates:
+        return None
+    return max(candidates)
+
 STALE_H = float(os.getenv('STALE_HOURS', '24'))
-age_h = None
+latest = _load_latest(sig_path)
+latest_dt = _pick_latest_ts(latest, sig_path)
+age_h = None if latest_dt is None else (dt.datetime.now(dt.timezone.utc) - latest_dt).total_seconds()/3600
 try:
     with open(sig_path, "r", encoding="utf-8") as f:
         j = json.load(f)
     ts_utc = j.get("ts_utc")
     if ts_utc:
         sigts = datetime.fromisoformat(ts_utc.replace("Z", "+00:00"))
-        age_h = (datetime.now(timezone.utc) - sigts).total_seconds() / 3600.0
+        age_h = (dt.datetime.now(dt.timezone.utc) - sigts).total_seconds() / 3600.0
 except Exception as e:
     print(f"{ts()} [WARN] canary_live: cannot read signal ({e})")
 
