@@ -1,0 +1,7 @@
+overlays:
+  bull_guard_sell:
+    enabled: true
+    cond_a_close_below_G200_daily: true
+    cond_b_weekly_G200_not_recovered_bars: 2   # N semanas cerradas sin recuperar
+    override_exit_to_reduce_whips: true
+    respect_hard_stops: true                    # si hay hard-stop en tu core, respétalo

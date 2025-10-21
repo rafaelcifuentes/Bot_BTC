@@ -35,8 +35,8 @@ asset: BTC-USD
 timezone: UTC
 
 data:
-  ohlc_4h_csv: data/ohlc/_rescued/4h/BTC-USD.csv
-  ohlc_d1_csv: data/ohlc/_rescued/1d/BTC-USD.csv
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/d1/BTC-USD.csv
   ts_col: timestamp
   price_col: close
   tz_input: UTC

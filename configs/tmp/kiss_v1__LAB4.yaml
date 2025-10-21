@@ -13,7 +13,7 @@ signals:
   ema_slow: 55
   entry: ema21 > ema55 and macro_green
   exit_active:
-    rule: close < ema21 # bull-guard handles 2nd-bar gating
+    rule: close < ema21 and next_close <= next_ema21
     confirm_bars: 1
   exit_passive:
     rule: ema21 < ema55
@@ -53,16 +53,9 @@ modules:
     enabled: false
   force_sell_on_macro_red: false
 overlays:
-  # LAB4 “Bull-guard”
-  # Propósito: evitar vender y recomprar más caro en bull markets (anti-churn).
-  # Lógica (doble confirmación para permitir venta):
-  #   A) Diario: close_d1 < SMA200_d1
-  #   B) Semanal: últimas N semanas (N=2) por debajo de la SMA semanal de L semanas (L=30 ≈ 200 días).
-  # Sólo si A y B son verdaderas se permite la venta. Si `respect_hard_stops: true`, no bloquea los hard stops.
-  # Nota: usamos weekly_sma_len=30 por cobertura de datos; si tienes ≥200 semanas de histórico, puedes subirlo a 200.
   bull_guard_sell:
     enabled: true
-    weekly_sma_len: 30 # ≈ 200 días con tus datos semanales actuales
+    cond_a_close_below_G200_daily: true
     cond_b_weekly_G200_not_recovered_bars: 2
+    override_exit_to_reduce_whips: true
     respect_hard_stops: true
-    debug: true

@@ -1,0 +1,72 @@
+version: 0.1
+numeraire: BTC
+asset: BTC-USD
+timezone: UTC
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/d1/BTC-USD.csv
+  ts_col: ts
+  price_col: close
+  tz_input: UTC
+signals:
+  ema_fast: 21
+  ema_slow: 55
+  entry: ema21 > ema55 and macro_green # c1 ema21 > ema55 and macro_green
+  exit_active:
+    rule: close < ema21 # c1 and next_close <= next_ema21
+    confirm_bars: 1
+  exit_passive:
+    rule: ema21 < ema55
+anti_whipsaw:
+  dwell_bars_min_between_flips: 6 # c1 6
+  ttl_confirm_bars: 1
+costs:
+  fee_bps_per_side: 6
+  slip_bps_per_side: 6
+flip_budget:
+  enforce_hard_yearly: true
+  hard_per_year: 26
+  soft_per_month: 2
+backtest:
+  reports_dir: reports/mini_accum
+  seed_btc: 1.0
+kpis:
+  accept:
+    net_btc_ratio_min: 1.05
+    mdd_vs_hodl_ratio_max: 0.85
+    flips_per_year_max: 26
+    flips_per_month_soft: 2
+modules:
+  hibernation_chop:
+    enabled: false
+  grace_ttl:
+    enabled: false
+  weekly_turnover_budget:
+    enabled: true # c1 true
+    flips_per_week_max: 1
+  atr_regime:
+    enabled: true
+    lookback_bars: 14
+    percentile_p: 40
+    yellow_band_pct: 5
+  macro_persist:
+    enabled: false
+  force_sell_on_macro_red: false
+# LAB4 :: bull_guard_sell
+# Objetivo: en bull markets, solo permitir VENTAS con doble confirmación de debilidad
+#   A) Diario:   close < SMA200 (d1)
+#   B) Semanal:  close_semana < SMA(weekly_sma_len) durante >= cond_b_weekly_G200_not_recovered_bars semanas
+# Diseño actual:
+#   - weekly_sma_len = 30 (≈200 días) por cobertura limitada del histórico semanal (195 semanas disponibles -> SMA200w no cubre).
+#   - Si amplías el histórico d1 para tener ≥200 semanas, cambia weekly_sma_len a 200 y revalida.
+# Verificación rápida (bull 2023-10-01 → 2024-03-01, L=30, N=2):
+#   python -c "import os,pandas as pd,numpy as np,sys; S,E,L,N='2023-10-01','2024-03-01',30,2; root=os.path.expanduser('~/PycharmProjects/Bot_BTC'); h4=pd.read_csv(f'{root}/data/ohlc/4h/BTC-USD.csv',parse_dates=['ts']); d1=pd.read_csv(f'{root}/data/ohlc/d1/BTC-USD.csv',parse_dates=['ts']); h4=h4[(h4.ts>=S)&(h4.ts<E)].set_index('ts'); ema=lambda s,w:s.ewm(span=w,adjust=False,min_periods=w).mean(); h4['ema21']=ema(h4['close'],21); exit_like=(h4['close']<h4['ema21']).fillna(False); d1=d1.set_index('ts'); d1['sma200']=d1['close'].rolling(200,min_periods=200).mean(); condA=(d1['close']<d1['sma200']).reindex(h4.index,method='pad').fillna(False); wk_close=d1['close'].resample('W-SUN').last(); wk_sma=wk_close.rolling(L,min_periods=L).mean(); below=(wk_close<wk_sma); condB_week=(below.rolling(N,min_periods=N).apply(lambda x: bool(np.all(x)),raw=False)).astype(bool); wk_df=condB_week.dropna().to_frame('condB').reset_index(); condB_4h=pd.merge_asof(h4.reset_index(),wk_df,on='ts',direction='backward')['condB'].fillna(False); allowed=int((exit_like.values & condA.values & condB_4h.values).sum()); blocked=int((exit_like.values & ~(condA.values & condB_4h.values)).sum()); print(f'exit_like={int(exit_like.sum())}  allowed={allowed}  blocked={blocked}  A%={(condA.mean()*100):.1f}  B%={(condB_4h.mean()*100):.1f}')"
+# Resultado esperado con este dataset (a 2025-09): exit_like≈304, allowed≈4, blocked≈300 (≈98.7% bloqueadas).
+# Impacto observado en NET_BTC (SMOKEBULLv5 2023-10 → 2024-03): 0.0% (no hubo ventas en ambos); el guard es “anti-churn”, no busca alpha por sí mismo.
+overlays:
+  bull_guard_sell:
+    enabled: false
+    weekly_sma_len: 30 # ≈ 200 días
+    cond_b_weekly_G200_not_recovered_bars: 2
+    respect_hard_stops: true
+    debug: true

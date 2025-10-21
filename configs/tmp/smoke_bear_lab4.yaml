@@ -11,14 +11,14 @@ data:
 signals:
   ema_fast: 21
   ema_slow: 55
-  entry: ema21 > ema55 and macro_green
+  entry: ema21 > ema55
   exit_active:
-    rule: close < ema21 # bull-guard handles 2nd-bar gating
-    confirm_bars: 1
+    rule: close < ema21
+    confirm_bars: 0
   exit_passive:
     rule: ema21 < ema55
 anti_whipsaw:
-  dwell_bars_min_between_flips: 6
+  dwell_bars_min_between_flips: 0
   ttl_confirm_bars: 1
 costs:
   fee_bps_per_side: 6
@@ -42,10 +42,10 @@ modules:
   grace_ttl:
     enabled: false
   weekly_turnover_budget:
-    enabled: true
+    enabled: false
     flips_per_week_max: 1
   atr_regime:
-    enabled: true
+    enabled: false
     lookback_bars: 14
     percentile_p: 40
     yellow_band_pct: 5
@@ -53,16 +53,8 @@ modules:
     enabled: false
   force_sell_on_macro_red: false
 overlays:
-  # LAB4 “Bull-guard”
-  # Propósito: evitar vender y recomprar más caro en bull markets (anti-churn).
-  # Lógica (doble confirmación para permitir venta):
-  #   A) Diario: close_d1 < SMA200_d1
-  #   B) Semanal: últimas N semanas (N=2) por debajo de la SMA semanal de L semanas (L=30 ≈ 200 días).
-  # Sólo si A y B son verdaderas se permite la venta. Si `respect_hard_stops: true`, no bloquea los hard stops.
-  # Nota: usamos weekly_sma_len=30 por cobertura de datos; si tienes ≥200 semanas de histórico, puedes subirlo a 200.
   bull_guard_sell:
     enabled: true
-    weekly_sma_len: 30 # ≈ 200 días con tus datos semanales actuales
     cond_b_weekly_G200_not_recovered_bars: 2
     respect_hard_stops: true
     debug: true

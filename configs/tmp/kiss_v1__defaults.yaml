@@ -1,0 +1,45 @@
+version: KISSv1_BASE_20250915_1642_final
+frozen: true
+notes:
+- baseline: provisional
+  frozen_at_utc: '2025-09-15T17:09:43.453727'
+- baseline: final
+  locked_at_utc: '2025-09-15T20:42:20.003374'
+status: final
+bull_hold:
+  enabled: true
+  macro:
+    ema_len: 200
+    adx_len: 14
+    adx_min: 20
+  sell:
+    confirm_closes_d1: 2
+  dd_cap: 15
+leverage:
+  mode: vol_target
+  fixed: 1.25
+  target_vol_ann: 0.45
+  max: 1.5
+  degear_on:
+    adx_below: 20
+    ema200_break_closes: 2
+  costs:
+    borrow_apr: 0.1
+    funding_apr: 0.0
+  risk_limits:
+    max_daily_loss_pct: 5
+    atr_stop_days: 5
+costs:
+  fee_bps_per_side: 6
+  slippage_bps_per_side: 6
+paths:
+  d1_csv: data/ohlc/1d/BTC-USD.csv
+  h4_csv: data/ohlc/4h/BTC-USD.csv
+backtest:
+  reports_dir: reports/mini_accum
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/d1/BTC-USD.csv
+  ohlc_1d_csv: data/ohlc/d1/BTC-USD.csv
+  ts_col: ts
+  tz_input: UTC

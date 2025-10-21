@@ -1,0 +1,9 @@
+data:
+  # Rutas a los CSV
+  ohlc_4h_csv: "data/ohlc/4h/BTC-USD.csv"
+  ohlc_d1_csv: "data/ohlc/d1/BTC-USD.csv"   # <- la que exige backtest.py
+  ohlc_1d_csv: "data/ohlc/d1/BTC-USD.csv"   # <- alias por compatibilidad
+
+  # Columna temporal unificada
+  ts_col: "ts"
+  tz_input: "UTC"

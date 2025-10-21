@@ -1,0 +1,3 @@
+backtest:
+  # carpeta donde tu runner escribe CSVs/rep
+  reports_dir: "reports/mini_accum"
