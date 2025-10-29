@@ -113,6 +113,11 @@ def main() -> None:
     ap.add_argument("--suffix", default=None, help="Sufijo de reporte; si no se pasa, se usa $REPORT_SUFFIX si existe")
     args = ap.parse_args()
 
+    # Validación explícita de la ruta de config para errores más claros
+    if not os.path.exists(args.config):
+        print(f"[ERROR] Config no encontrada: {args.config}")
+        raise SystemExit(2)
+
     # suffix precedence: CLI arg > env var
     suffix = args.suffix if args.suffix else os.environ.get("REPORT_SUFFIX")
 
