@@ -95,3 +95,43 @@ Este modo NO es una versión beta, es una versión de producción con capital re
 ¡Satochi Canario listo para despegar! 🕊️🌕
 
 ---
+
+# Stages
+- Shadow (DRYRUN) — actual
+- Pilot Live (DO_TRADE=1 con size min, sólo tras 5/5 sucesivos y gates OK)
+- Go-Live (post-pilot, sin cambios de lógica)
+
+## Gates de promoción
+- ≥5/5 días GREEN (criterio KISS), sin alertas duras.
+- MDD no empeora vs baseline; flips↓; NetBTC≈.
+## 📈 Estado de avance — corte UTC 2025-10-28 (Bogotá 2025-10-28)
+
+> Esta sección se **añade** sin borrar nada del contenido previo.
+
+### 🔎 Resumen operativo
+- **Canario GREEN** validado hoy: `.../evidence/dayN_2025-10-28/canary_live.20251028T180700Z.log` incluye `ready (signal fresh)` + `done` (sin errores).
+- **Gate** `gates_pilot_live`: detector GREEN robusto (acepta `→ **GREEN**` y patrón nuevo `ready+done`). **ATTEST** temporalmente en *warning* (no bloquea), manteniendo KISS.
+- **Reporte diario** `bb_dailyreport.zsh`: `- ATTEST OK: 1` (cálculo robusto, fallback a `health/mini_accum.status`).
+- **Freeze** etiquetado: `FREEZE_DAILY_20251028` publicado.
+- **Soak Test (Shadow/DRYRUN)**: reiniciado el 2025-10-27. **Día 1** contado = 2025-10-28 (faltan 6 para 7/7).
+- **Paquetes diarios**: `artifacts/canary_pack_20251028.tgz` generado.
+
+### ✅ Done (ajustado a Etapas 3–6 donde aplica)
+- **Shadow (pre-Etapa 3)** estable: canario horario DRYRUN con locks (rate-limit + process) activos.
+- **Gates**: GREEN robusto; ATTEST calculado y **reportado** (modo informativo).
+- **Evidencia**: `REPORT.md` diario + empaquetado por día.
+- **Trazabilidad**: freeze diario etiquetado en remoto.
+
+### 🧭 ToDo inmediato (próximas 72 h)
+- **7/7 GREEN**: mantener racha con **ATTEST OK** diario (≥1 log GREEN/día y reporte emitido).
+- **Docs**: incorporar el blueprint EN actualizado a `docs/` y enlazarlo desde `README`.
+- **Selector de régimen por ciclo**: añadir `scripts/mini_accum/dev/run_regime_year.sh` y preset `configs/mini_accum/presets/E1_Y2.yaml` (Y+2 ⇒ E1; resto ⇒ v1 TOP) para reproducibilidad.
+- **Pilot readiness (Etapa 3)**: preparar `RUN_MODE=canary` con **size real 10–20%** y **PAUSE** instantáneo (activar sólo tras 7/7).
+- **Backups / rollback (Etapa 5)**: validar backup automático de `state/`, `signals/latest.json`, `reports/*`; documentar comando de **replay** en el runbook.
+- **Monitoreo semanal (Etapas 4/6)**: crear `docs/mini_accum/Progreso.md` (tabla semanal) y `estado_semanal.md` (KPIs).
+
+### ⚠️ Riesgos / observaciones
+- Cambios de formato en logs: el gate cubre `ready+done`; si cambia el prefijo, habrá que ajustar el detector.
+- ATTEST en *warning*: reactivar modo “hard” cuando estabilicemos 7/7 sin falsos negativos.
+- Cron a `:07`: revisar colisiones tras cambios (locks están activos, pero conviene mirar).
+
