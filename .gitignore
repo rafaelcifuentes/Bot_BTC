@@ -28,3 +28,5 @@ artifacts/*.tgz
 evidence/dayN_*/
 logs/*.log
 scripts/mini_accum/kpi_guard_sandbox.py
+backups/**/*.tgz
+code_HEAD.tgz
