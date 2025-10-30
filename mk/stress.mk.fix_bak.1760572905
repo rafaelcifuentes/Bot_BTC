@@ -1,0 +1,40 @@
+.PHONY: stress-help stress-head stress-head-save stress-prob stress-prob-save
+
+# Usamos el mismo prefijo en este include también
+.RECIPEPREFIX := |
+
+stress-help:
+| cat <<-'H'
+| Uso: make [-s] stress-head [E1_S_MIN=...] [E1_M_MAX=...] [V1_S_MIN=...] [V1_M_MAX=...]
+| Ej.:  E1_S_MIN=3.0 V1_M_MAX=0.9 make -s stress-head
+| make -s stress-prob
+| make -s stress-head-save && tail -n 3 reports/mini_accum/STRESS_HEAD.txt
+| make -s stress-prob-save  && tail -n 3 reports/mini_accum/STRESS_PROB.txt
+| H
+
+# Muestra la tabla de headroom (tu script ya existe)
+stress-head:
+| echo "==      THR  E1_S_MIN=$${E1_S_MIN:-2.9}  E1_M_MAX=$${E1_M_MAX:-0.12}     V1_S_MIN=$${V1_S_MIN:-1.0}  V1_M_MAX=$${V1_M_MAX:-1.0}  =="
+| scripts/mini_accum/dev/stress_head.sh
+
+# Guarda el headroom
+stress-head-save:
+| mkdir -p reports/mini_accum
+| { echo "== $$(date -u +'%Y-%m-%dT%H:%M:%SZ') headroom =="; \
+|   scripts/mini_accum/dev/stress_head.sh; } \
+| | tee -a reports/mini_accum/STRESS_HEAD.txt >/dev/null
+
+# Probabilidad de mantener KPIs (global y bajo gate 2/1,2/2)
+stress-prob:
+| $(MAKE) -s stress-head | \
+| awk '/^PROD_/ {t=$$1; tot[t]++; if ($$NF=="OK") ok[t]++} \
+|      /^PROD_/ && $$0 ~ /  2\/(1|2)  / {gate[t]++; if ($$NF=="OK") okg[t]++} \
+|      END {for (t in tot) printf "%-16s all=%2d/%2d (%.1f%%)  gate=%2d/%2d (%.1f%%)\n", \
+|            t, ok[t]+0, tot[t], 100*(ok[t]+0)/tot[t], okg[t]+0, gate[t]+0, (gate[t]?100*(okg[t]+0)/gate[t]:0)}' | sort
+
+# Guarda probabilidades
+stress-prob-save:
+| mkdir -p reports/mini_accum
+| { echo "== $$(date -u +'%Y-%m-%dT%H:%M:%SZ') stress-prob =="; \
+|   $(MAKE) -s stress-prob; } \
+| | tee -a reports/mini_accum/STRESS_PROB.txt >/dev/null

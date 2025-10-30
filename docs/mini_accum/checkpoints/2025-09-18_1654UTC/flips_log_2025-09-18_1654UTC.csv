@@ -1,4 +1,3 @@
-ts_utc,from,to,reason,version
-2025-09-18T01:49:48.761130+00:00,0.0,1.0,test-buy,KISSv1_BASE_20250915_1642_final
-2025-09-18T01:55:05.928200+00:00,1.0,0.0,test-sell,KISSv1_BASE_20250915_1642_final
-2025-09-18T02:12:08.455070+00:00,0.0,1.0,"macro_green=True, trend_up=True",KISSv1_BASE_20250915_1642_final
+version https://git-lfs.github.com/spec/v1
+oid sha256:e3b4a6f738b2da6879b40954d55b9c7e0275004c4cf5c41f59913abdb5eddd51
+size 306

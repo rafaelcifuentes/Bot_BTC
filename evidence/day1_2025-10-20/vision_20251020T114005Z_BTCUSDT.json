@@ -1,0 +1,163 @@
+{
+  "meta": {
+    "host": "testnet.binance.vision",
+    "symbol": "BTC/USDT",
+    "ts": "2025-10-20T11:40:06Z"
+  },
+  "balances": {
+    "focus": {
+      "USDT": 9901.9849555,
+      "BTC": 1.0009,
+      "BNB": 1.0
+    },
+    "nonzero_top": {
+      "TRY": 18466.0,
+      "ZAR": 18466.0,
+      "UAH": 18466.0,
+      "PLN": 18466.0,
+      "RON": 18466.0,
+      "ARS": 18466.0,
+      "JPY": 18466.0,
+      "MXN": 18466.0,
+      "COP": 18466.0,
+      "CZK": 18466.0
+    }
+  },
+  "orders_last": [
+    {
+      "time": "2025-10-19T21:03:09.278Z",
+      "id": "4178338",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 108813.67,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T21:05:20.766Z",
+      "id": "4178713",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 108820.81,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T21:10:47.266Z",
+      "id": "4179416",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 108848.47,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T21:13:40.741Z",
+      "id": "4180089",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 108749.99,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T21:24:58.436Z",
+      "id": "4181357",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 108634.0,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T21:34:11.516Z",
+      "id": "4182147",
+      "symbol": "BTC/USDT",
+      "side": "sell",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 108627.2,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T21:49:54.275Z",
+      "id": "4183560",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 108719.62,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T21:49:54.577Z",
+      "id": "4183561",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 108719.62,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T22:45:55.930Z",
+      "id": "4199092",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 109281.03,
+      "filled": 9e-05
+    },
+    {
+      "time": "2025-10-19T22:46:03.398Z",
+      "id": "4199128",
+      "symbol": "BTC/USDT",
+      "side": "buy",
+      "type": "market",
+      "status": "closed",
+      "amount": 9e-05,
+      "price": 109272.56,
+      "filled": 9e-05
+    }
+  ],
+  "pnl": {
+    "trades_count": {
+      "buys": 11,
+      "sells": 1
+    },
+    "qty": {
+      "buy": 0.00099,
+      "sell": 9e-05,
+      "net_btc": 0.0009
+    },
+    "cash": {
+      "buy_cost_usdt": 107.7914925,
+      "sell_proceeds_usdt": 9.776448,
+      "net_usdt": -98.0150445
+    },
+    "wap": {
+      "buy": 108880.29545454546,
+      "sell": 108627.2
+    },
+    "mark_to_market": {
+      "last": 110738.15,
+      "unrealized_approx": 99.664335
+    },
+    "total_pnl_mtm_approx": 1.6492904999999922
+  }
+}

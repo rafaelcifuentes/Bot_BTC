@@ -1,0 +1,12 @@
+20251021T143802Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=0 USD<=10 cap=0.10
+20251021T143802Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T14:38:02Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=0 USD<=10 cap=0.10
+2025-10-21T14:38:02Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T14:38:02Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+Traceback (most recent call last):
+  File "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/scripts/mini_accum/live_wrapper.py", line 65, in <module>
+    age_h = None if latest_dt is None else (datetime.datetime.now(datetime.timezone.utc) - latest_dt).total_seconds()/3600
+                                            ^^^^^^^^^^^^^^^^^
+AttributeError: type object 'datetime.datetime' has no attribute 'datetime'

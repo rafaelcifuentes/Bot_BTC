@@ -296,6 +296,189 @@ Leyenda prob.: **Alta (≥70%)**, **Media (40–60%)**, **Baja (≤30%)**.
 4) **Automatizar tabla A/B** en `scripts/mini_accum/make_run_report.sh`.
 
 > **Meta del sprint:** mantener **FPY ≤ BASE±2**, **MDD ≤ BASE+0.05**, y buscar **ΔnetBTC ≥ +0.02** vs XB20.
+
+---
+
+## 2025-10-29 — Estrategias “SANTO GRIAL” (KISS v1 TOP + regla estacional E1 en Año +2)
+
+**Objetivo:** dejar trazado, versionado y reproducible el stack canónico y la política de preset por ciclo.
+
+### One-Pager — OOS 2025H1 · KISS v1 (PROD)
+- **Freeze:** `KISSv1_BASE_20251010_freeze_NETBTC_4p340727`  
+- **Preset:** `configs/mini_accum/presets/CORE_2025.yaml`  
+- **Config (ganadora):** `G200 · DD15 · RB1 · H30 · BULL0` *(sin SL/TP)*
+
+**Tabla de resultados (2022–2025):**
+
+| Periodo         | Modo | sats_mult | BTC desde 1 BTC | mdd_vs_hodl | flips_total | Source (archivo) |
+|---              |---   |---:       |---:             |---:         |---:         |---|
+| 2022 (WF)       | WF   | 1.018661  | 1.018661        | 0.000000    | 0           | reports/mini_accum/kiss_v1/WF_2022_kpis__v1_2.csv |
+| 2023 (WF)       | WF   | 2.641397  | 2.690688        | 0.936073    | 7           | reports/mini_accum/kiss_v1/WF_2023_kpis__v1_2.csv |
+| 2024 (WF)       | WF   | 1.613240  | 4.340726        | 0.768424    | 6           | reports/mini_accum/kiss_v1/WF_2024_kpis__v1_2.csv |
+| **Acum. WF 22–24** | — | **×4.340727** | **4.340726** | — | — | (producto de las 3 ventanas) |
+| 2025H1 (OOS)    | OOS  | 1.138462  | 4.941751        | 0.741494    | 2           | reports/mini_accum/base_v0_1_20251011_0320_kpis__OOS_2025H1_G200_DD15_RB1_H30_BULL0.csv |
+| **Acum. 22–24 + OOS 25H1** | — | **×4.941751** | **4.941751** | — | — | (WF producto × OOS 2025H1) |
+
+- **Producto WF 2022–2024:** **4.340727**  
+- **Compuesto con OOS 2025H1 (6m):** **4.941751** *(indicativo)*
+
+**🧪 Gate & Decisión**
+- **NetBTC_OOS > 0** ✔︎ · **Riesgo consistente** (*mdd_vs_hodl ≈ 0.74*) ✔︎ · **Baja rotación** (*flips_total = 2*) ✔︎  
+- **Overlay SL/TP (12×24)** → *0% lift, mismo riesgo* ⇒ **queda en experimento** *(no se activa en PROD)*.  
+**Conclusión:** **Promover KISS v1 a `PROD_KISSv1_2025H1` sin SL/TP.**  
+**Siguiente:** micro‑barridos H31/H32 (RB1; RB2 referencia) y repetir gate.
+
+### Micro-barridos H31/H32 — 2025-10-29 (OOS 2025H1)
+- H31: net≈0.9883 (−13.19% vs BASE=1.1385), flips=39 → FPY≈113.88 → **FAIL** (Contrato B.3 y D.7).
+- H32: net≈0.9883 (−13.19% vs BASE=1.1385), flips=39 → FPY≈113.88 → **FAIL** (Contrato B.3 y D.7).
+- mdd_vs_hodl: n/d en CSV candidato (no requerido para fallar: lift<+5% y fricción≫2×BASE).
+**Acción:** mantener KISS v1 base (DD15/RB1/H30/G200/BULL0) en PROD; H31/H32 quedan OFF (experimento).
+
+### Base canónica (palancas)
+- **DD15:** compras solo en dips ≥15% (mejor NetBTC/MDD).  
+- **RB1:** 1% por flip (eficiencia de costes).  
+- **H30:** 30 velas 4h ≈ ~5 días (anti‑chop).  
+- **G200:** filtro macro (SMA/EMA 200D) para riesgo ON/OFF.  
+- **BULL0:** sin sesgo alcista adicional.
+
+**Parámetros (preset base):**
+- **Modo:** PT 1D · **EMAs:** 21/55 · **gate_sma:** 200 (modo sell)  
+- **Gestión:** `dd_pct=15`, `dd_hard_pct=30`, `rb_pct=1`, `bull_hold_sma=0`  
+- **Costes baseline:** `fee/slip/spread` neutros en freeze; *stress* ±20bps evaluado aparte.  
+- **WF base:** `WF_2022/23/24_kpis__v1_2.csv` · **OOS 2025H1:** helper `kiss_oos_2025H1`.
+
+### Lecturas rápidas
+- **WF 22–24:** ×4.3407 sats; **mdd_vs_hodl < 1** en 2023–2024.  
+- **OOS 2025H1:** ×1.1385 con **2 flips**, **mdd_vs_hodl ≈ 0.7415**.  
+- **Barrido H30±1 / RB1–RB2:** confirma **RB1/H30** como sólido.
+
+---
+### Regla de orquestación (KISS estacional)
+**Determinista por ciclo:**
+- **Año +2 post‑halving** ⇒ `configs/mini_accum/presets/E1_Y2.yaml` *(EMA12/26, RSI 35/65, ADX≥22, dwell=3, bar=1d, macro_sma=200)*  
+- **Otros años** ⇒ `configs/mini_accum/presets/CORE_2025.yaml` *(DD15 / RB1 / H30 / G200 / BULL0; sin SL/TP)*
+
+**Motivación (2022 observado):** E1 captura rebotes post‑pico con **mdd_vs_hodl ≈ 0.10** y ~6–8 flips, mientras v1 en 2022 aportó ≈1.02×. En 2023–2024 (tendenciales), v1 TOP domina.
+
+
+#### Snippets YAML (reproducibles)
+
+**CORE_2025.yaml** — KISS v1 TOP (DD15 • RB1 • H30 • G200 • BULL0)
+```yaml
+# Mini-Accum v1.0 — CORE (TOP)
+preset: CORE_2025
+version: 1.0
+bar: 1d
+
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/snapshots/20250914/1d/BTC-USD.csv
+  ts_col: ts
+  tz_input: UTC
+
+risk:
+  hard_dd_pct: 0.15     # DD15
+rebalancing:
+  frequency: "1W"       # RB1
+horizon:
+  h_bars: 30            # H30
+execution:
+  gamma_bps: 200        # G200
+  bull_bias_bps: 0      # BULL0
+
+strategy:
+  params:
+    ema_fast: 21
+    ema_slow: 55
+
+filters:
+  macro_sma: 200
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 24  # rotación baja (24 días entre flips)
+
+tag: DD15_RB1_H30_G200_BULL0
+```
+
+**E1_Y2.yaml** — preset táctico Año +2 post‑halving (EMA12/26 + RSI 35/65 + ADX≥22; dwell=3; 1D; macro ON)
+```yaml
+# Mini-Accum v2.0 — E1_Y2 (Año +2 post-halving)
+preset: E1_Y2
+version: 2.0
+bar: 1d
+
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/snapshots/20250914/1d/BTC-USD.csv
+  ts_col: ts
+  tz_input: UTC
+
+risk:
+  hard_dd_pct: 15
+
+rebalancing:
+  frequency: 1
+
+horizon:
+  h_bars: 30
+
+filters:
+  macro_sma: 200
+  adx:
+    enabled: true
+    period: 14
+    min: 22
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 3   # dwell3 estándar para Y+2
+
+strategy:
+  params:
+    ema_fast: 12
+    ema_slow: 26
+    rsi_len: 14
+    rsi_buy: 35
+    rsi_sell: 65
+    adx_len: 14
+    adx_min: 22
+```
+
+#### Runner por régimen (sufijos `OOS_${TAG}_REGIME`)
+
+```bash
+# 2022 → E1_Y2 (Año +2 tras halving 2020)
+python -m mini_accum.cli \
+  --config configs/mini_accum/presets/E1_Y2.yaml \
+  --start  2022-01-01 --end 2022-12-31 \
+  --suffix OOS_2022_REGIME
+
+# 2023 → CORE_2025  (warm-up recomendado desde 2022-06-01)
+python -m mini_accum.cli \
+  --config configs/mini_accum/presets/CORE_2025.yaml \
+  --start  2022-06-01 --end 2023-12-31 \
+  --suffix OOS_2023_REGIME
+
+# 2024 → CORE_2025
+python -m mini_accum.cli \
+  --config configs/mini_accum/presets/CORE_2025.yaml \
+  --start  2024-01-01 --end 2024-12-31 \
+  --suffix OOS_2024_REGIME
+
+# 2025H1 → CORE_2025
+python -m mini_accum.cli \
+  --config configs/mini_accum/presets/CORE_2025.yaml \
+  --start  2025-01-01 --end 2025-06-30 \
+  --suffix OOS_2025H1_REGIME
+```
+
+---
+
+### Glosario mínimo
+- **WF:** walk‑forward disciplinado (entrenar→avanzar→test).  
+- **OOS:** *out‑of‑sample* (fuera de muestra).  
+- **sats_mult:** multiplicador de satoshis (≈ ROI periodo).  
+- **mdd_vs_hodl:** drawdown relativo vs HODL (<1 mejor).  
+- **FPY:** flips por año (rotación; objetivo ≤ 26/año).
 ## Checklist OOS / Walk-Forward — Candidato `DD15 • RB1 • H30 • G200 • BULL0`
 
 **Objetivo:** hacer consistentes los sats en el tiempo y respaldar estadísticamente la elección.
@@ -371,3 +554,19 @@ Leyenda prob.: **Alta (≥70%)**, **Media (40–60%)**, **Baja (≤30%)**.
 - BASE OOS 2025H1: sats=1.138462; CAND v1.2 WF_2025: sats=0.917246
 - Lift: –19.43%  → FAIL (umbral +5%); acción: mantener BASE; v1.2 OFF
 [INFO] WF_2022 y WF_2023 quedan pendientes por datos (skip intencional)
+### '"$TODAY"' — Cierre micro-barridos H31/H32 (DWELL96)
+- Gate principal: FAIL (lift < +5% y MDD peor).
+- Cláusula D.7 (fricción): FAIL (FPY_cand > 2× FPY_base sin lift).
+- Acción: conservar preset PROD `configs/mini_accum/presets/CORE_2025.yaml` (H30·RB1).
+- Estado código: fix TTL/dwell aplicado; ADX `.ffill()` sin warnings.
+### '"$TODAY"' — Cierre micro-barridos H31/H32 (DWELL96)
+- Gate principal: FAIL (lift < +5% y MDD peor).
+- Cláusula D.7 (fricción): FAIL (FPY_cand > 2× FPY_base sin lift).
+- Acción: conservar preset PROD `configs/mini_accum/presets/CORE_2025.yaml` (H30·RB1).
+- Estado código: fix TTL/dwell aplicado; ADX `.ffill()` sin warnings.
+### '"'"$(date -u +%F %TZ)"'"' — Cierre micro-barridos H31/H32 (DWELL96)
+- Gate principal: FAIL (lift < +5% y MDD peor o sin mejora).
+- Cláusula D.7 (fricción): FAIL (FPY_cand > 2× FPY_base sin lift).
+- Acción: conservar preset PROD `configs/mini_accum/presets/CORE_2025.yaml` (H30·RB1).
+- Estado código: fix TTL/dwell aplicado; ADX `.ffill()` sin warnings.
+- Ni un satoshi cedido.

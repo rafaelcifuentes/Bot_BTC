@@ -12,9 +12,10 @@
 - attest == OK
 - Señal fresca (latest.json no stale)
 - Canario DRYRUN con `ready (signal fresh)` + `[PAPER] flip`.
-
+[
 **Rollback**:
 - `override_mode: PAUSE`, reemisión señal, restore desde snapshot.
 
 **A/B**:
 - Promoción sólo si Δ median(sats_mult) ≥ +0.02 **sin empeorar** median_mdd_vs_hodl ni median_fpy.
+]()

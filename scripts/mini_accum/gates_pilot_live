@@ -44,7 +44,17 @@ find_canary_green() {
   local log_path
   if [[ -d "$CANARY_DIR" ]]; then
     log_path="$(ls -1t "$CANARY_DIR"/canary_live.*.log 2>/dev/null | head -1 || true)"
-    if [[ -n "$log_path" ]] && grep -qi 'GREEN' "$log_path"; then
+    [[ -z "$log_path" ]] && return 1
+
+    # 1) Formato antiguo: marcador explícito en el propio log
+    if grep -qiF '→ **GREEN**' "$log_path"; then
+      print -r -- "$log_path"; return 0
+    fi
+
+    # 2) Formato nuevo (silencioso): éxito = "ready (signal fresh)" y "canary_live: done", sin errores
+    if grep -qiF 'ready (signal fresh)' "$log_path" \
+       && grep -qiF 'canary_live: done' "$log_path" \
+       && ! grep -qiE '\[ERROR\]|\bFAIL\b' "$log_path"; then
       print -r -- "$log_path"; return 0
     fi
   fi

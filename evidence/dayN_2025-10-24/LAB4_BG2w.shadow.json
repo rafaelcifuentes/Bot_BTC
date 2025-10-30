@@ -1,0 +1,7 @@
+{
+  "lab": "LAB4_BullGuard",
+  "rule": "Daily < SMA200_d AND 2w < SMA200_w",
+  "double_confirm": null,
+  "ts_utc": "2025-10-24T12:20:01Z",
+  "note": "shadow-only stub; no trading logic touched"
+}

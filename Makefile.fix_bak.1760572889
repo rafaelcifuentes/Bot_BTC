@@ -1,0 +1,55 @@
+E1_S_MIN ?= 2.9
+E1_M_MAX ?= 0.12
+V1_S_MIN ?= 1.0
+V1_M_MAX ?= 1.0
+
+.PHONY: help deploy-help deploy-plan deploy-select deploy-status
+.DEFAULT_GOAL := help
+
+# Evitamos TABs en recetas
+.RECIPEPREFIX := |
+
+# Aliases: reenvían a mk/deploy.mk
+deploy-help deploy-plan deploy-select deploy-status:
+| $(MAKE) -f mk/deploy.mk -s $@
+
+help:
+| printf "%s\n" \
+| "" \
+| "# plan/selector/estado (ya probados):" \
+| "make -f mk/deploy.mk -s deploy-plan" \
+| "make -f mk/deploy.mk -s deploy-select" \
+| "make -f mk/deploy.mk -s deploy-status" \
+| "" \
+| "# conmutador SPORT/DRIVE por fricción viva:" \
+| "echo \"2/2\" > deploy/live_fee_slip" \
+| "make -f mk/deploy.mk -s deploy-select" \
+| "make -f mk/deploy.mk -s deploy-status   # SPORT / PROD_KISSv1_2024" \
+| "" \
+| "echo \"2/3\" > deploy/live_fee_slip" \
+| "make -f mk/deploy.mk -s deploy-select" \
+| "make -f mk/deploy.mk -s deploy-status   # DRIVE / PROD_KISSv1_2023" \
+| "" \
+| "Targets:" \
+| "  gate                 - corre gate y volcado" \
+| "  stress               - corre gate + stress-costs" \
+| "  stress-q             - solo resumen final de stress" \
+| "  stress-tail          - últimas ~40 filas tabuladas" \
+| "  stress-summary       - min/max por política (S_ADJ)" \
+| "  stress-head          - tabla headroom S/M con umbrales" \
+| "  stress-head-save     - idem y guarda en STRESS_HEAD.txt" \
+| "  stress-prob          - % de escenarios donde se mantienen KPIs" \
+| "  stress-prob-save     - idem y guarda en STRESS_PROB.txt" \
+| "  deploy-help          - ayuda despliegue DRIVE/SPORT" \
+| "  deploy-plan          - escribe PLAN.txt y plan.vars" \
+| "  deploy-select        - activa DRIVE/SPORT según live_fee_slip" \
+| "  deploy-status        - muestra modo/tag activos" \
+| "  help                 - este mensaje" \
+| "" \
+| "Variables (umbrales; puedes sobreescribir con VAR=valor):" \
+| "  E1_S_MIN     = $${E1_S_MIN:-2.9}" \
+| "  E1_M_MAX     = $${E1_M_MAX:-0.12}" \
+| "  V1_S_MIN     = $${V1_S_MIN:-1.0}" \
+| "  V1_M_MAX     = $${V1_M_MAX:-1.0}"
+
+include mk/stress.mk

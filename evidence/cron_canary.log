@@ -1,0 +1,1615 @@
+/bin/sh: ./scripts/mini_accum/bb_day.zsh: No such file or directory
+zsh:1: no such file or directory: ./scripts/mini_accum/bb_day.zsh
+zsh:1: no such file or directory: ./scripts/mini_accum/bb_day.zsh
+2025-10-21T17:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-21T17:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T17:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-21T17:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-21T17:07:01Z [INFO] canary_live: done
+2025-10-21T18:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-21T18:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T18:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-21T18:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-21T18:07:00Z [INFO] canary_live: done
+2025-10-21T19:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-21T19:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T19:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-21T19:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-21T19:07:00Z [INFO] canary_live: done
+2025-10-21T20:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-21T20:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T20:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-21T20:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-21T20:07:00Z [INFO] canary_live: done
+2025-10-21T21:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-21T21:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T21:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-21T21:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-21T21:07:00Z [INFO] canary_live: done
+2025-10-21T22:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-21T22:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T22:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-21T22:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-21T22:07:00Z [INFO] canary_live: done
+2025-10-21T23:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-21T23:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T23:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 8.6h
+2025-10-21T23:07:01Z [WARN] mini_accum: stale signal: 8.6h — PAUSE
+2025-10-22T00:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T00:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T00:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 9.6h
+2025-10-22T00:07:00Z [WARN] mini_accum: stale signal: 9.6h — PAUSE
+2025-10-22T01:07:02Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T01:07:02Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T01:07:02Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 10.6h
+2025-10-22T01:07:02Z [WARN] mini_accum: stale signal: 10.6h — PAUSE
+2025-10-22T02:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T02:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T02:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T02:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T02:07:00Z [INFO] canary_live: done
+2025-10-22T03:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T03:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T03:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T03:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T03:07:01Z [INFO] canary_live: done
+2025-10-22T04:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T04:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T04:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T04:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T04:07:00Z [INFO] canary_live: done
+2025-10-22T05:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T05:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T05:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T05:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T05:07:00Z [INFO] canary_live: done
+2025-10-22T06:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T06:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T06:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T06:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T06:07:00Z [INFO] canary_live: done
+2025-10-22T07:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T07:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T07:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T07:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T07:07:00Z [INFO] canary_live: done
+2025-10-22T08:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T08:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T08:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T08:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T08:07:01Z [INFO] canary_live: done
+2025-10-22T09:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T09:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T09:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T09:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T09:07:01Z [INFO] canary_live: done
+2025-10-22T10:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T10:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T10:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T10:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T10:07:00Z [INFO] canary_live: done
+2025-10-22T11:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T11:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T11:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T11:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T11:07:01Z [INFO] canary_live: done
+2025-10-22T12:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T12:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T12:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T12:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T12:07:00Z [INFO] canary_live: done
+2025-10-22T13:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T13:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T13:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T13:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T13:07:00Z [INFO] canary_live: done
+2025-10-22T14:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T14:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T14:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T14:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T14:07:01Z [INFO] canary_live: done
+2025-10-22T15:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T15:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T15:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T15:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T15:07:01Z [INFO] canary_live: done
+2025-10-22T16:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T16:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T16:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T16:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T16:07:01Z [INFO] canary_live: done
+2025-10-22T18:07:01Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T18:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T18:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T18:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T18:07:01Z [INFO] canary_live: done
+2025-10-22T21:07:00Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T21:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T21:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T21:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T21:07:00Z [INFO] canary_live: done
+2025-10-22T22:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T22:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T22:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T22:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T22:07:00Z [INFO] canary_live: done
+2025-10-22T22:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T22:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T22:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T22:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T22:07:00Z [INFO] canary_live: done
+2025-10-22T23:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-22T23:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T23:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T23:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-22T23:07:00Z [INFO] canary_live: done
+2025-10-23T00:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T00:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T00:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T00:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T00:07:00Z [INFO] canary_live: done
+2025-10-23T01:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T01:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T01:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T01:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T01:07:00Z [INFO] canary_live: done
+2025-10-23T02:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T02:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T02:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T02:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T02:07:00Z [INFO] canary_live: done
+2025-10-23T03:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T03:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T03:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T03:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T03:07:00Z [INFO] canary_live: done
+2025-10-23T04:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T04:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T04:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T04:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T04:07:00Z [INFO] canary_live: done
+2025-10-23T05:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T05:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T05:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T05:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T05:07:00Z [INFO] canary_live: done
+2025-10-23T06:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T06:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T06:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 8.9h
+2025-10-23T06:07:00Z [WARN] mini_accum: stale signal: 8.9h — PAUSE
+2025-10-23T07:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T07:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T07:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 9.9h
+2025-10-23T07:07:00Z [WARN] mini_accum: stale signal: 9.9h — PAUSE
+2025-10-23T08:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T08:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T08:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 10.9h
+2025-10-23T08:07:00Z [WARN] mini_accum: stale signal: 10.9h — PAUSE
+2025-10-23T09:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T09:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T09:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 11.9h
+2025-10-23T09:07:00Z [WARN] mini_accum: stale signal: 11.9h — PAUSE
+2025-10-23T10:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T10:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T10:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 12.9h
+2025-10-23T10:07:01Z [WARN] mini_accum: stale signal: 12.9h — PAUSE
+2025-10-23T11:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T11:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T11:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 13.9h
+2025-10-23T11:07:01Z [WARN] mini_accum: stale signal: 13.9h — PAUSE
+2025-10-23T12:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T12:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T12:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 14.9h
+2025-10-23T12:07:00Z [WARN] mini_accum: stale signal: 14.9h — PAUSE
+2025-10-23T13:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T13:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T13:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 15.9h
+2025-10-23T13:07:00Z [WARN] mini_accum: stale signal: 15.9h — PAUSE
+[INFO] bb_day: signal stale (1.688096601e+01h >= 8.000000000e+00h) — refreshing via runner_cron.sh…
+[WARN] runner_cron.sh failed; proceeding
+2025-10-23T14:07:04Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T14:07:04Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T14:07:04Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 16.9h
+2025-10-23T14:07:04Z [WARN] mini_accum: stale signal: 16.9h — PAUSE
+2025-10-23T15:00:18Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T15:00:18Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T15:00:18Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T15:00:18Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T15:00:18Z [INFO] canary_live: done
+2025-10-23T15:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T15:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T15:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T15:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T15:07:00Z [INFO] canary_live: done
+2025-10-23T15:11:11Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T15:11:11Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T15:11:11Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T15:11:11Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T15:11:11Z [INFO] canary_live: done
+2025-10-23T16:04:06Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T16:04:06Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T16:04:06Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T16:04:06Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T16:04:06Z [INFO] canary_live: done
+2025-10-23T16:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T16:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T16:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T16:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T16:07:00Z [INFO] canary_live: done
+2025-10-23T17:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T17:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T17:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T17:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T17:07:00Z [INFO] canary_live: done
+2025-10-23T18:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T18:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T18:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T18:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T18:07:00Z [INFO] canary_live: done
+2025-10-23T19:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T19:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T19:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T19:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T19:07:00Z [INFO] canary_live: done
+2025-10-23T20:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T20:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T20:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T20:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T20:07:01Z [INFO] canary_live: done
+2025-10-23T21:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T21:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T21:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T21:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T21:07:01Z [INFO] canary_live: done
+2025-10-23T22:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T22:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T22:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T22:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T22:07:00Z [INFO] canary_live: done
+2025-10-23T23:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-23T23:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-23T23:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-23T23:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-23T23:07:00Z [INFO] canary_live: done
+2025-10-24T00:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T00:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T00:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T00:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T00:07:00Z [INFO] canary_live: done
+2025-10-24T01:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T01:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T01:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T01:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T01:07:00Z [INFO] canary_live: done
+2025-10-24T02:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T02:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T02:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T02:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T02:07:00Z [INFO] canary_live: done
+2025-10-24T03:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T03:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T03:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T03:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T03:07:00Z [INFO] canary_live: done
+2025-10-24T04:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T04:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T04:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T04:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T04:07:00Z [INFO] canary_live: done
+2025-10-24T05:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T05:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T05:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T05:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T05:07:01Z [INFO] canary_live: done
+2025-10-24T06:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T06:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T06:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T06:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T06:07:00Z [INFO] canary_live: done
+2025-10-24T07:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T07:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T07:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T07:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T07:07:00Z [INFO] canary_live: done
+2025-10-24T08:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T08:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T08:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T08:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T08:07:00Z [INFO] canary_live: done
+2025-10-24T09:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T09:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T09:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T09:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T09:07:00Z [INFO] canary_live: done
+2025-10-24T10:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T10:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T10:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T10:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T10:07:00Z [INFO] canary_live: done
+2025-10-24T11:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T11:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T11:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T11:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T11:07:00Z [INFO] canary_live: done
+2025-10-24T12:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T12:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T12:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T12:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T12:07:00Z [INFO] canary_live: done
+2025-10-24T13:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T13:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T13:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T13:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T13:07:01Z [INFO] canary_live: done
+2025-10-24T14:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T14:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T14:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T14:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T14:07:01Z [INFO] canary_live: done
+2025-10-24T15:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T15:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T15:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T15:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T15:07:00Z [INFO] canary_live: done
+[INFO] bb_day: signal stale (8.016568320e+00h >= 8.000000000e+00h) — refreshing via runner_cron.sh…
+[WARN] runner_cron.sh failed; proceeding
+[INFO] bb_day: post-refresh age=8.017530461e+00h
+[SKIP] bb_day: still stale after refresh (8.017530461e+00h > 8.000000000e+00h) — skipping live_wrapper
+2025-10-24T17:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T17:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T17:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T17:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T17:07:00Z [INFO] canary_live: done
+2025-10-24T18:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T18:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T18:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T18:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T18:07:00Z [INFO] canary_live: done
+2025-10-24T19:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T19:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T19:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T19:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T19:07:00Z [INFO] canary_live: done
+2025-10-24T20:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-24T20:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-24T20:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-24T20:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-24T20:07:00Z [INFO] canary_live: done
+2025-10-27T16:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:07:00Z [INFO] canary_live: done
+2025-10-27T16:08:34Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:08:34Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:08:34Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:08:34Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:08:34Z [INFO] canary_live: done
+2025-10-27T16:08:44Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:08:44Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:08:44Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:08:44Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:08:44Z [INFO] canary_live: done
+2025-10-27T16:08:54Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:08:54Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:08:54Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:08:54Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:08:54Z [INFO] canary_live: done
+2025-10-27T16:09:05Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:09:05Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:09:05Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:09:05Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:09:05Z [INFO] canary_live: done
+2025-10-27T16:09:15Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:09:15Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:09:15Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:09:15Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:09:15Z [INFO] canary_live: done
+2025-10-27T16:09:25Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:09:25Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:09:25Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:09:25Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:09:25Z [INFO] canary_live: done
+2025-10-27T16:09:35Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:09:35Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:09:35Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:09:35Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:09:35Z [INFO] canary_live: done
+2025-10-27T16:09:45Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:09:45Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:09:45Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:09:45Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:09:45Z [INFO] canary_live: done
+2025-10-27T16:09:55Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:09:55Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:09:55Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:09:55Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:09:55Z [INFO] canary_live: done
+2025-10-27T16:10:05Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:10:05Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:10:05Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:10:05Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:10:05Z [INFO] canary_live: done
+2025-10-27T16:10:15Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:10:15Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:10:15Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:10:15Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:10:15Z [INFO] canary_live: done
+2025-10-27T16:10:26Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:10:26Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:10:26Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:10:26Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:10:26Z [INFO] canary_live: done
+2025-10-27T16:10:36Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:10:36Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:10:36Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:10:36Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:10:36Z [INFO] canary_live: done
+2025-10-27T16:10:46Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:10:46Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:10:46Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:10:46Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:10:46Z [INFO] canary_live: done
+2025-10-27T16:10:56Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:10:56Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:10:56Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:10:56Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:10:56Z [INFO] canary_live: done
+2025-10-27T16:11:06Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:11:06Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:11:06Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:11:06Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:11:06Z [INFO] canary_live: done
+2025-10-27T16:11:16Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:11:16Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:11:16Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:11:16Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:11:16Z [INFO] canary_live: done
+2025-10-27T16:11:27Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:11:27Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:11:27Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:11:27Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:11:27Z [INFO] canary_live: done
+2025-10-27T16:11:37Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:11:37Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:11:37Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:11:37Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:11:37Z [INFO] canary_live: done
+2025-10-27T16:11:47Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:11:47Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:11:47Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:11:47Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:11:47Z [INFO] canary_live: done
+2025-10-27T16:11:57Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:11:57Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:11:57Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:11:57Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:11:57Z [INFO] canary_live: done
+2025-10-27T16:12:07Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:12:07Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:12:07Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:12:07Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:12:07Z [INFO] canary_live: done
+2025-10-27T16:12:17Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:12:17Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:12:17Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:12:17Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:12:17Z [INFO] canary_live: done
+2025-10-27T16:12:27Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:12:27Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:12:27Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:12:27Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:12:27Z [INFO] canary_live: done
+2025-10-27T16:12:37Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:12:37Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:12:37Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:12:37Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:12:37Z [INFO] canary_live: done
+2025-10-27T16:12:48Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:12:48Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:12:48Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:12:48Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:12:48Z [INFO] canary_live: done
+2025-10-27T16:12:58Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:12:58Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:12:58Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:12:58Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:12:58Z [INFO] canary_live: done
+2025-10-27T16:13:08Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:13:08Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:13:08Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:13:08Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:13:08Z [INFO] canary_live: done
+2025-10-27T16:13:18Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:13:18Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:13:18Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:13:18Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:13:18Z [INFO] canary_live: done
+2025-10-27T16:13:28Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:13:28Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:13:28Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:13:28Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:13:28Z [INFO] canary_live: done
+2025-10-27T16:13:38Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:13:38Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:13:38Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:13:38Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:13:38Z [INFO] canary_live: done
+2025-10-27T16:13:48Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:13:48Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:13:48Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:13:48Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:13:48Z [INFO] canary_live: done
+2025-10-27T16:13:58Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:13:58Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:13:58Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:13:58Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:13:58Z [INFO] canary_live: done
+2025-10-27T16:14:09Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:14:09Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:14:09Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:14:09Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:14:09Z [INFO] canary_live: done
+2025-10-27T16:14:19Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:14:19Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:14:19Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:14:19Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:14:19Z [INFO] canary_live: done
+2025-10-27T16:14:29Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:14:29Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:14:29Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:14:29Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:14:29Z [INFO] canary_live: done
+2025-10-27T16:14:39Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:14:39Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:14:39Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:14:39Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:14:39Z [INFO] canary_live: done
+2025-10-27T16:14:49Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:14:49Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:14:49Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:14:49Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:14:49Z [INFO] canary_live: done
+2025-10-27T16:14:59Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:14:59Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:14:59Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:14:59Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:14:59Z [INFO] canary_live: done
+2025-10-27T16:15:10Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:15:10Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:15:10Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:15:10Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:15:10Z [INFO] canary_live: done
+2025-10-27T16:15:20Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:15:20Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:15:20Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:15:20Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:15:20Z [INFO] canary_live: done
+2025-10-27T16:15:30Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:15:30Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:15:30Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:15:30Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:15:30Z [INFO] canary_live: done
+2025-10-27T16:15:40Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:15:40Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:15:40Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:15:40Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:15:40Z [INFO] canary_live: done
+2025-10-27T16:15:50Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:15:50Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:15:50Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:15:50Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:15:50Z [INFO] canary_live: done
+2025-10-27T16:16:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:16:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:16:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:16:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:16:00Z [INFO] canary_live: done
+2025-10-27T16:16:10Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:16:10Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:16:10Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:16:10Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:16:10Z [INFO] canary_live: done
+2025-10-27T16:16:21Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:16:21Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:16:21Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:16:21Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:16:21Z [INFO] canary_live: done
+2025-10-27T16:16:31Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:16:31Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:16:31Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:16:31Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:16:31Z [INFO] canary_live: done
+2025-10-27T16:16:41Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:16:41Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:16:41Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:16:41Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:16:41Z [INFO] canary_live: done
+2025-10-27T16:16:51Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:16:51Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:16:51Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:16:51Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:16:51Z [INFO] canary_live: done
+2025-10-27T16:17:02Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:17:02Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:17:02Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:17:02Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:17:02Z [INFO] canary_live: done
+2025-10-27T16:17:12Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:17:12Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:17:12Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:17:12Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:17:12Z [INFO] canary_live: done
+2025-10-27T16:17:22Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:17:22Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:17:22Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:17:22Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:17:22Z [INFO] canary_live: done
+2025-10-27T16:17:32Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:17:32Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:17:32Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:17:32Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:17:32Z [INFO] canary_live: done
+2025-10-27T16:17:42Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:17:42Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:17:42Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:17:42Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:17:42Z [INFO] canary_live: done
+2025-10-27T16:17:52Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:17:52Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:17:52Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:17:52Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:17:52Z [INFO] canary_live: done
+2025-10-27T16:18:02Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:18:02Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:18:02Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:18:02Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:18:02Z [INFO] canary_live: done
+2025-10-27T16:18:13Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:18:13Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:18:13Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:18:13Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:18:13Z [INFO] canary_live: done
+2025-10-27T16:18:23Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:18:23Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:18:23Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:18:23Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:18:23Z [INFO] canary_live: done
+2025-10-27T16:18:33Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:18:33Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:18:33Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:18:33Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:18:33Z [INFO] canary_live: done
+2025-10-27T16:18:43Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:18:43Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:18:43Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:18:43Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:18:43Z [INFO] canary_live: done
+2025-10-27T16:18:53Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:18:53Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:18:53Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:18:53Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:18:53Z [INFO] canary_live: done
+2025-10-27T16:19:03Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:19:03Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:19:03Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:19:03Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:19:03Z [INFO] canary_live: done
+2025-10-27T16:19:13Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:19:13Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:19:13Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:19:13Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:19:13Z [INFO] canary_live: done
+2025-10-27T16:19:24Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:19:24Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:19:24Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:19:24Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:19:24Z [INFO] canary_live: done
+2025-10-27T16:19:34Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:19:34Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:19:34Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:19:34Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:19:34Z [INFO] canary_live: done
+2025-10-27T16:19:44Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:19:44Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:19:44Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:19:44Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:19:44Z [INFO] canary_live: done
+2025-10-27T16:19:54Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:19:54Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:19:54Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:19:54Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:19:54Z [INFO] canary_live: done
+2025-10-27T16:20:04Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T16:20:04Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T16:20:04Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T16:20:04Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T16:20:04Z [INFO] canary_live: done
+2025-10-27T17:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T17:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T17:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T17:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T17:07:01Z [INFO] canary_live: done
+2025-10-27T18:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T18:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T18:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T18:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T18:07:01Z [INFO] canary_live: done
+[SKIP] bb_day: otro proceso en curso
+[SKIP] bb_day: otro proceso en curso
+2025-10-27T19:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T19:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T19:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T19:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T19:07:01Z [INFO] canary_live: done
+2025-10-27T20:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T20:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T20:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T20:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T20:07:00Z [INFO] canary_live: done
+2025-10-27T21:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T21:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T21:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T21:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T21:07:01Z [INFO] canary_live: done
+2025-10-27T22:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T22:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T22:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T22:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T22:07:00Z [INFO] canary_live: done
+2025-10-27T23:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-27T23:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-27T23:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-27T23:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-27T23:07:00Z [INFO] canary_live: done
+2025-10-28T00:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T00:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T00:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T00:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T00:07:01Z [INFO] canary_live: done
+2025-10-28T01:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T01:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T01:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T01:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T01:07:00Z [INFO] canary_live: done
+2025-10-28T02:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T02:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T02:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T02:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T02:07:00Z [INFO] canary_live: done
+2025-10-28T03:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T03:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T03:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T03:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T03:07:00Z [INFO] canary_live: done
+2025-10-28T04:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T04:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T04:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T04:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T04:07:01Z [INFO] canary_live: done
+2025-10-28T05:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T05:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T05:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T05:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T05:07:01Z [INFO] canary_live: done
+2025-10-28T06:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T06:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T06:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T06:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T06:07:00Z [INFO] canary_live: done
+2025-10-28T07:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T07:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T07:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T07:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T07:07:01Z [INFO] canary_live: done
+2025-10-28T08:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T08:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T08:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T08:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T08:07:00Z [INFO] canary_live: done
+2025-10-28T09:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T09:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T09:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T09:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T09:07:00Z [INFO] canary_live: done
+2025-10-28T10:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T10:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T10:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T10:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T10:07:00Z [INFO] canary_live: done
+2025-10-28T11:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T11:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T11:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T11:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T11:07:01Z [INFO] canary_live: done
+2025-10-28T12:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T12:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T12:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T12:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T12:07:00Z [INFO] canary_live: done
+2025-10-28T13:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T13:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T13:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T13:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T13:07:01Z [INFO] canary_live: done
+2025-10-28T14:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T14:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T14:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T14:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T14:07:01Z [INFO] canary_live: done
+2025-10-28T15:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T15:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T15:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T15:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T15:07:00Z [INFO] canary_live: done
+2025-10-28T16:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T16:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T16:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T16:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T16:07:00Z [INFO] canary_live: done
+2025-10-28T17:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T17:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T17:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T17:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T17:07:00Z [INFO] canary_live: done
+2025-10-28T18:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T18:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T18:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T18:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T18:07:00Z [INFO] canary_live: done
+2025-10-28T19:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T19:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T19:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T19:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T19:07:00Z [INFO] canary_live: done
+2025-10-28T20:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T20:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T20:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T20:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T20:07:01Z [INFO] canary_live: done
+2025-10-28T21:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T21:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T21:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T21:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T21:07:00Z [INFO] canary_live: done
+2025-10-28T22:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T22:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T22:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T22:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T22:07:00Z [INFO] canary_live: done
+2025-10-28T23:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-28T23:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-28T23:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-28T23:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-28T23:07:00Z [INFO] canary_live: done
+2025-10-29T00:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T00:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T00:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T00:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T00:07:00Z [INFO] canary_live: done
+2025-10-29T01:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T01:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T01:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T01:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T01:07:00Z [INFO] canary_live: done
+2025-10-29T02:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T02:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T02:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T02:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T02:07:00Z [INFO] canary_live: done
+2025-10-29T03:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T03:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T03:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T03:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T03:07:01Z [INFO] canary_live: done
+2025-10-29T04:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T04:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T04:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T04:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T04:07:00Z [INFO] canary_live: done
+2025-10-29T05:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T05:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T05:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T05:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T05:07:00Z [INFO] canary_live: done
+2025-10-29T06:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T06:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T06:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T06:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T06:07:00Z [INFO] canary_live: done
+2025-10-29T07:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T07:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T07:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T07:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T07:07:00Z [INFO] canary_live: done
+2025-10-29T08:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T08:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T08:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T08:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T08:07:00Z [INFO] canary_live: done
+2025-10-29T09:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T09:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T09:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T09:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T09:07:00Z [INFO] canary_live: done
+2025-10-29T10:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T10:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T10:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T10:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T10:07:00Z [INFO] canary_live: done
+2025-10-29T11:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T11:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T11:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T11:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T11:07:01Z [INFO] canary_live: done
+2025-10-29T12:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T12:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T12:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T12:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T12:07:00Z [INFO] canary_live: done
+2025-10-29T13:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T13:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T13:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T13:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T13:07:00Z [INFO] canary_live: done
+2025-10-29T14:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T14:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T14:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T14:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T14:07:00Z [INFO] canary_live: done
+2025-10-29T15:07:01Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T15:07:01Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T15:07:01Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T15:07:01Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T15:07:01Z [INFO] canary_live: done
+2025-10-29T16:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T16:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T16:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T16:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T16:07:00Z [INFO] canary_live: done
+2025-10-29T17:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T17:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T17:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T17:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T17:07:00Z [INFO] canary_live: done
+2025-10-29T18:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T18:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T18:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T18:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T18:07:00Z [INFO] canary_live: done
+2025-10-29T19:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T19:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T19:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T19:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T19:07:00Z [INFO] canary_live: done
+2025-10-29T20:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T20:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T20:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T20:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T20:07:00Z [INFO] canary_live: done
+2025-10-29T21:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T21:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T21:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T21:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T21:07:00Z [INFO] canary_live: done
+2025-10-29T22:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T22:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T22:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T22:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T22:07:00Z [INFO] canary_live: done
+2025-10-29T23:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T23:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T23:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T23:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T23:07:00Z [INFO] canary_live: done
+2025-10-30T00:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-30T00:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-30T00:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-30T00:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-30T00:07:00Z [INFO] canary_live: done

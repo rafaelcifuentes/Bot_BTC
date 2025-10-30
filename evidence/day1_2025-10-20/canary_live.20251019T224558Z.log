@@ -1,0 +1,16 @@
+20251019T224558Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=0 USD<=10 cap 0.10
+20251019T224558Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+20251019T224558Z [INFO] env loader: BINANCE_TESTNET=1 HOST=vision KEY=set SEC=set SIDE=buy
+[INFO] mini_accum: Canary LIVE lanzado (EXCHANGE=binance, DRYRUN=0, USD<=10, cap 0.10); log=canary_live.20251019T224558Z.log
+2025-10-19T22:45:58Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=0 USD<=10 cap=0.1
+2025-10-19T22:45:58Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-19T22:45:58Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-19T22:45:58Z [INFO] canary_live: ready (signal fresh)
+2025-10-19T22:45:58Z [DEBUG] live_order: ORDER_SIDE=buy SYMBOL_in=BTC/USDT
+2025-10-19T22:45:59Z [INFO] CCXT testnet: VISION (testnet.binance.vision)
+2025-10-19T22:46:02Z [DEBUG] markets loaded: 1565 spot symbols
+2025-10-19T22:46:03Z [INFO] live_order: placed side=buy id=4199128 status=closed amount=9e-05 symbol=BTC/USDT
+2025-10-19T22:46:03Z [INFO] live_order: state=closed filled=9e-05
+2025-10-19T22:46:03Z [INFO] canary_live: done

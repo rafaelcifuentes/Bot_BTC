@@ -116,6 +116,19 @@
       "status": "opt-in",
       "planned_version": "v2+",
       "placeholder": true
-    }
+    },
+    {
+      "strategy_version": "KISSv1_BASE_20250915_1642_final",
+      "live_trading_enabled": false,
+      "canary": { "mode": "DRYRUN", "exchange": "binance", "freshness_max_hours": 8 },
+      "ops": {
+        "shadow_keepalive": true,
+        "write_status_hourly": true,
+        "daily_report": true,
+        "lab4_shadow": true,
+        "selector_shadow": true,
+        "pack_daily": true
+      }
+  }
   ]
 }

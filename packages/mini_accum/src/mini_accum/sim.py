@@ -5,6 +5,51 @@ from collections import deque
 import numpy as np
 import pandas as pd
 
+def _parse_bar_timedelta(cfg):
+    """Convierte cfg['bar'] como '4h', '1d' a Timedelta."""
+    bar = (cfg.get('bar') or '4h')
+    # Acepta '4h', '1h', '1d'… pandas lo entiende bien.
+    try:
+        return pd.Timedelta(bar)
+    except Exception:
+        # Fallback: asume 4 horas
+        return pd.Timedelta('4h')
+
+def enforce_min_bars_between_flips(flips_df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
+    """
+    Filtra flips para respetar un mínimo de barras entre flips (TTL/dwell).
+    Requiere columna 'ts' y opcionalmente 'executed'. No depende del resto del pipeline.
+    """
+    if flips_df is None or flips_df.empty:
+        return flips_df
+
+    # Lee palancas
+    horizon_bars = int(((cfg.get('horizon') or {}).get('h_bars') or 0))
+    dwell_bars   = int(((cfg.get('anti_whipsaw') or {}).get('dwell_bars_min_between_flips') or 0))
+    ttl_bars     = max(horizon_bars, dwell_bars)
+
+    if ttl_bars <= 0:
+        return flips_df
+
+    bar_td = _parse_bar_timedelta(cfg)
+    min_dt = ttl_bars * bar_td
+
+    df = flips_df.copy()
+    # Asegura orden temporal y dtype de tiempo
+    df['ts'] = pd.to_datetime(df['ts'], utc=True, errors='coerce')
+    df = df.sort_values('ts').dropna(subset=['ts'])
+
+    keep_mask = []
+    last_ts = None
+    for _, row in df.iterrows():
+        t = row['ts']
+        if last_ts is None or (t - last_ts) >= min_dt:
+            keep_mask.append(True)
+            last_ts = t
+        else:
+            keep_mask.append(False)
+
+    return df.loc[keep_mask].reset_index(drop=True)
 
 def max_drawdown(series: pd.Series) -> float:
     """Máx. drawdown en valor positivo (p.ej. 0.25 = -25%)."""
@@ -98,9 +143,12 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
     if 'macro_green' not in df.columns:
         df['macro_green'] = df['d_close'] > df['d_ema200']
 
-    # --- Anti-whipsaw (pausa y dwell) ---
+    # --- Anti-whipsaw (pausa y dwell) + TTL/HORIZON ---
     aw = cfg.get('anti_whipsaw', {}) or {}
-    dwell_min = int(aw.get('dwell_bars_min_between_flips', aw.get('dwell_bars_min', 0)))
+    horizon = (cfg.get('horizon') or {})
+    h_bars = int(horizon.get('h_bars', 0))
+    dwell_cfg = int(aw.get('dwell_bars_min_between_flips', aw.get('dwell_bars_min', 0)))
+    dwell_min = max(h_bars, dwell_cfg)
     pause_after_flip_bars = int(aw.get('pause_after_flip_bars', 0))
     pause_affects_sell = bool(aw.get('pause_affects_sell', False))
 
@@ -141,6 +189,39 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
         df['atr_quiet'] = True
         df['atr_loud'] = False
         df['atr_yellow'] = False
+
+    # --- ADX (gate de entrada) ---
+    adx_cfg = (cfg.get('filters', {}) or {}).get('adx', {}) or {}
+    adx_enabled = bool(adx_cfg.get('enabled', False))
+    adx_period = int(adx_cfg.get('period', 14))
+    adx_min = float(adx_cfg.get('min', 0.0))
+
+    if adx_enabled and all(c in df.columns for c in ['high', 'low', 'close']):
+        # Wilder-like ADX (aprox) usando EWM
+        prev_high = df['high'].shift(1)
+        prev_low  = df['low'].shift(1)
+        prev_close = df['close'].shift(1)
+
+        up_move = df['high'] - prev_high
+        down_move = prev_low - df['low']
+
+        plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0.0)
+        minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0.0)
+
+        tr1 = (df['high'] - df['low']).abs()
+        tr2 = (df['high'] - prev_close).abs()
+        tr3 = (df['low']  - prev_close).abs()
+        tr = np.maximum(tr1, np.maximum(tr2, tr3))
+
+        atr = pd.Series(tr, index=df.index).ewm(span=adx_period, adjust=False).mean().replace(0, np.nan)
+
+        plus_di = (pd.Series(plus_dm, index=df.index).ewm(span=adx_period, adjust=False).mean() / atr) * 100.0
+        minus_di = (pd.Series(minus_dm, index=df.index).ewm(span=adx_period, adjust=False).mean() / atr) * 100.0
+
+        dx = ( (plus_di - minus_di).abs() / (plus_di + minus_di).replace(0, np.nan) ) * 100.0
+        df['adx'] = dx.ewm(span=adx_period, adjust=False).mean().ffill()
+    else:
+        df['adx'] = np.nan
 
     # --- XB adaptativo por ATR (opcional) ---
     # Si está habilitado, recomputa trend_up/trend_dn usando un buffer por-vela
@@ -294,7 +375,12 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
                 flips_blocked_hard += 1
 
         # ======= Entrada a BTC =======
-        if position == 'STABLE' and macro_green and trend_up and can_buy and schedule_buy_i is None:
+        adx_ok = True
+        if adx_enabled:
+            adx_val = float(row.get('adx', np.nan))
+            adx_ok = (np.isfinite(adx_val) and (adx_val >= adx_min))
+
+        if position == 'STABLE' and macro_green and trend_up and adx_ok and can_buy and schedule_buy_i is None:
             # Throttle semanal soft para BUY (rolling 7 días; no cuenta SELL)
             if soft_per_week < 10**8:
                 seven_days_ago = row['ts'] - pd.Timedelta(days=7)
@@ -310,6 +396,8 @@ def simulate(cfg: dict, df4: pd.DataFrame, costs: TradeCosts) -> Tuple[pd.DataFr
                 else:
                     flips_blocked_hard += 1
                     blocked_reason_cur = 'hard_year_budget'
+        elif position == 'STABLE' and macro_green and trend_up and (not adx_ok) and blocked_reason_cur is None:
+            blocked_reason_cur = 'adx_below_min'
 
         # ======= Equity (al cierre de la barra i) =======
         price_now = float(row['close'])

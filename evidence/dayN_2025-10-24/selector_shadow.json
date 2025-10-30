@@ -1,0 +1,9 @@
+{
+  "ts_utc": "2025-10-24T00:02:05Z",
+  "rule": "fric_live_shadow_v1",
+  "decision": "insuficiente",
+  "day_utc": "2025-10-24",
+  "attest_ok": 0,
+  "counts": { "total": 0, "green": 0, "pause": 0, "yellow": 0 },
+  "notes": "Solo registro en sombra. No cambia lógica ni envía señales."
+}

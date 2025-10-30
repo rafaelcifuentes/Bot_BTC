@@ -1,0 +1,6 @@
+sha256 2bf8c646589db1cd52fdd7b4bfc822860d9b8283fe3f2e129961732a3ff0d947
+sources:
+  - data/tmp_wf/BTC-USD_4h_WF_.csv
+  - data/tmp_wf/BTC-USD_4h_WF_2022.csv
+  - data/tmp_wf/BTC-USD_4h_WF_2023.csv
+  - data/tmp_wf/BTC-USD_4h_WF_2025.csv

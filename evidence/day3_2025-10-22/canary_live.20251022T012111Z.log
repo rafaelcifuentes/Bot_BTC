@@ -1,0 +1,13 @@
+20251022T012111Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=0 USD<=10 cap=0.10
+20251022T012111Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T01:21:11Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=0 USD<=10 cap=0.10
+2025-10-22T01:21:11Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-22T01:21:11Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-22T01:21:11Z [INFO] canary_live: ready (signal fresh)
+Traceback (most recent call last):
+  File "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/scripts/mini_accum/live_wrapper.py", line 93, in <module>
+    DO_TRADE = os.etenv("DO_TRADE", "0") == "1"
+               ^^^^^^^^
+AttributeError: module 'os' has no attribute 'etenv'. Did you mean: 'getenv'?

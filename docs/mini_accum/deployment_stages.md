@@ -104,6 +104,7 @@ Este modo NO es una versión beta, es una versión de producción con capital re
 ## Gates de promoción
 - ≥5/5 días GREEN (criterio KISS), sin alertas duras.
 - MDD no empeora vs baseline; flips↓; NetBTC≈.
+
 ## 📈 Estado de avance — corte UTC 2025-10-28 (Bogotá 2025-10-28)
 
 > Esta sección se **añade** sin borrar nada del contenido previo.

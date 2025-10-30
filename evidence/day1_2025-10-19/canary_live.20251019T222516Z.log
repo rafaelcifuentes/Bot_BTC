@@ -1,0 +1,22 @@
+20251019T222516Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=0 USD<=10 cap 0.10
+20251019T222516Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+20251019T222516Z [INFO] env loader: BINANCE_TESTNET=1 HOST=vision KEY=set SEC=set SIDE=buy
+[INFO] mini_accum: Canary LIVE lanzado (EXCHANGE=binance, DRYRUN=0, USD<=10, cap 0.10); log=canary_live.20251019T222516Z.log
+2025-10-19T22:25:16Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=0 USD<=10 cap=0.1
+2025-10-19T22:25:16Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-19T22:25:16Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 6.4h
+2025-10-19T22:25:16Z [WARN] mini_accum: stale signal: 6.4h — PAUSE
+20251019T222516Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=0 USD<=10 cap 0.10
+20251019T222516Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+20251019T222516Z [INFO] env loader: BINANCE_TESTNET=1 HOST=vision KEY=set SEC=set SIDE=sell
+[INFO] mini_accum: Canary LIVE lanzado (EXCHANGE=binance, DRYRUN=0, USD<=10, cap 0.10); log=canary_live.20251019T222516Z.log
+2025-10-19T22:25:17Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=0 USD<=10 cap=0.1
+2025-10-19T22:25:17Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-19T22:25:17Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+[PAUSE] stale signal: 6.4h
+2025-10-19T22:25:17Z [WARN] mini_accum: stale signal: 6.4h — PAUSE

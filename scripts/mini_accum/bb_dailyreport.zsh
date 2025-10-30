@@ -41,6 +41,7 @@ compute_attest_ok() {
   if (( ok == 0 )) && [[ -f "$LOG" ]]; then
     last="$(grep -nE '(^\[OK\] write_status:)|(^[0-9]{4}-[0-9]{2}-[0-9]{2}T.*\[OK\] write_status:)' "$LOG" | tail -1)"
     if [[ -n "$last" ]]; then
+      ln="${last%%:*}"
       line="${last#*:}"
       if [[ "$line" == \[* ]]; then
         # Sin fecha → usa mtime del LOG como último recurso del día objetivo
@@ -56,6 +57,27 @@ compute_attest_ok() {
   print -r -- "$ok"
 }
 ATTEST_OK="$(compute_attest_ok)"
+
+find_canary_green() {
+  local log_path
+  if [[ -d "$CANARY_DIR" ]]; then
+    log_path="$(ls -1t "$CANARY_DIR"/canary_live.*.log 2>/dev/null | head -1 || true)"
+    [[ -z "$log_path" ]] && return 1
+
+    # 1) Formato antiguo: marcador explícito en el propio log
+    if grep -qiF '→ **GREEN**' "$log_path"; then
+      print -r -- "$log_path"; return 0
+    fi
+
+    # 2) Formato nuevo (silencioso): éxito = "ready (signal fresh)" y "canary_live: done", sin errores
+    if grep -qiF 'ready (signal fresh)' "$log_path" \
+       && grep -qiF 'canary_live: done' "$log_path" \
+       && ! grep -qiE '\[ERROR\]|\bFAIL\b' "$log_path"; then
+      print -r -- "$log_path"; return 0
+    fi
+  fi
+  return 1
+}
 
 # --- Recolecta logs de canario del día (logs/ y evidence/day*/ del mismo día) ---
 typeset -a FILES

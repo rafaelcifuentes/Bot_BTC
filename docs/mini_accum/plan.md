@@ -317,3 +317,13 @@ _(No se encontró mini_bot_macro_plan.md; incluir aquí la visión macro y alcan
 - `docs/mini_accum/roadmap.md` (Roadmap + PDCA)  
 - `docs/mini_accum/brochure.md` (externo/público)  
 - `configs/mini_accum/overlays/*.yaml` (máquina)  
+
+# Plan Macro (KISS, 4 días) — Estado
+
+1) Evidencia automática —— ✅
+2) Salud & Watchdog —— ✅
+3) Arranque & cortes —— ✅
+4) LAB4 (sombra) —— ✅ (solo informe)
+5) Pack canario diario —— ✅ (ajuste de contenidos aplicado)
+
+**Criterio canario KISS**: última corrida del día con `ready (signal fresh)` + `done` ⇒ **GREEN**.

@@ -1,0 +1,54 @@
+#!/bin/zsh
+set -euo pipefail
+: ${ROOT:="$HOME/PycharmProjects/Bot_BTC"}
+cd "$ROOT"
+DAY=${1:-$(date -u +%F)}
+DSTR=${DAY//-/}
+OUTDIR="$ROOT/evidence/dayN_${DAY}"
+mkdir -p "$OUTDIR"
+
+# files del día (UTC)
+setopt NULL_GLOB
+files=($ROOT/logs/canary_live.${DSTR}T*.log(N) $ROOT/evidence/day*_${DAY}/canary_live.${DSTR}T*.log(N))
+
+# válidos = binance + DRYRUN=1
+valid=()
+for f in $files; do
+  grep -q 'start EXCHANGE=binance DRYRUN=1' "$f" || continue
+  valid+=("$f")
+done
+
+# conteos
+typeset -i GREEN=0 PAUSE=0
+for f in $valid; do
+  if grep -q 'PAUSE' "$f"; then ((PAUSE++)); continue; fi
+  if grep -q 'ready (signal' "$f" && grep -q '\[INFO\] canary_live: done' "$f"; then ((GREEN++)); fi
+done
+
+# attest del día
+ATTEST_OK=$(
+  awk -v d="$DAY" 'BEGIN{ib=0;ok=0}
+    $0~"^== ATTEST START " d "T"{ib=1; ok=0; next}
+    ib && /^== ATTEST START /{print ok; exit}
+    ib && /ATTESTATION: OK/{ok=1}
+    END{if(ib)print ok}' "$ROOT/logs/cron.log" 2>/dev/null || echo 0
+)
+
+# escribir reporte
+{
+  echo "# Canary DRYRUN — Resumen diario (UTC: $DAY)"
+  echo
+  echo "- ATTEST OK: $ATTEST_OK"
+  echo "- Canarios válidos: ${#valid}  | GREEN=$GREEN  | PAUSE=$PAUSE"
+  echo
+  echo "## Últimos 12 válidos"
+  print -rl -- $valid | tail -n 12 | while read -r f; do
+    s=$(grep -m1 'start EXCHANGE' "$f" | sed 's/.*start /start /')
+    r=$(grep -m1 'ready (signal' "$f" || true)
+    d=$(grep -m1 '\[INFO\] canary_live: done' "$f" || true)
+    verdict="YELLOW"; [[ -n "$r" && -n "$d" ]] && verdict="GREEN"; grep -q 'PAUSE' "$f" && verdict="PAUSE"
+    printf "\n%s\n  %s\n  %s\n  %s\n  → %s\n" "$f" "$s" "$r" "$d" "$verdict"
+  done
+} > "$OUTDIR/REPORT.md"
+
+echo "[OK] bb_dailyreport: $OUTDIR/REPORT.md"

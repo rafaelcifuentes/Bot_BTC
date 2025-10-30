@@ -1,0 +1,1 @@
+[WARN] No pude copiar a EXT_BACKUP_DIR='/Volumes/sda1/rafaelcifuentes/Bot BTC' (continuo con backup local)

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 0) Permite saltar el lint si lo pides
+if [[ "${SKIP_YAML_LINT:-0}" == "1" ]]; then
+  echo "[yaml-lint] SKIP_YAML_LINT=1 -> saltando validación"
+  exit 0
+fi
+
+# 1) Construye la lista de ficheros a validar
+FILES=()
+if [[ -f .yaml_validate_allowlist ]]; then
+  # macOS: sin 'xargs -a'. Usamos while read.
+  while IFS= read -r f; do
+    [[ -n "$f" ]] && FILES+=("$f")
+  done < .yaml_validate_allowlist
+else
+  # Solo YAML staged (index), no todo el repo
+  while IFS= read -r f; do
+    [[ "$f" == *.yaml ]] && FILES+=("$f")
+  done < <(git diff --cached --name-only)
+fi
+
+# 2) Filtra cosas que rompen herramientas o no queremos validar
+FILTERED=()
+for f in "${FILES[@]}"; do
+  # Existe y es regular (no symlink)? fuera '_archive/'
+  if [[ -e "$f" ]] && [[ ! -L "$f" ]] && [[ -f "$f" ]] && [[ "$f" != *"/_archive/"* ]]; then
+    FILTERED+=("$f")
+  fi
+done
+
+# 3) Valida con Python (yaml.safe_load). Sin your_yaml_validator.py, todo inline.
+if ((${#FILTERED[@]})); then
+  python3 - "$@" <<'PY' "${FILTERED[@]}"
+import sys, yaml, pathlib
+ok = True
+for p in sys.argv[1:]:
+    path = pathlib.Path(p)
+    try:
+        with path.open('r', encoding='utf-8') as fh:
+            yaml.safe_load(fh)
+    except Exception as e:
+        print(f"❌ YAML inválido: {p}\n    {e.__class__.__name__}: {e}")
+        ok = False
+if not ok:
+    sys.exit(1)
+else:
+    print("[yaml-lint] OK:", len(sys.argv[1:]), "archivos validados")
+PY
+fi# --- README residue guard (KISS) ---
+if grep -qE 'heredoc>$|>\.{3,}\s*$' README.md; then
+  echo "[pre-commit] README contiene residuos (heredoc o >...). Límpialo antes de commitear."
+  exit 1
+fi

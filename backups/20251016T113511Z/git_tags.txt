@@ -1,0 +1,42 @@
+FREEZE_BASELINE_2025-10-02 pre-commit self-test (hibernation no-placeholder)
+H1_FZ_v1        Baseline FREEZE H1 2024
+KISSv1_1_CANARY_20251003_0234UTC V1.1 canary (SL/TP post) ventanas OOS PASS
+KISSv1_2_EXPERIMENT_OFF_WF2025_FAIL v1.2 OFF — WF_2025 FAIL gate (lift –19.43%, MDD mejor)
+KISSv1_BASE_20250915_1642_final KISS v1 FINAL — DD15_RB1_H30_G200_BULL0
+KISSv1_BASE_20251002_2124UTC KISS v1 baseline FREEZE 2025-03-01..2025-09-19 (CORE_2025)
+KISSv1_BASE_20251010_1839_freeze Baseline congelado (grid con G200+G150, artefactos reproducibles)
+KISSv1_BASE_20251010_NETBTC_4p3407 Golden snapshot
+KISSv1_BASE_20251010_freeze_NETBTC_4p340727 PROD: KISS v1 BASE; overlays OFF; docs consolidados; tmp_wf ignorado; helpers estable
+KISSv1_BASE_20251010_freeze_NETBTC_4p340727_r1 Golden snapshot: KISSv1_BASE_20251010_freeze DD15_RB1_H30_G200_BULL0 NetBTC=4.340727 (rerun)
+KISSv1_BASE_20251010_freeze_NETBTC_4p340727_r2 Golden snapshot: KISSv1_BASE_20251010_freeze DD15_RB1_H30_G200_BULL0 NetBTC=4.340727 (rerun)
+KISSv1_PROD_2025H1_BASE_RB1H30G200BULL0 KISS v1 — PROD 2025H1 (BASE: RB1/H30/G200/BULL0)
+KISSv2_0_EXPERIMENT_OFF_WF2025_FAIL v2.0 OFF — WF_2025 FAIL gate (lift −19.43%, MDD mejor)
+PAPER_2025-09-18_0800ET Paper checkpoint — Thu 08:00 ET
+PAPER_2025-09-18_1654UTC Paper checkpoint — 2025-09-18_1654UTC
+PROD_E1_Y2_2022 NetBTC=2.921250 MDD_vs_HODL=0.104540 | 1D=c4c71c88a357b4d0f821e141b6ecca52db4867919c7ecd82fc8e9af9fdd2a151 4H=2bf8c646589db1cd52fdd7b4bfc822860d9b8283fe3f2e129961732a3ff0d947 | costs fee=2bps slip=1bps
+PROD_KISSv1_2023 NetBTC=2.641397 MDD_vs_HODL=0.936073 | 1D=cf79d91941c8b9682d690529087ad3e1ba2e61e7a48bae5d10da2235c5512afe 4H=2bf8c646589db1cd52fdd7b4bfc822860d9b8283fe3f2e129961732a3ff0d947 | costs fee=2bps slip=1bps
+PROD_KISSv1_2024 NetBTC=1.613240 MDD_vs_HODL=0.768424 | 1D=bf7fa0ec2c8126751474b34951de2453eb5b4674ea3ccd0a31509279b7f976f3 4H=2bf8c646589db1cd52fdd7b4bfc822860d9b8283fe3f2e129961732a3ff0d947 | costs fee=2bps slip=1bps
+PROD_KISSv1_2025H1 NetBTC=1.138462 MDD_vs_HODL=0.741494 | 1D=4fc2fdcac21ac1f9acf0ceb624d1622c990b3e4e76302cf3d624c448ebc2441b 4H=2bf8c646589db1cd52fdd7b4bfc822860d9b8283fe3f2e129961732a3ff0d947 | costs fee=2bps slip=1bps
+baseline-core2025-xb20 Baseline CORE_2025 XB=20 (OOS PASS)
+baseline-core2025-xb20-r2 CORE_2025 XB=20 (net>1, FPy=18.57)
+data-ohlc-20250914 Pin OHLC usados para baseline CORE_2025
+diamante_wk1_lock Diamante Semana1 lock
+mini-accum-v1.1-canary Canary: SL/TP ATR (2×/3×) con guardrails (README SPA/RC 2025-10-05)
+mini_accum_v0.1_shadow Freeze v0.1-shadow (E1)
+pass-20250913-kissv4-core KISSv4 PASS
+pass-20250914-kissv4-core PASS reafirmado
+release/H1_FZ_v1 Freeze baseline locked
+v0.1-baselines  Baselines: H1_FZ (H1) y Q4_E3 (Q4)
+v0.1-prudente-ATR-p40-yb5-dw6 Preset prudente estable (2-verde/1-resto)
+v0.1-prudente-ckpt-20250908-1910 PDCA checkpoint — preset bb1-dynATR-dw6-p40-yb5
+v0.1-prudente-xbuf25 Preset prudente (dynATR + dwell6 + xbuf25)
+v0.1-prudente-xbuf25-OOS Preset prudente OOS PASS (23Q4,24H1)
+v0.1-prudente-xbuf25-eod-20250908-2344 checkpoint: EOD v0.1-prudente-xbuf25 + logs + cfg
+v0.1-prudente-xbuf25-r1 Preset prudente (dynATR + dwell6 + xbuf25) r1
+v0.1.1-mini_accum H1_FZ + Q4_E4 baselines; artifacts
+v0.1.2-mini_accum Mini Accum: baselines fijados y artefactos empaquetados
+v0.1.3-mini_accum-snapshot-20250913_002727 Mini Accum snapshot: H1_FZ + Q4_E3 (BASE=auto)
+v0.1.3-mini_accum-snapshot-20250913_002815 Mini Accum snapshot: H1_FZ + Q4_E3 (BASE=auto)
+v0.1.4-mini_accum-snapshot-20250913_003353 Mini Accum snapshot
+v1.0_shadow_cert_20251005 KISS v1.0 baseline certified (shadow only; no canary)
+v2.0_sanity_costs Gate OK en 2/1–2/2; degradación esperada en 4/2–5/3

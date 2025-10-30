@@ -1,0 +1,8 @@
+2025-10-29T13:07:00Z [INFO] canary_live: start EXCHANGE=binance DRYRUN=1 USD<=10 cap=0.10
+2025-10-29T13:07:00Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-29T13:07:00Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-29T13:07:00Z [INFO] canary_live: ready (signal fresh)
+[PAPER] flip: simulated (no order)
+2025-10-29T13:07:00Z [INFO] canary_live: done

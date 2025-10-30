@@ -1,0 +1,16 @@
+# FREEZE base_v0_1_20251014_1509_kpis__OOS_2025H1_REGIME.csv
+date_utc: 2025-10-14T15:35:21.977141Z
+git_sha: 851921afdd9f243e2b07f89fb08a950c34218e24
+costs_bps_per_side: fee=2.0, slip=1.0
+kpis:
+  sats_mult: 1.138462
+  mdd_vs_hodl: 0.741494
+  flips: 0
+  kpi_csv: null
+version: 1
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+data_hashes:
+  data_1d_sha256: 4fc2fdcac21ac1f9acf0ceb624d1622c990b3e4e76302cf3d624c448ebc2441b
+  data_4h_sha256: 2bf8c646589db1cd52fdd7b4bfc822860d9b8283fe3f2e129961732a3ff0d947

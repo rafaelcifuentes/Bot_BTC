@@ -54,3 +54,4 @@ Rationale: menor complejidad y riesgo de modelo; gobernanza KISS; BULL_HOLD opt-
 - 2025-10-03 02:34:37Z CANARY V1.1 (SLTP post) .. (CORE_2025) → PASS (gates PDCA).
 - 2025-10-03 02:43:36Z SPA/RC V1.1 (SLTP post) sobre CORE_2025 → artefacto: docs/mini_accum/checkpoints/2025-10-03_0243UTC/KISS_v1_1_canary_spa.json
 - 2025-10-03 02:51:06Z SPA/RC V1.1 (SLTP post) CORE_2025 → docs/mini_accum/checkpoints/2025-10-03_0251UTC/KISS_v1_1_canary_spa.json
+

@@ -1,0 +1,10 @@
+20251021T163120Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=0 USD<=10 cap=0.10
+20251021T163120Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T16:31:20Z [INFO] canary_live: start EXCHANGE=binanceus DRYRUN=0 USD<=10 cap=0.10
+2025-10-21T16:31:20Z [INFO] canary_live: python=/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+3.12.6
+sys.executable: /Users/rafaelcifuentes/PycharmProjects/Bot_BTC/.venv/bin/python
+2025-10-21T16:31:20Z INFO mini_accum: LOG_LEVEL=INFO aplicado
+2025-10-21T16:31:20Z [INFO] canary_live: ready (signal fresh)
+[LIVE] trading disabled (DO_TRADE!=1) — only logging
+2025-10-21T16:31:20Z [INFO] canary_live: done

@@ -1,56 +1,63 @@
-# Mini-Accum KISS v4 — single source of truth
+# Mini-Accum v1.0 — CORE (TOP: DD15 • RB1 • H30 • G200 • BULL0)
+preset: CORE_2025
+version: 1.0
+bar: 4h
 
 data:
-  ohlc_4h_csv: data/snapshots/20250914/4h/BTC-USD.csv
-  ohlc_d1_csv: data/snapshots/20250914/1d/BTC-USD.csv
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.norm.csv
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
   ts_col: timestamp
   tz_input: UTC
+  tz_output: UTC
+
 backtest:
   reports_dir: reports/mini_accum
+  seed_btc: 1.0
+
+risk:
+  hard_dd_pct: 0.15
+
+rebalancing:
+  frequency: "1W"
+
+horizon:
+  h_bars: 30
+
+execution:
+  gamma_bps: 200
+  bull_bias_bps: 0
+
 costs:
-  fee_bps_per_side: 6
-  slip_bps_per_side: 6
-macro_filter:
-  use: true
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+
+# V1 TOP (EMA21/55, G200, DD15, RB1, H30), sin SL/TP
+strategy:
+  params:
+    ema_fast: 21
+    ema_slow: 55
+
 signals:
   ema_fast: 21
   ema_slow: 55
   entry: "ema21 > ema55 and macro_green"
   exit_active:
-    rule: "close < ema21"
+    rule: "close < ema21 and macro_red"
     confirm_bars: 2
+    max_wait_bars_after_confirm: 2
   exit_passive:
     rule: "ema21 < ema55 and macro_red"
-  cross_buffer_bps: 23
+
 filters:
+  macro_sma: 200
   adx:
     enabled: true
     period: 14
-    min: 22
-  exit_margin:
-    enabled: true
-    margin_pct: 0.003
+    min: 25
+
 anti_whipsaw:
-  dwell_bars_4h: 0
   dwell_bars_min_between_flips: 96
-  grace_ttl_bars_4h: 0
-  ttl_confirm_bars: 2
-modules:
-  atr_regime:
-    enabled: true
-    percentile_p: 65
-  hibernation_chop:
-    enabled: false
-    window_bars: 40
-    min_crosses: 2
-  grace_ttl:
-    enabled: false
-  weekly_turnover_budget:
-    enabled: false
-  xb_adaptive:
-    enabled: false
-flip_budget:
-  hard_per_year: 26
-  enforce_hard_yearly: false
-force_sell_on_macro_red: true
-# touch 2025-09-14 05:57:42 UTC
+
+force_sell_on_macro_red: false
+
+tag: DD15_RB1_H30_G200_BULL0

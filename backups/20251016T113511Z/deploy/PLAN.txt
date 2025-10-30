@@ -1,0 +1,5 @@
+# Deployment plan KISS
+
+CORE (DRIVE):        PROD_KISSv1_2023
+CONDITIONAL (SPORT): PROD_KISSv1_2024  - activo si live_fee_slip in {2/1, 2/2}
+OFF:                 PROD_KISSv1_2025H1, PROD_E1_Y2_2022

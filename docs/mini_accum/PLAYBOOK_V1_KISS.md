@@ -147,3 +147,16 @@ El pipeline debe:
 - **Reproducibilidad**: devuelve el alias `kiss_v1` a un estado **medible y auditable**.
 - **Trazabilidad**: `manifest.json` con SHA‑256 por ventana evita drift.
 - **Seguridad operativa**: rollback atómico con **tag dorado** y snapshot versionado.
+
+# Playbook (KISS)
+
+## Diaria
+- `bb_today`, `bb_canary`, `bb_streak_canary_kiss`
+- Ver `evidence/dayN_YYYY-MM-DD/REPORT.md`
+
+## Incidentes
+- Si aparece DRYRUN=0 en logs → `quarantine/` y re-lanzar canario sombra.
+- Si señal vieja >8h → `shadow_keepalive.zsh` y re-canario DRYRUN.
+
+## Empaque
+- Automático 23:59 o manual: `./scripts/mini_accum/pack_canary.zsh`

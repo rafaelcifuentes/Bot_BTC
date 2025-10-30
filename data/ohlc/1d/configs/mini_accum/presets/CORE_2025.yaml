@@ -1,0 +1,47 @@
+# KISS v1 TOP — CORE 2025 (1D)
+version: 1.0
+bar: 1d
+
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
+  ts_col: ts
+  tz_input: UTC
+
+backtest:
+  reports_dir: reports/mini_accum/WF_YYYY/v1_0
+  seed_btc: 1.0
+
+# Señales (retro-compat v1)
+strategy:
+  params:
+    ema_fast: 21
+    ema_slow: 55
+
+# Filtros/gates y palancas KISS
+filters:
+  macro_sma: 200
+
+risk:
+  hard_dd_pct: 15      # DD15
+
+rebalancing:
+  frequency: 1         # RB1
+
+horizon:
+  h_bars: 30           # H30
+
+execution:
+  gamma_bps: 200       # G200
+  bull_bias_bps: 0     # BULL0
+
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+
+# Duplicado mínimo para sim v2 (si mira 'signals')
+signals:
+  ema_fast: 21
+  ema_slow: 55
+
+tag: DD15_RB1_H30_G200_BULL0
