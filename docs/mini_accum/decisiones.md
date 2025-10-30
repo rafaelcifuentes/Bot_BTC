@@ -83,3 +83,10 @@ H31_DWELL96: net≈0.7790, mdd≈1.0085, FPY≈19.67 → FAIL (Gate + D.7)
 H32_DWELL96: net≈0.7790, mdd≈1.0085, FPY≈19.67 → FAIL (Gate + D.7)
 Decisión: mantener PROD CORE_2025 (H30·RB1). No promover. Ni un satoshi cedido.
 Notas: TTL/dwell respetados; warning de pandas resuelto (ffill()).
+
+## 2025-10-30 — TTL/dwell fix + H31/H32 (DWELL96) = FAIL
+- **Fix:** sim.py respeta TTL (h_bars) y dwell; sin fillna(method=...).
+- **Base PROD:** CORE_2025 H30·RB1 (DWELL=96 probado como sanity).
+- **H31/H32 (DWELL96):** FAIL (lift OOS ≈ –31.6%, MDD>base, D.7 fricción). **No promoción**.
+- **Guardas:** KPI Guard = OK (FPY≈10.81; drift≈1.00%), Canario DRYRUN=1 = GREEN.
+- **Principio:** *Ni un satoshi cedido* — conservamos la lógica ganadora y rechazamos sobre-operar sin lift ≥+5%.
