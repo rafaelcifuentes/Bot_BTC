@@ -669,3 +669,6 @@ python -m mini_accum.cli \
 |---        |---                                           |---               |-------------------|
 | CORE_2025 | `configs/mini_accum/presets/CORE_2025.yaml` | ac8af148d536    | 6e1a649fb687      |
 | E1_Y2     | `configs/mini_accum/presets/E1_Y2.yaml`     | 188d038b49ae   | 6e1a649fb687      |
+
+**Streak (7d)**: 7/7 **GREEN** — semana cerrada ✅  
+• OK 2025-10-30T11:13:21Z
