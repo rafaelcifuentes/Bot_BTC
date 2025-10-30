@@ -1,7 +1,7 @@
-# Mini-Accum v1.0 — CORE (TOP: DD15 • RB1 • H30 • G200 • BULL0)
+# Mini-Accum v1.0 — CORE_2025.yaml — KISS v1 TOP (DD15 · RB1 · H30 · G200 · BULL0)
 preset: CORE_2025
 version: 1.0
-bar: 4h
+bar: 4h              # marco de decisión
 
 data:
   ohlc_4h_csv: data/ohlc/4h/BTC-USD.norm.csv
@@ -15,13 +15,15 @@ backtest:
   seed_btc: 1.0
 
 risk:
-  hard_dd_pct: 0.15
+  dd_pct: 0.15         # DD15 (compras en retroceso)
+  hard_dd_pct: 0.30    # hard stop defensivo
 
 rebalancing:
   frequency: "1W"
+  rb_pct: 0.01          # RB1 (1% por flip)
 
 horizon:
-  h_bars: 30
+  h_bars: 30             # H30 (TTL de señal)
 
 execution:
   gamma_bps: 200
@@ -30,6 +32,14 @@ execution:
 costs:
   fee_bps_per_side: 2.0
   slip_bps_per_side: 1.0
+
+bias:
+  bull_hold_sma: 0     # BULL0
+  shorting: false
+  leverage: 0
+
+output:
+  reports_dir: reports/mini_accum
 
 # V1 TOP (EMA21/55, G200, DD15, RB1, H30), sin SL/TP
 strategy:
@@ -49,14 +59,14 @@ signals:
     rule: "ema21 < ema55 and macro_red"
 
 filters:
-  macro_sma: 200
+  macro_sma: 200        # G200 ON/OFF de riesgo
   adx:
-    enabled: true
+    enabled: false     # desactivado en CORE (lo usamos ON en el preset estacional E1_Y2)
     period: 14
     min: 25
 
 anti_whipsaw:
-  dwell_bars_min_between_flips: 96
+  dwell_bars_min_between_flips: 96    # DWELL=96 (anti-whipsaw)
 
 force_sell_on_macro_red: false
 

@@ -1,31 +1,46 @@
-# Mini-Accum v2.0 — E1_Y2 (Año +2 post-halving)
+# Mini-Accum v2.0 — E1_Y2 (Año +2 post-halving): ADX ON (p.ej. min 22), EMA12/26 + RSI 35/65, dwell_bars_min_between_flips: 3, marco 1D.
 preset: E1_Y2
 version: 2.0
 bar: 1d
 
 data:
-  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
-  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
-  ts_col: ts
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.norm.csv
+  ts_col: timestamp
   tz_input: UTC
 
 backtest:
-  reports_dir: reports/mini_accum/WF_YYYY/v2_0
+  reports_dir: reports/mini_accum
   seed_btc: 1.0
 
-risk: { hard_dd_pct: 0.15 }
-rebalancing: { frequency: 1 }
-horizon: { h_bars: 30 }
+risk:
+  dd_pct: 0.15
+  hard_dd_pct: 0.30
+
+rebalancing:
+  frequency: "1W"
+  rb_pct: 0.01
+
+horizon:
+  h_bars: 30
 
 filters:
   macro_sma: 200
-  adx: { enabled: true, period: 14, min: 22 }
-  exit_atr: { enabled: false }
+  adx:
+    enabled: true
+    period: 14
+    min: 22
 
-execution: { gamma_bps: 0, bull_bias_bps: 0 }
-costs: { fee_bps_per_side: 2.0, slip_bps_per_side: 1.0 }
+anti_whipsaw:
+  dwell_bars_min_between_flips: 3
 
-anti_whipsaw: { dwell_bars_min_between_flips: 3 }
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+
+bias:
+  bull_hold_sma: 0
+  shorting: false
+  leverage: 0
 
 strategy:
   params:
@@ -37,7 +52,7 @@ strategy:
     adx_len: 14
     adx_min: 22
 
-# Duplicado para retro-compat (lectores v1.x)
+# Duplicado para retro-compat v1.x
 signals:
   ema_fast: 12
   ema_slow: 26

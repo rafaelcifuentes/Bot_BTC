@@ -361,63 +361,135 @@ Leyenda prob.: **Alta (≥70%)**, **Media (40–60%)**, **Baja (≤30%)**.
 **Motivación (2022 observado):** E1 captura rebotes post‑pico con **mdd_vs_hodl ≈ 0.10** y ~6–8 flips, mientras v1 en 2022 aportó ≈1.02×. En 2023–2024 (tendenciales), v1 TOP domina.
 
 
+
 #### Snippets YAML (reproducibles)
+
+```
+> **Nota anti‑misclick — YAML ≠ shell**
+>
+> El error `zsh: command not found: data:` ocurre cuando pegas **YAML** en la terminal.
+> El YAML va en archivos `.yaml`, no en el prompt.
+>
+> **Cómo trabajar bien:**
+> 1) Edita los presets en el editor:
+>    - `configs/mini_accum/presets/CORE_2025.yaml`
+>    - `configs/mini_accum/presets/E1_Y2.yaml`
+> 2) Si necesitas crearlos desde terminal, usa *heredoc*:
+>    ```zsh
+>    cat > configs/mini_accum/presets/CORE_2025.yaml &lt;&lt;'YAML'
+>    # ...contenido YAML aquí...
+>    YAML
+>    ```
+> 3) **Smoke test** (esto sí es comando):
+>    ```zsh
+>    python -m mini_accum.cli \
+>      --config configs/mini_accum/presets/CORE_2025.yaml \
+>      --start  2025-01-01 --end 2025-06-30 \
+>      --suffix OOS_2025H1_CORE_SMOKE
+>    ```
+```
 
 **CORE_2025.yaml** — KISS v1 TOP (DD15 • RB1 • H30 • G200 • BULL0)
 ```yaml
-# Mini-Accum v1.0 — CORE (TOP)
+# Mini-Accum v1.0 — CORE_2025.yaml — KISS v1 TOP (DD15 · RB1 · H30 · G200 · BULL0)
 preset: CORE_2025
 version: 1.0
-bar: 1d
+bar: 4h              # marco de decisión
 
 data:
-  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
-  ohlc_d1_csv: data/snapshots/20250914/1d/BTC-USD.csv
-  ts_col: ts
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.norm.csv
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv   # necesario para macro D1 (G200)
+  ts_col: timestamp
   tz_input: UTC
+  tz_output: UTC
+
+backtest:
+  reports_dir: reports/mini_accum
+  seed_btc: 1.0
 
 risk:
-  hard_dd_pct: 0.15     # DD15
-rebalancing:
-  frequency: "1W"       # RB1
-horizon:
-  h_bars: 30            # H30
-execution:
-  gamma_bps: 200        # G200
-  bull_bias_bps: 0      # BULL0
+  dd_pct: 0.15         # DD15 (compras en retroceso)
+  hard_dd_pct: 0.30    # hard stop defensivo
 
+rebalancing:
+  frequency: "1W"
+  rb_pct: 0.01          # RB1 (1% por flip)
+
+horizon:
+  h_bars: 30             # H30 (TTL de señal)
+
+execution:
+  gamma_bps: 200
+  bull_bias_bps: 0
+
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+
+bias:
+  bull_hold_sma: 0     # BULL0
+  shorting: false
+  leverage: 0
+
+output:
+  reports_dir: reports/mini_accum
+  
+# V1 TOP (EMA21/55, G200, DD15, RB1, H30), sin SL/TP
 strategy:
   params:
     ema_fast: 21
     ema_slow: 55
 
+signals:
+  ema_fast: 21
+  ema_slow: 55
+  entry: "ema21 > ema55 and macro_green"
+  exit_active:
+    rule: "close < ema21 and macro_red"
+    confirm_bars: 2
+    max_wait_bars_after_confirm: 2
+  exit_passive:
+    rule: "ema21 < ema55 and macro_red"
+
 filters:
-  macro_sma: 200
+  macro_sma: 200        # G200 ON/OFF de riesgo
+  adx:
+    enabled: false     # desactivado en CORE (lo usamos ON en el preset estacional E1_Y2)
+    period: 14
+    min: 25
 
 anti_whipsaw:
-  dwell_bars_min_between_flips: 24  # rotación baja (24 días entre flips)
+  dwell_bars_min_between_flips: 96    # DWELL=96 (anti-whipsaw)
+  ttl_bars: 1                         # TTL explícito (mismo comportamiento, más claro)
+
+force_sell_on_macro_red: false
 
 tag: DD15_RB1_H30_G200_BULL0
 ```
 
 **E1_Y2.yaml** — preset táctico Año +2 post‑halving (EMA12/26 + RSI 35/65 + ADX≥22; dwell=3; 1D; macro ON)
 ```yaml
-# Mini-Accum v2.0 — E1_Y2 (Año +2 post-halving)
+# Mini-Accum v2.0 — E1_Y2 (Año +2 post-halving): ADX ON (p.ej. min 22), EMA12/26 + RSI 35/65, dwell_bars_min_between_flips: 3, marco 1D.
 preset: E1_Y2
 version: 2.0
 bar: 1d
 
 data:
-  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
-  ohlc_d1_csv: data/snapshots/20250914/1d/BTC-USD.csv
-  ts_col: ts
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.norm.csv
+  ts_col: timestamp
   tz_input: UTC
 
+backtest:
+  reports_dir: reports/mini_accum
+  seed_btc: 1.0
+
 risk:
-  hard_dd_pct: 15
+  dd_pct: 0.15
+  hard_dd_pct: 0.30
 
 rebalancing:
-  frequency: 1
+  frequency: "1W"
+  rb_pct: 0.01
 
 horizon:
   h_bars: 30
@@ -430,7 +502,16 @@ filters:
     min: 22
 
 anti_whipsaw:
-  dwell_bars_min_between_flips: 3   # dwell3 estándar para Y+2
+  dwell_bars_min_between_flips: 3
+
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+
+bias:
+  bull_hold_sma: 0
+  shorting: false
+  leverage: 0
 
 strategy:
   params:
@@ -441,6 +522,16 @@ strategy:
     rsi_sell: 65
     adx_len: 14
     adx_min: 22
+
+# Duplicado para retro-compat v1.x
+signals:
+  ema_fast: 12
+  ema_slow: 26
+  rsi_len: 14
+  rsi_buy: 35
+  rsi_sell: 65
+  adx_len: 14
+  adx_min: 22
 ```
 
 #### Runner por régimen (sufijos `OOS_${TAG}_REGIME`)
@@ -570,3 +661,17 @@ python -m mini_accum.cli \
 - Acción: conservar preset PROD `configs/mini_accum/presets/CORE_2025.yaml` (H30·RB1).
 - Estado código: fix TTL/dwell aplicado; ADX `.ffill()` sin warnings.
 - Ni un satoshi cedido.
+
+---
+## Preset canónico — ruta y hash corto
+
+| Preset    | Ruta                                         | blob sha (short) | HEAD commit (short) |
+|---        |---                                           |---               |-------------------|
+| CORE_2025 | `configs/mini_accum/presets/CORE_2025.yaml` | ac8af148d536    | 6e1a649fb687      |
+| E1_Y2     | `configs/mini_accum/presets/E1_Y2.yaml`     | 188d038b49ae   | 6e1a649fb687      |
+
+**Cómo rellenar los hashes (pegar en terminal):**
+```zsh
+echo "CORE_2025 blob: $(git hash-object configs/mini_accum/presets/CORE_2025.yaml | cut -c1-12)"
+echo "E1_Y2     blob: $(git hash-object configs/mini_accum/presets/E1_Y2.yaml     | cut -c1-12)"
+echo "HEAD commit:   $(git rev-parse --short=12 HEAD)"
