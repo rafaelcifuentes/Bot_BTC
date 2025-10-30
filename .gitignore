@@ -24,3 +24,7 @@ logs/
 reports/**/*
 !docs/mini_accum/checkpoints/**   # preserva snapshots
 data/tmp_wf/*.yaml
+artifacts/*.tgz
+evidence/dayN_*/
+logs/*.log
+scripts/mini_accum/kpi_guard_sandbox.py
