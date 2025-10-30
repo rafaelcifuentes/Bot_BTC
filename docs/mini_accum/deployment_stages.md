@@ -136,3 +136,33 @@ Este modo NO es una versión beta, es una versión de producción con capital re
 - ATTEST en *warning*: reactivar modo “hard” cuando estabilicemos 7/7 sin falsos negativos.
 - Cron a `:07`: revisar colisiones tras cambios (locks están activos, pero conviene mirar).
 
+
+<!-- 2025-10-30 — Estado y siguientes pasos (KISS v1) -->
+## 2025-10-30 — Estado del despliegue y próximos pasos (KISS v1)
+
+**Resumen de hoy**
+- Presets canónicos: **CORE_2025** (DD15/RB1/H30/G200/BULL0) y **E1_Y2** (ADX≥22, EMA12/26+RSI, 1D) fijados.
+- **KPI Guard**: OK (FPY≈10.81, drift≈1.00%) con `launchd` activo.
+- **Canario**: 7/7 días **GREEN** (smoke `scripts/mini_accum/smoke_canary.zsh`).
+- **H31/H32**: artefactos en **cuarentena**; checks confirman **OFF**.
+
+**Etapas de despliegue (estado)**
+1) **Dev/Shadow** → ✅ Completo (reglas CORE v1, datos normalizados, renombrado de artefactos, evidencias).
+2) **Canario** → ✅ Estable (7/7 GREEN), guardarraíl activo, KPI Guard en verde.
+3) **Prod BASE** → ✅ CORE_2025 sin overlays; SL/TP queda en experimento.
+4) **Régimen** → ⏳ Por correr:  
+   - 2022 ⇒ `E1_Y2`  
+   - 2023/2024/2025H1 ⇒ `CORE_2025`
+5) **Governance** → 🟨 En curso: FREEZE semanal (lunes), cuarentena H31/H32, evidencia diaria.
+
+**DoD por etapa (extracto)**
+- *Canario (DoD)*: ≥5/7 GREEN + KPI Guard OK + sin violaciones de D.7 (fricción) → **CUMPLIDO**.
+- *Régimen (DoD)*: runners por periodo con tabla OOS/WF en Progreso.md; fuentes (paths) citadas.
+
+**Acciones siguientes**
+- Ejecutar runners por régimen y **tabular KPIs** (sats_mult, mdd_vs_hodl, FPY, flips).
+- Mantener **H31/H32 OFF** (check + cuarentena) y **FREEZE semanal** (snapshots de blobs y HEAD).
+- Actualizar **Progreso.md** con la tabla OOS/WF y enlaces a artefactos.
+
+> Nota: No se promueven overlays que **no** aporten lift ≥ +5% **y** respeten MDD/FPY (Gate + D.7). “Ni un satoshi cedido”.
+
