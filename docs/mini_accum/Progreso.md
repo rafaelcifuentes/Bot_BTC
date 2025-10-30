@@ -672,3 +672,18 @@ python -m mini_accum.cli \
 
 **Streak (7d)**: 7/7 **GREEN** — semana cerrada ✅  
 • OK 2025-10-30T11:13:21Z
+
+<!-- 2025-10-30 — B4 sombra y checklist A→B -->
+### 2025-10-30 — B4 en sombra: PASS
+- Storm guard validado en sombra: `scripts/mini_accum/check_storm.zsh` → **≤1 ejecución/hora** en 24 h.
+- Canario: **7/7 GREEN**; KPI Guard: OK; evidencia diaria empaquetada.
+
+**Checklist A → B (estado actual)**
+- [x] 7/7 días GREEN (1/h a :07, sin tormentas)
+- [x] 7/7 ATTEST OK (≥1 por día)
+- [x] gates_pilot_live OK (sin errores tras write_status)
+- [x] REPORT.md diario presente
+- [x] canary_pack diario no vacío
+- [x] Cero DRYRUN=0 con placed/filled en mainnet
+
+> Siguiente acción: preparar *Pilot Live armado* (Etapa B) con ejecutor en modo **ARMED** (no-envía) y evidencia diaria.

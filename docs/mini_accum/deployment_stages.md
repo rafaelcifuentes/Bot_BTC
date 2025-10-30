@@ -136,7 +136,6 @@ Este modo NO es una versión beta, es una versión de producción con capital re
 - ATTEST en *warning*: reactivar modo “hard” cuando estabilicemos 7/7 sin falsos negativos.
 - Cron a `:07`: revisar colisiones tras cambios (locks están activos, pero conviene mirar).
 
-
 <!-- 2025-10-30 — Estado y siguientes pasos (KISS v1) -->
 ## 2025-10-30 — Estado del despliegue y próximos pasos (KISS v1)
 
@@ -166,3 +165,44 @@ Este modo NO es una versión beta, es una versión de producción con capital re
 
 > Nota: No se promueven overlays que **no** aporten lift ≥ +5% **y** respeten MDD/FPY (Gate + D.7). “Ni un satoshi cedido”.
 
+<!-- 2025-10-30 — Etapas A→E snapshot + B4 sombra -->
+## 2025-10-30 — Siguientes etapas (plan a rajatabla) — Snapshot de estado
+
+**Etapa A — Canario DRYRUN (actual)**
+- Objetivo: estabilidad + telemetría real con riesgo cero.
+- Estado: ✅ 7/7 días GREEN; KPI Guard OK; evidencia diaria empaquetada.
+
+**Etapa B — Pilot Live “armado, sin ordenar”**
+- Config: DO_TRADE=1 DRYRUN=0, pero el ejecutor imprime *(armed) crear orden aquí* (no envía).
+- Duración: 1–2 días.
+- Gates: `gates_pilot_live OK`, **B4: sin storm (1/h)**, evidencia empaquetada diaria.
+- **B4 en sombra:** ✅ PASS. Validado con canario DRYRUN y `scripts/mini_accum/check_storm.zsh` (≤1/h en 24 h).
+
+**Etapa C — Pilot Live Testnet**
+- Config: BINANCE_TESTNET=1; 1–2 ejecuciones manuales ~$10 sim.
+- Gates: logs con `placed … status=closed … filled=…` (solo testnet); sin errores CCXT/red.
+- Estado: ⏳ pendiente.
+
+**Etapa D — Pilot Live Mainnet micro (capas duras)**
+- Config: DO_TRADE=1 DRYRUN=0 USD_MAX=10 CAP=0.10; kill-switch listo; máx 1 orden/día.
+- Gates: 100% órdenes micro exitosas o abortadas correctamente; sin duplicados, sin storm, sin slippage raro.
+- Estado: ⏳ pendiente.
+
+**Etapa E — Producción limitada**
+- Escalonar tamaño/frecuencia con capas, manteniendo el canario DRYRUN como sentinela.
+- Estado: ⏳ pendiente.
+
+**Señales de rollback (cualquier etapa)**
+- DO_TRADE=0 o DRYRUN=1.
+- Parar cron de :07.
+- Cuarentena de logs a `evidence/quarantine/`.
+
+**Checklist de pase A → B (compacta)**
+- [x] 7/7 días GREEN (1/h a :07, sin tormentas)  
+- [x] 7/7 ATTEST OK (≥1/día)  
+- [x] `gates_pilot_live` OK (sin errores tras write_status)  
+- [x] `REPORT.md` diario presente  
+- [x] `canary_pack` diario no vacío  
+- [x] Cero DRYRUN=0 con `placed/filled` en mainnet
+
+> Cuando todo está ✅, se autoriza pasar a **Etapa B**. “Ni un satoshi cedido.”
