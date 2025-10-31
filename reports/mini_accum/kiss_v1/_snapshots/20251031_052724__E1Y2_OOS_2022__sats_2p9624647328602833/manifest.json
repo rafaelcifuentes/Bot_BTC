@@ -1,0 +1,11 @@
+{
+  "version": "E1Y2_OOS_2022_freeze",
+  "preset": "E1_Y2",
+  "bar": "1d",
+  "window": "OOS_2022",
+  "sats_mult": 2.9624647328602833,
+  "artifacts": {
+    "kpis": {"path": "reports/mini_accum/base_v0_1_20251031_0522_kpis__OOS_2022_E1Y2.csv", "sha256": "6e3d1a8a6517e01ebd73c3cbff5f089adc2fe7c1d145208bdd512c2387ad2d58"},
+    "equity": {"path": "reports/mini_accum/base_v0_1_20251031_0522_equity__OOS_2022_E1Y2.csv", "sha256": "78b4eccab622351336eb662aee6dc783bdf8c4934b78cf69f6dab3cfd9c81a93"}
+  }
+}
