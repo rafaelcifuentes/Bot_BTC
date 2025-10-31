@@ -705,3 +705,5 @@ python -m mini_accum.cli \
 - [x] Cero DRYRUN=0 con placed/filled en mainnet
 
 > Siguiente acción: preparar *Pilot Live armado* (Etapa B) con ejecutor en modo **ARMED** (no-envía) y evidencia diaria.
+
+> **Manifest PROD_TOP:** reports/mini_accum/kiss_v1/_snapshots/PROD_TOP/manifest.json
