@@ -1,0 +1,74 @@
+# === FREEZE: E1_Y2 canonical (Año+2 post-halving) ===
+# Manifest: reports/mini_accum/kiss_v1/_snapshots/E1Y2_2022/manifest.json
+# Contract tag: KISSv1_BASE_20251010_freeze_NETBTC_4p340727
+# Last-freeze: 2025-10-31T00:00Z  (actualiza si re-sellas)
+# sha256: (rellenar con: shasum -a 256 configs/mini_accum/presets/E1_Y2.yaml | cut -d' ' -f1)
+# Mini-Accum v2.0 — E1_Y2 (Año +2 post-halving): marco 1D, ADX ON (>=22),
+# EMA12/26 + RSI 35/65, dwell=3, macro_sma200 ON, sin ATR exit.
+preset: E1_Y2
+version: 2.0
+bar: 1d
+
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.norm.csv   # requerido por el código base
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv        # necesario para macro D1
+  ts_col: timestamp
+  tz_input: UTC
+  tz_output: UTC
+
+backtest:
+  reports_dir: reports/mini_accum
+  seed_btc: 1.0
+
+risk:
+  dd_pct: 0.15
+  hard_dd_pct: 0.30
+
+rebalancing:
+  frequency: "1W"
+  rb_pct: 0.01
+
+horizon:
+  h_bars: 30
+
+filters:
+  macro_sma: 200
+  adx:
+    enabled: true
+    period: 14
+    min: 22
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 3
+
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+
+bias:
+  bull_hold_sma: 0
+  shorting: false
+  leverage: 0
+
+# Sin ATR exit en E1_Y2 (atr_exit: false)
+sl_tp:
+  enabled: false
+
+strategy:
+  params:
+    ema_fast: 12
+    ema_slow: 26
+    rsi_len: 14
+    rsi_buy: 35
+    rsi_sell: 65
+    adx_len: 14
+    adx_min: 22
+
+signals:
+  ema_fast: 12
+  ema_slow: 26
+  rsi_len: 14
+  rsi_buy: 35
+  rsi_sell: 65
+  adx_len: 14
+  adx_min: 22

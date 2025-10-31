@@ -1,0 +1,70 @@
+# Mini-Accum v1.0 — CORE_2025.yaml — KISS v1 TOP (DD15 · RB1 · H30 · G200 · BULL0)
+preset: CORE_2025
+version: 1.0
+bar: 4h
+
+data:
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.norm.csv
+  ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
+  ts_col: "timestamp"
+  tz_input: UTC
+  tz_output: UTC
+
+backtest:
+  reports_dir: reports/mini_accum
+  seed_btc: 1.0
+
+risk:
+  dd_pct: 0.15
+  hard_dd_pct: 0.30
+
+rebalancing:
+  frequency: "1W"
+  rb_pct: 0.01
+
+horizon:
+  h_bars: 30
+
+execution:
+  gamma_bps: 200
+  bull_bias_bps: 0
+
+costs:
+  fee_bps_per_side: 2.0
+  slip_bps_per_side: 1.0
+
+bias:
+  bull_hold_sma: 0
+  shorting: false
+  leverage: 0
+
+strategy:
+  params:
+    ema_fast: 21
+    ema_slow: 55
+
+signals:
+  ema_fast: 21
+  ema_slow: 55
+  entry: "ema21 > ema55 and macro_green"
+  exit_active:
+    rule: "close < ema21 and macro_red"
+    confirm_bars: 2
+    max_wait_bars_after_confirm: 2
+  exit_passive:
+    rule: "ema21 < ema55 and macro_red"
+
+filters:
+  macro_sma: 200
+  adx:
+    enabled: false
+    period: 14
+    min: 25
+
+anti_whipsaw:
+  dwell_bars_min_between_flips: 96
+  ttl_bars: 1
+
+force_sell_on_macro_red: false
+
+tag: DD15_RB1_H30_G200_BULL0
