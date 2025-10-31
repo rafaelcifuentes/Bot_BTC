@@ -1,12 +1,17 @@
-# Mini-Accum v1.0 — CORE_2025.yaml — KISS v1 TOP (DD15 · RB1 · H30 · G200 · BULL0)
+# === FREEZE: CORE_2025 canonical (KISS v1 TOP) ===
+# Manifest: reports/mini_accum/kiss_v1/_snapshots/PROD_TOP/manifest.json
+# Contract tag: KISSv1_BASE_20251010_freeze_NETBTC_4p340727
+# Last-freeze: 2025-10-31T16:21:03Z  (actualiza si re-sellas)
+# sha256: 0569aa68f75511d567221507ab01a6363309b26901691860a5114e628e6f707b
+# Mini-Accum v1.0 — CORE_2025: KISS v1 TOP (DD15 · RB1 · H30 · G200 · BULL0), bar=4h, sin SL/TP.
 preset: CORE_2025
 version: 1.0
-bar: 4h              # marco de decisión
+bar: 4h
 
 data:
   ohlc_4h_csv: data/ohlc/4h/BTC-USD.norm.csv
   ohlc_d1_csv: data/ohlc/1d/BTC-USD.csv
-  ts_col: timestamp
+  ts_col: "timestamp"
   tz_input: UTC
   tz_output: UTC
 
@@ -15,15 +20,15 @@ backtest:
   seed_btc: 1.0
 
 risk:
-  dd_pct: 0.15         # DD15 (compras en retroceso)
-  hard_dd_pct: 0.30    # hard stop defensivo
+  dd_pct: 0.15
+  hard_dd_pct: 0.30
 
 rebalancing:
   frequency: "1W"
-  rb_pct: 0.01          # RB1 (1% por flip)
+  rb_pct: 0.01
 
 horizon:
-  h_bars: 30             # H30 (TTL de señal)
+  h_bars: 30
 
 execution:
   gamma_bps: 200
@@ -34,14 +39,10 @@ costs:
   slip_bps_per_side: 1.0
 
 bias:
-  bull_hold_sma: 0     # BULL0
+  bull_hold_sma: 0
   shorting: false
   leverage: 0
 
-output:
-  reports_dir: reports/mini_accum
-
-# V1 TOP (EMA21/55, G200, DD15, RB1, H30), sin SL/TP
 strategy:
   params:
     ema_fast: 21
@@ -59,14 +60,15 @@ signals:
     rule: "ema21 < ema55 and macro_red"
 
 filters:
-  macro_sma: 200        # G200 ON/OFF de riesgo
+  macro_sma: 200
   adx:
-    enabled: false     # desactivado en CORE (lo usamos ON en el preset estacional E1_Y2)
+    enabled: false
     period: 14
     min: 25
 
 anti_whipsaw:
-  dwell_bars_min_between_flips: 96    # DWELL=96 (anti-whipsaw)
+  dwell_bars_min_between_flips: 96
+  ttl_bars: 1
 
 force_sell_on_macro_red: false
 
