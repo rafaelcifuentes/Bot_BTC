@@ -1,9 +1,27 @@
+> **KISS/ACCUM — North star:** NetBTC > HODL (3–6–12m) con MDD ≤ HODL · FPY ≤ 26/año · SPA/RC ≥ 0.60 antes de promover.
+> **Regla de oro:** si no gana SATS vs HODL al mismo o menor riesgo, **no se promueve**.
 <file name=Progreso.md path=docs/mini_accum>
 >>> Atajos: [Ver histórico V1.0](Progreso_HISTORICO.md#v10--histórico-recuperado) · [Ver histórico V2.0](Progreso_HISTORICO.md#v20--histórico-recuperado)
 
 # Progreso al 2025-09-09 — V1.0 (prudente‑xbuf25) y plan V2.0
 
 ## Resumen ejecutivo
+
+> ### Cómo reproducir el **Santo Grial** (KISS v1 TOP)
+> **1)** Alias estable del snapshot:
+> ```zsh
+> CANON="20251010_202006__NETBTC_4p340727__DD15_RB1_H30_G200_BULL0"
+> ln -sfn "$CANON" "$HOME/PycharmProjects/Bot_BTC/reports/mini_accum/kiss_v1/_snapshots/PROD_TOP"
+> ```
+> **2)** Carga el entorno del contrato:
+> ```zsh
+> source "$HOME/PycharmProjects/Bot_BTC/env/kiss_contract.env"
+> ```
+> **3)** Valida el contrato:
+> ```zsh
+> "$HOME/PycharmProjects/Bot_BTC/scripts/mini_accum/contract_check.zsh"
+> ```
+
 
 ✅ DONE
 - Core v0.1 congelado y replicable.
