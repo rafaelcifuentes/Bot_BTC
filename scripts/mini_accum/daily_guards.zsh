@@ -12,7 +12,7 @@ mkdir -p "$ROOT/logs"
   source "$ROOT/env/kiss_contract.env" || true
   "$ROOT/scripts/mini_accum/contract_check.zsh"
 
-  # 2) KPI Guard (forzado al KPI canónico si está disponible)
+  # 2) KPI Guard
   . "$ROOT/.venv/bin/activate"
   if [[ -n "${OOS_2025H1_KPIS:-}" && -s "$OOS_2025H1_KPIS" ]]; then
     python "$ROOT/scripts/mini_accum/kpi_kiss_guard.py" \
@@ -20,7 +20,6 @@ mkdir -p "$ROOT/logs"
       --manifest "$MANIFEST" \
       --oos-kpi "$OOS_2025H1_KPIS"
   else
-    OOS_KPI_GLOB="${OOS_KPI_GLOB:-}" \
     python "$ROOT/scripts/mini_accum/kpi_kiss_guard.py" \
       --min-sats 1.00 --max-fpy 26 \
       --manifest "$MANIFEST"
