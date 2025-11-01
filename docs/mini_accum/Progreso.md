@@ -15,7 +15,7 @@
 > ```
 > **2)** Carga el entorno del contrato:
 > ```zsh
-> source "$HOME/PycharmProjects/Bot_BTC/env/kiss_contract.env"
+> source "$HOME/PycharmProjects/Bot_BTC/env/mini_accum/kiss_contract.env"
 > ```
 > **3)** Valida el contrato:
 > ```zsh

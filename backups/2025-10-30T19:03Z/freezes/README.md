@@ -1,0 +1,4 @@
+# Weekly FREEZE 2025-10-30T19:03Z
+CORE_2025: f0e1bf6c63f5
+E1_Y2:     188d038b49ae
+HEAD:      9cc8dde35f59

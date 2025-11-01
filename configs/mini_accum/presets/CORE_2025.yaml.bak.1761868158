@@ -1,0 +1,30 @@
+# CORE_2025.yaml — DD15_RB1_H30_G200_BULL0 (TOP canónico)
+bar: 1d
+ema_fast: 21
+ema_slow: 55
+macro_sma: 200
+
+# Palancas de ejecución (TOP)
+dd_pct: 0.15       # DD15
+rb_pct: 0.01       # RB1
+h_bars: 30         # H30
+gamma_bps: 200     # G200
+bull_bias_bps: 0   # BULL0
+
+# Costes del contrato
+costs:
+  fee_bps_per_side: 2
+  slip_bps_per_side: 1
+
+# Rutas que el CLI espera
+backtest:
+  reports_dir: reports/mini_accum
+
+data:
+  ohlc_1d_csv: data/ohlc/1d/BTC-USD.csv
+  ohlc_4h_csv: data/ohlc/4h/BTC-USD.csv
+  ts_col: ts
+  tz_input: UTC
+
+# Módulos opt-in (OFF por defecto)
+bull_hold_sma: 0

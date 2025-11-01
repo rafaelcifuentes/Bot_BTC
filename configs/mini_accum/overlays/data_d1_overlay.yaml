@@ -1,0 +1,4 @@
+data:
+  ohlc_d1_csv: "data/ohlc/1d/BTC-USD.csv"
+  ts_col: "timestamp"
+  tz_input: "UTC"

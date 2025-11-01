@@ -1,31 +1,29 @@
 SHELL := /bin/zsh
+.SHELLFLAGS := -eu -o pipefail -c
 
 ROOT := $(HOME)/PycharmProjects/Bot_BTC
 MANIFEST := $(ROOT)/reports/mini_accum/kiss_v1/_snapshots/PROD_TOP/manifest.json
 
-.PHONY: contract-check kiss-guard daily-guards
+.PHONY: engine-switch-check engine-core-2025H1 contract-check kiss-guard daily-guards
+
+engine-switch-check:
+	@ROOT="$(ROOT)" "$(ROOT)/scripts/mini_accum/engine_switch_check.zsh"
+
+engine-core-2025H1:
+	@ROOT="$(ROOT)" "$(ROOT)/scripts/mini_accum/engine_core_2025H1_from_source.zsh"
 
 contract-check:
-	# Carga contrato y corre guardián del Santo Grial
-	source "$(ROOT)/env/kiss_contract.env" || true; \
+	@source "$(ROOT)/env/mini_accum/kiss_contract.env" || true; \
 	"$(ROOT)/scripts/mini_accum/contract_check.zsh"
 
 kiss-guard:
-	# KPI guard con KPI pinneado (OOS_2025H1_KPIS) si existe
-	source "$(ROOT)/env/kiss_contract.env" || true; \
+	@source "$(ROOT)/env/mini_accum/kiss_contract.env" || true; \
 	. "$(ROOT)/.venv/bin/activate"; \
-	if [[ -n "$$OOS_2025H1_KPIS" && -s "$$OOS_2025H1_KPIS" ]]; then \
-	  python "$(ROOT)/scripts/mini_accum/kpi_kiss_guard.py" \
-	    --min-sats 1.00 --max-fpy 26 \
-	    --manifest "$(MANIFEST)" \
-	    --oos-kpi "$$OOS_2025H1_KPIS"; \
-	else \
-	  python "$(ROOT)/scripts/mini_accum/kpi_kiss_guard.py" \
-	    --min-sats 1.00 --max-fpy 26 \
-	    --manifest "$(MANIFEST)"; \
-	fi
+	python "$(ROOT)/scripts/mini_accum/kpi_kiss_guard.py" \
+		--min-sats 1.00 --max-fpy 26 \
+		--manifest "$(MANIFEST)"
 
 daily-guards:
-	# Ejecuta ambos guardianes y registra en logs/contract.log
+	@mkdir -p "$(ROOT)/logs"; \
 	ROOT="$(ROOT)" MANIFEST="$(MANIFEST)" \
-	"$(ROOT)/scripts/mini_accum/daily_guards.zsh"
+	  "$(ROOT)/scripts/mini_accum/daily_guards.zsh"

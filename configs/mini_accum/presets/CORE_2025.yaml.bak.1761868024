@@ -1,0 +1,30 @@
+# Mini-Accum v1.0 — KISS v1 TOP (DD15 · RB1 · H30 · G200 · BULL0)
+# Preset canónico del contrato (bar=1d). Sin adornos.
+
+tag: DD15_RB1_H30_G200_BULL0
+
+# Marco temporal del motor
+bar: 1d
+
+# Señales base
+ema_fast: 21
+ema_slow: 55
+macro_sma: 200   # G200
+
+# Palancas TOP (planas, sin anidamientos raros)
+dd_pct: 0.15       # DD15
+rb_pct: 0.01       # RB1 (1%)
+h_bars: 30         # H30 (TTL)
+gamma_bps: 200     # G200 (ejecución)
+bull_bias_bps: 0   # BULL0
+
+# Costes del contrato
+costs:
+  fee_bps_per_side: 2
+  slip_bps_per_side: 1
+
+# Módulos extra en OFF por defecto (no interfieren)
+bull_hold_sma: 0
+
+backtest:
+  reports_dir: reports/mini_accum
