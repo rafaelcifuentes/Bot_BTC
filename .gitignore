@@ -30,3 +30,11 @@ logs/*.log
 scripts/mini_accum/kpi_guard_sandbox.py
 backups/**/*.tgz
 code_HEAD.tgz
+# Mini-Accum temp y artefactos locales
+configs/mini_accum/presets/__tmp_*.yaml
+configs/mini_accum/overlays/__tmp_*.yaml
+data/_bk_now/
+scripts/mini_accum/env/
+env/mini_acum/
+reports/
+evidence/*.log
