@@ -2,7 +2,6 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-reports/
 .env
 !reports/mini_accum/*__DEMO_PASS.*
 # --- allow publishing PASS artefacts only ---
@@ -36,5 +35,27 @@ configs/mini_accum/overlays/__tmp_*.yaml
 data/_bk_now/
 scripts/mini_accum/env/
 env/mini_acum/
-reports/
 evidence/*.log
+# --- Mini-Accum reports governance ---
+# Ignora todo reports por defecto…
+reports/*
+# …pero conserva estos artefactos canónicos:
+!reports/.gitkeep
+
+# Mini-Accum root
+!reports/mini_accum/
+reports/mini_accum/*
+
+# Freezes y decisiones (SIEMPRE versionados)
+!reports/mini_accum/_freezes/
+!reports/mini_accum/_freezes/**
+
+!reports/mini_accum/_decisions/
+!reports/mini_accum/_decisions/**
+
+# Locks y snapshots canónicos
+!reports/mini_accum/kiss_v1/
+reports/mini_accum/kiss_v1/*
+!reports/mini_accum/kiss_v1/CONTRACT.lock.json
+!reports/mini_accum/kiss_v1/_snapshots/**/manifest.json
+# --- end block ---
