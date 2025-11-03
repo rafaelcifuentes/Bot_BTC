@@ -1,0 +1,21 @@
+{
+  "version": "KISSv1_TOP_LOCK",
+  "nums": {
+    "wf_2022": 1.018661,
+    "wf_2023": 2.641397,
+    "wf_2024": 1.613240,
+    "wf_product": 4.340726883639296,
+    "oos_2025H1": 1.138462
+  },
+  "files": {
+    "manifest":      {"path": "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/reports/mini_accum/kiss_v1/_snapshots/20251010_202006__NETBTC_4p340727__DD15_RB1_H30_G200_BULL0/manifest.json",     "sha256": "312fc21ca026524e77e13223f3b71d872fb36cc9ce0d7f3c95111a2c48e871c2"},
+    "preset_core":   {"path": "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/configs/mini_accum/presets/CORE_2025.yaml",  "sha256": "1c70b0a7ff76ed5fb2bc74203d133caa7de76ecfe2d585234e87db3dba17b085"},
+    "preset_e1y2":   {"path": "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/configs/mini_accum/presets/E1_Y2.yaml",  "sha256": "e1bb008f8950a37f189f3c28401f7610146001cf20f273ff6aabe253ef46e946"},
+    "ohlc_1d":       {"path": "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/data/ohlc/1d/BTC-USD.csv",       "sha256": "8cb87bac9657d580ef082293c054babc7177da68f341d7dd5c86d5590a124fc8"},
+    "ohlc_4h":       {"path": "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/data/ohlc/4h/BTC-USD.norm.csv",   "sha256": "66e854a9548c573a199ee6b2fd9dda79f3781d113d48aa9d50dcf3af1eb672f8"}
+  },
+  "oos_2025H1_artifacts": {
+    "kpis":   {"path": "/Users/rafaelcifuentes/PycharmProjects/Bot_BTC/reports/mini_accum/base_v0_1_20251011_0320_kpis__OOS_2025H1_G200_DD15_RB1_H30_BULL0.csv", "sha256": ""},
+    "equity": {"path": "",  "sha256": ""}
+  }
+}
