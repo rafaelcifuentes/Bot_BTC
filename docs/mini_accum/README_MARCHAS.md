@@ -218,3 +218,7 @@ TL;DR
 - M3 (bull-hold puro) **FAIL**: net < 1.05 aun con bull_pct=1.00 ⇒ **no se promueve**.
 - Marcha activa: **M2 (CORE_2025.yaml)** hasta nuevo aviso.
 - Re-test semanal automatizado: sólo promover si **net ≥ 1.05** y **bull_pct ≥ 0.90**.
+
+### Estado Q4-2025
+- M3 (bull_hold_ext): **PAUSADO** en H2-2025; gates net≥1.05 no superados (último net=1.02835 puro / 0.99862 con coste).
+- Marcha por defecto: **M2 (CORE_2025)**; en shock: **M1 (E1_Y2)**.

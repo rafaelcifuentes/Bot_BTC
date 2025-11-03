@@ -42,3 +42,4 @@
   - Equity: `reports/mini_accum/base_v0_1_20251103_1744_equity__OOS_2025H2_m3_puro.csv`
 - **M2 (CORE_2025)**: sats_mult=**1.0275823**, mdd_vs_hodl=**0.580359**, flips=**6** (ref KPI: `reports/mini_accum/base_v0_1_20251102_0227_kpis__OOS_2025H2_core.csv`)
 - **Decisión**: mantener **M2** como marcha activa en H2-2025. Programar re-chequeo semanal de M3.
+2025H2	Rango (actual)	M2 (CORE_2025)	1.027582	0.580359	6	reports/mini_accum/base_v0_1_20251102_0227_kpis__OOS_2025H2_core.csv
