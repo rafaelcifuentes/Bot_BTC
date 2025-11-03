@@ -1,0 +1,29 @@
+# Overlay M3 "puro": bull-hold sin salidas del CORE, sin apalancamiento
+version: 1
+overlay: bull_hold_puro
+
+# Desactiva salidas del CORE (para 0 flips, estilo freeze H1)
+exits:
+  active: false
+  passive: false
+
+bull_hold:
+  enabled: true
+  macro:
+    ema_len: 200
+    adx_len: 14
+    adx_min: 20
+  sell:
+    confirm_closes_d1: 2
+  dd_cap: 15
+
+leverage:
+  mode: fixed
+  fixed: 1.00
+  max: 1.00
+  costs:
+    borrow_apr: 0.10
+    funding_apr: 0.00
+
+risk_limits:
+  max_daily_loss_pct: 5
